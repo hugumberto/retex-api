@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  application:
+    container_name: application
+    build:
+      context: .
+      target: development
+    command: yarn dev
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 3000:3000
+    networks:
+      - network
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16.2
+    container_name: postgres
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=retex
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+networks:
+  network:
+volumes:
+  postgres:
+    driver: local
+  prometheus-data:

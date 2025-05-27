@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  test-postgres:
+    container_name: test-postgres
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=test
+    ports:
+      - '5433:5432'
+    restart: always
