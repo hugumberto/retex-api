@@ -1,4 +1,5 @@
 import { EntitySchema } from 'typeorm';
+import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { User } from '../../../../domain/user/user.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
 import { addressEmbedded } from './address.embedded';
@@ -53,6 +54,12 @@ export const userSchema = new EntitySchema<User>({
       length: 20,
       unique: true,
       name: 'nif',
+    },
+    status: {
+      type: 'enum',
+      enum: UserStatus,
+      nullable: false,
+      name: 'status',
     },
     ...BaseTimestampColumns,
   },

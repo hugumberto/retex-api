@@ -1,0 +1,4 @@
+export enum UserStatus {
+  INSIDE_TEST_ZONE = 'INSIDE_TEST_ZONE',
+  OUTSIDE_TEST_ZONE = 'OUTSIDE_TEST_ZONE',
+} 

@@ -8,6 +8,15 @@ export class SanitizationService implements ISanitizationService {
   }
 
   sanitizeCoordinate(value: string): number {
-    return parseFloat(value.replace(',', '.'));
+    return parseFloat(value.replace(/[^\d.-]/g, ''));
+  }
+
+  sanitizeString(value: string): string {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .toLowerCase()
+      .trim();
   }
 } 

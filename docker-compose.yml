@@ -17,11 +17,11 @@ services:
     networks:
       - network
     depends_on:
-      - postgres
+      - postgresdb
 
-  postgres:
+  postgresdb:
     image: postgres:16.2
-    container_name: postgres
+    container_name: postgresdb
     restart: always
     ports:
       - '5432:5432'
