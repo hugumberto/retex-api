@@ -11,6 +11,12 @@ async function bootstrap() {
   const PORT = parseInt(process.env.PORT) || 3000;
   const app = await NestFactory.create(AppModule.register(), {
     bufferLogs: true,
+    cors: {
+      origin: '*',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      preflightContinue: false,
+      optionsSuccessStatus: 200,
+    },
   });
   app.useLogger(app.get(Logger));
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
