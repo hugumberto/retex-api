@@ -67,12 +67,12 @@ export class CreateUserDto {
   contactPhone: string;
 
   @IsString()
-  @IsNotEmpty()
-  dayOfWeek: string;
+  @IsOptional()
+  dayOfWeek?: string;
 
   @IsString()
-  @IsNotEmpty()
-  timeOfDay: string;
+  @IsOptional()
+  timeOfDay?: string;
 
   @IsString()
   @IsNotEmpty()

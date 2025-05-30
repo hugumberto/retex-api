@@ -7,8 +7,8 @@ export interface User {
   lastName: string;
   email: string;
   contactPhone: string;
-  dayOfWeek: string;
-  timeOfDay: string;
+  dayOfWeek?: string;
+  timeOfDay?: string;
   nif: string;
   status: UserStatus;
   address: Address;

@@ -38,13 +38,13 @@ export const userSchema = new EntitySchema<User>({
     },
     dayOfWeek: {
       type: 'varchar',
-      nullable: false,
+      nullable: true,
       length: 20,
       name: 'day_of_week',
     },
     timeOfDay: {
       type: 'varchar',
-      nullable: false,
+      nullable: true,
       length: 20,
       name: 'time_of_day',
     },
