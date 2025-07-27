@@ -2,7 +2,6 @@ import { EntitySchema } from 'typeorm';
 import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { User } from '../../../../domain/user/user.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
-import { addressEmbedded } from './address.embedded';
 
 export const userSchema = new EntitySchema<User>({
   name: 'user',
@@ -36,24 +35,12 @@ export const userSchema = new EntitySchema<User>({
       length: 20,
       name: 'contact_phone',
     },
-    dayOfWeek: {
-      type: 'varchar',
-      nullable: true,
-      length: 20,
-      name: 'day_of_week',
-    },
-    timeOfDay: {
-      type: 'varchar',
-      nullable: true,
-      length: 20,
-      name: 'time_of_day',
-    },
-    nif: {
+    documentNumber: {
       type: 'varchar',
       nullable: false,
       length: 20,
       unique: true,
-      name: 'nif',
+      name: 'document_number',
     },
     status: {
       type: 'enum',
@@ -63,17 +50,37 @@ export const userSchema = new EntitySchema<User>({
     },
     ...BaseTimestampColumns,
   },
-  embeddeds: {
-    address: {
-      schema: addressEmbedded,
-      prefix: 'address_',
+  relations: {
+    packages: {
+      type: 'one-to-many',
+      target: 'package',
+      joinColumn: {
+        name: 'user_id',
+      },
+      inverseSide: 'user',
+    },
+    routes: {
+      type: 'one-to-many',
+      target: 'route',
+      joinColumn: {
+        name: 'user_id',
+      },
+      inverseSide: 'user',
+    },
+    roles: {
+      type: 'one-to-many',
+      target: 'user_role',
+      joinColumn: {
+        name: 'user_id',
+      },
+      inverseSide: 'user',
     },
   },
   indices: [
     {
-      name: 'IDX_USER_NIF',
+      name: 'IDX_USER_DOCUMENT_NUMBER',
       unique: true,
-      columns: ['nif'],
+      columns: ['documentNumber'],
     },
   ],
 });

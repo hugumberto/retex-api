@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ITestZoneRepository } from '../../../../domain/test-zone/test-zone.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
+import { IUserRoleRepository } from '../../../../domain/user/user-role.repository';
+import { Role } from '../../../../domain/user/user-roles.entity';
 import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
@@ -10,41 +11,42 @@ import { IUseCase } from '../../interfaces/use-case.interface';
 import { CreateUserDto } from './create-user.dto';
 
 @Injectable()
-export class CreateUserUseCase implements IUseCase<CreateUserDto, { message: string } | User> {
+export class CreateUserUseCase implements IUseCase<CreateUserDto, User> {
   constructor(
     @Inject(DOMAIN_TOKENS.USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
-    @Inject(DOMAIN_TOKENS.TEST_ZONE_REPOSITORY)
-    private readonly testZoneRepository: ITestZoneRepository,
+    @Inject(DOMAIN_TOKENS.USER_ROLE_REPOSITORY)
+    private readonly userRoleRepository: IUserRoleRepository,
     @Inject(SERVICE_TOKENS.SANITIZATION_SERVICE)
     private readonly sanitizationService: ISanitizationService,
-  ) {}
+  ) { }
 
-  async call(param: CreateUserDto): Promise<{ message: string } | User> {
-    const sanitizedNif = this.sanitizationService.sanitizeNumericString(param.nif);
-    const existingUser = await this.userRepository.findOne({ nif: sanitizedNif });
+  async call(param: CreateUserDto): Promise<User> {
+    const sanitizedDocument = this.sanitizationService.sanitizeNumericString(param.documentNumber);
+    const existingUser = await this.userRepository.findOne({ documentNumber: sanitizedDocument });
 
     if (existingUser) {
-      return { message: 'Usuário já cadastrado com sucesso' };
+      return existingUser;
     }
 
-    const sanitizedCity = this.sanitizationService.sanitizeString(param.address.city);
-    const testZone = await this.testZoneRepository.findByCity(sanitizedCity);
+    let user: Partial<User> = {
+      firstName: param.firstName,
+      lastName: param.lastName,
+      documentNumber: param.documentNumber,
+      email: param.email,
+      contactPhone: param.contactPhone,
+      status: UserStatus.ACTIVE,
+    }
 
-    const sanitizedData = {
-      ...param,
-      nif: sanitizedNif,
-      status: testZone ? UserStatus.INSIDE_TEST_ZONE : UserStatus.OUTSIDE_TEST_ZONE,
-      contactPhone: this.sanitizationService.sanitizeNumericString(param.contactPhone),
-      address: {
-        ...param.address,
-        city: param.address.city,
-        zipCode: this.sanitizationService.sanitizeNumericString(param.address.zipCode),
-        lat: this.sanitizationService.sanitizeCoordinate(param.address.lat),
-        long: this.sanitizationService.sanitizeCoordinate(param.address.long),
-      },
-    };
+    user = await this.userRepository.create(user)
 
-    return this.userRepository.create(sanitizedData);
+    const role = await this.userRoleRepository.create({
+      user: user as User,
+      role: Role.USER
+    })
+
+    delete role.user;
+
+    return { ...user, roles: [role] } as User;
   }
 }

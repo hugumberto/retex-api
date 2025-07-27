@@ -1,53 +1,5 @@
-import { Type } from 'class-transformer';
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-
-export class AddressDto {
-  @IsString()
-  @IsNotEmpty()
-  street: string;
-
-  @IsString()
-  @IsNotEmpty()
-  number: string;
-
-  @IsString()
-  @IsOptional()
-  complement?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  city: string;
-
-  @IsString()
-  @IsNotEmpty()
-  cityDivision: string;
-
-  @IsString()
-  @IsNotEmpty()
-  country: string;
-
-  @IsString()
-  @IsNotEmpty()
-  countryDivision: string;
-
-  @IsString()
-  @IsNotEmpty()
-  zipCode: string;
-
-  @IsString()
-  @IsNotEmpty()
-  lat: string;
-
-  @IsString()
-  @IsNotEmpty()
-  long: string;
-}
+import { IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { Role } from "../../../../domain/user/user-roles.entity";
 
 export class CreateUserDto {
   @IsString()
@@ -58,7 +10,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   lastName: string;
 
-  @IsEmail()
+  @IsString()
   @IsNotEmpty()
   email: string;
 
@@ -67,18 +19,10 @@ export class CreateUserDto {
   contactPhone: string;
 
   @IsString()
-  @IsOptional()
-  dayOfWeek?: string;
-
-  @IsString()
-  @IsOptional()
-  timeOfDay?: string;
-
-  @IsString()
   @IsNotEmpty()
-  nif: string;
+  documentNumber: string;
 
-  @ValidateNested()
-  @Type(() => AddressDto)
-  address: AddressDto;
-} 
+  @IsNotEmpty()
+  @IsEnum(Role)
+  role: Role
+}

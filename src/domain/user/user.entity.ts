@@ -1,18 +1,17 @@
-import { Address } from './address.entity';
+import { Entity } from '../interfaces/entity.interface';
+import { Package } from '../package/package.entity';
+import { Route } from '../route/route.entity';
+import { UserRole } from './user-roles.entity';
 import { UserStatus } from './user-status.enum';
 
-export interface User {
-  id: string;
+export interface User extends Entity {
   firstName: string;
   lastName: string;
   email: string;
   contactPhone: string;
-  dayOfWeek?: string;
-  timeOfDay?: string;
-  nif: string;
+  documentNumber: string;
   status: UserStatus;
-  address: Address;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
+  packages?: Package[];
+  routes?: Route[];
+  roles: UserRole[];
 }

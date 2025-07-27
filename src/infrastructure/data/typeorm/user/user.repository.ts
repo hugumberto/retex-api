@@ -9,8 +9,7 @@ import { userSchema } from './user.schema';
 @Injectable()
 export class UserRepository
   extends BaseRepository<User>
-  implements IUserRepository
-{
+  implements IUserRepository {
   constructor(
     @InjectRepository(userSchema)
     userRepository: Repository<User>,

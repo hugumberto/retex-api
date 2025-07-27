@@ -47,23 +47,19 @@ export class BaseRepository<Entity> implements IRepository<Entity> {
 
   private normalizeQuery(query: Partial<Entity>): Record<string, any> {
     const normalizedQuery = {};
-    
+
     for (const [key, value] of Object.entries(query)) {
       if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
         // Se for um objeto (como address), normaliza as propriedades aninhadas
         for (const [nestedKey, nestedValue] of Object.entries(value)) {
-          normalizedQuery[`${key}_${this.toSnakeCase(nestedKey)}`] = nestedValue;
+          normalizedQuery[`${key}_${nestedKey}`] = nestedValue;
         }
       } else {
         // Para campos simples, converte para snake_case
-        normalizedQuery[this.toSnakeCase(key)] = value;
+        normalizedQuery[key] = value;
       }
     }
 
     return normalizedQuery;
-  }
-
-  private toSnakeCase(str: string): string {
-    return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).replace(/^_/, '');
   }
 }

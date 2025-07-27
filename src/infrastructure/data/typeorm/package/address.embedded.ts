@@ -1,5 +1,5 @@
 import { EntitySchema } from 'typeorm';
-import { Address } from '../../../../domain/user/address.entity';
+import { Address } from '../../../../domain/package/address.entity';
 
 export const addressEmbedded = new EntitySchema<Address>({
   name: 'address',
