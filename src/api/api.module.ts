@@ -3,6 +3,7 @@ import { TerminusModule } from '@nestjs/terminus';
 import { UseCasesModule } from '../app/use-cases/use-cases.module';
 import { HealthController } from './health/health.controller';
 import { PackageController } from './package/package.controller';
+import { StorageUnitController } from './storage-unit/storage-unit.controller';
 import { UserController } from './user/user.controller';
 import { WelcomeController } from './welcome/welcome.controller';
 
@@ -11,6 +12,12 @@ import { WelcomeController } from './welcome/welcome.controller';
     UseCasesModule,
     TerminusModule,
   ],
-  controllers: [WelcomeController, UserController, HealthController, PackageController],
+  controllers: [
+    WelcomeController,
+    UserController,
+    HealthController,
+    PackageController,
+    StorageUnitController
+  ],
 })
 export class ApiModule { }
