@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { UseCasesModule } from '../app/use-cases/use-cases.module';
+import { BrandController } from './brand/brand.controller';
 import { HealthController } from './health/health.controller';
 import { PackageController } from './package/package.controller';
 import { StorageUnitController } from './storage-unit/storage-unit.controller';
@@ -17,7 +18,8 @@ import { WelcomeController } from './welcome/welcome.controller';
     UserController,
     HealthController,
     PackageController,
-    StorageUnitController
+    StorageUnitController,
+    BrandController
   ],
 })
 export class ApiModule { }
