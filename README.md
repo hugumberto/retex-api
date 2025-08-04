@@ -86,7 +86,10 @@ The API includes a complete authentication system with the following features:
 ### User Management Endpoints
 
 - `POST /user` - Create new user (public)
+- `GET /user` - List all users (requires ADMIN or OPS role)
 - `GET /user/:id` - Get user by ID (requires ADMIN or OPS role)
+- `PUT /user/:id` - Update user (requires ADMIN or OPS role)
+- `POST /user/:id/roles` - Add role to user (requires ADMIN role only)
 
 ### Token Management
 
@@ -159,6 +162,54 @@ Authorization: Bearer <your-access-token>
 }
 ```
 
+### User Management Operations
+
+#### List All Users (ADMIN/OPS only)
+```bash
+GET /user
+Authorization: Bearer <your-access-token>
+```
+
+#### Update User (ADMIN/OPS only)
+```bash
+PUT /user/:id
+Authorization: Bearer <your-access-token>
+Content-Type: application/json
+
+{
+  "firstName": "João Updated",
+  "email": "newemail@example.com",
+  "status": "INACTIVE"
+}
+```
+
+#### Add Role to User (ADMIN only)
+```bash
+POST /user/:id/roles
+Authorization: Bearer <your-access-token>
+Content-Type: application/json
+
+{
+  "role": "DRIVER"
+}
+```
+
+**Available roles**: `USER`, `DRIVER`, `OPS`, `ADMIN`
+
+### Permission Matrix
+
+| Endpoint | Public | USER | DRIVER | OPS | ADMIN |
+|----------|--------|------|--------|-----|-------|
+| `POST /user` | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `POST /auth/login` | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `POST /auth/refresh` | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `POST /auth/logout` | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `GET /auth/profile` | ❌ | ✅ | ✅ | ✅ | ✅ |
+| `GET /user` | ❌ | ❌ | ❌ | ✅ | ✅ |
+| `GET /user/:id` | ❌ | ❌ | ❌ | ✅ | ✅ |
+| `PUT /user/:id` | ❌ | ❌ | ❌ | ✅ | ✅ |
+| `POST /user/:id/roles` | ❌ | ❌ | ❌ | ❌ | ✅ |
+
 ### Guards and Decorators
 
 - `@UseGuards(JwtAuthGuard)` - Requires valid JWT token
@@ -190,6 +241,11 @@ async adminOnlyEndpoint() {
    - Implement proper CORS policies
    - Monitor for suspicious token usage
 
+4. **Role Management**:
+   - Only ADMIN users can add roles to other users
+   - Use principle of least privilege
+   - Regularly audit user permissions
+
 ## How to run
 
 To execute de project you need to have [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed on your machine.
@@ -201,12 +257,24 @@ docker-compose up
 
 Once the project is running, you can access it at the port configurated in the `.env` file (default `3000`). The API includes the following endpoints:
 
+### Available Endpoints
+
+#### Public Endpoints
 - (GET) `/` - Home page
 - (POST) `/auth/login` - User login
 - (POST) `/auth/refresh` - Refresh access token
 - (POST) `/auth/logout` - User logout
-- (GET) `/auth/profile` - Get authenticated user profile
 - (POST) `/user` - Create a new user
-- (GET) `/user/:id` - Get a user by id (protected - requires ADMIN or OPS role)
+
+#### Protected Endpoints (Authentication Required)
+- (GET) `/auth/profile` - Get authenticated user profile
+
+#### Admin/OPS Endpoints (ADMIN or OPS role required)
+- (GET) `/user` - List all users
+- (GET) `/user/:id` - Get a user by id
+- (PUT) `/user/:id` - Update a user
+
+#### Admin Only Endpoints (ADMIN role required)
+- (POST) `/user/:id/roles` - Add role to user
 
 The API documentation is available at `/api` when running in development mode.
