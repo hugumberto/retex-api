@@ -6,6 +6,7 @@ import { IRouteRepository } from './route/route.repository';
 import { IStorageUnitRepository } from './storage-unit/storage-unit.repository';
 import { ITestZoneRepository } from './test-zone/test-zone.repository';
 import { DOMAIN_TOKENS } from './tokens';
+import { IRefreshTokenRepository } from './user/refresh-token.repository';
 import { IUserRoleRepository } from './user/user-role.repository';
 import { IUserRepository } from './user/user.repository';
 
@@ -18,6 +19,7 @@ export interface DomainModuleOptions {
   routeRepository: Type<IRouteRepository>;
   storageUnitRepository: Type<IStorageUnitRepository>;
   userRoleRepository: Type<IUserRoleRepository>;
+  refreshTokenRepository: Type<IRefreshTokenRepository>;
   imports?: Array<
     Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
   >;
@@ -62,6 +64,10 @@ export class DomainModule {
           provide: DOMAIN_TOKENS.USER_ROLE_REPOSITORY,
           useClass: options.userRoleRepository,
         },
+        {
+          provide: DOMAIN_TOKENS.REFRESH_TOKEN_REPOSITORY,
+          useClass: options.refreshTokenRepository,
+        },
       ],
       exports: [
         {
@@ -95,6 +101,10 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.USER_ROLE_REPOSITORY,
           useClass: options.userRoleRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.REFRESH_TOKEN_REPOSITORY,
+          useClass: options.refreshTokenRepository,
         },
       ],
     };

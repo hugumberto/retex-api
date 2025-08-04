@@ -1,4 +1,5 @@
 import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
+import { CryptoService } from './crypto/crypto.service';
 import { ISanitizationService } from './interfaces/sanitization.interface';
 import { SERVICE_TOKENS } from './tokens';
 
@@ -19,6 +20,10 @@ export class ServicesModule {
         {
           provide: SERVICE_TOKENS.SANITIZATION_SERVICE,
           useClass: options.sanitizationService,
+        },
+        {
+          provide: SERVICE_TOKENS.CRYPTO_SERVICE,
+          useClass: CryptoService,
         },
       ],
       exports: [...Object.values(SERVICE_TOKENS)],

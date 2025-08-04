@@ -3,7 +3,6 @@ import { Package, PackageStatus } from "../../../../domain/package/package.entit
 import { IPackageRepository } from "../../../../domain/package/package.repository";
 import { ITestZoneRepository } from "../../../../domain/test-zone/test-zone.repository";
 import { DOMAIN_TOKENS } from "../../../../domain/tokens";
-import { Role } from "../../../../domain/user/user-roles.entity";
 import { ISanitizationService } from "../../../services/interfaces/sanitization.interface";
 import { SERVICE_TOKENS } from "../../../services/tokens";
 import { IUseCase } from "../../interfaces/use-case.interface";
@@ -55,8 +54,8 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
       email: packageDto.email,
       contactPhone: packageDto.contactPhone,
       documentNumber: packageDto.nif,
-      role: Role.USER,
-    }
+      password: 'temp123456', // Senha temporária - deve ser alterada pelo usuário
+    };
 
     return dto;
   }

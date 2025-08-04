@@ -45,7 +45,7 @@ export class BaseRepository<Entity> implements IRepository<Entity> {
     return this.repository.softRemove(entity);
   }
 
-  private normalizeQuery(query: Partial<Entity>): Record<string, any> {
+  protected normalizeQuery(query: Partial<Entity>): Record<string, any> {
     const normalizedQuery = {};
 
     for (const [key, value] of Object.entries(query)) {

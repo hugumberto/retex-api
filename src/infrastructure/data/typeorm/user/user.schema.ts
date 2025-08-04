@@ -28,6 +28,7 @@ export const userSchema = new EntitySchema<User>({
       nullable: false,
       length: 255,
       name: 'email',
+      unique: true,
     },
     contactPhone: {
       type: 'varchar',
@@ -41,6 +42,12 @@ export const userSchema = new EntitySchema<User>({
       length: 20,
       unique: true,
       name: 'document_number',
+    },
+    password: {
+      type: 'varchar',
+      nullable: false,
+      length: 255,
+      name: 'password',
     },
     status: {
       type: 'enum',
@@ -81,6 +88,11 @@ export const userSchema = new EntitySchema<User>({
       name: 'IDX_USER_DOCUMENT_NUMBER',
       unique: true,
       columns: ['documentNumber'],
+    },
+    {
+      name: 'IDX_USER_EMAIL',
+      unique: true,
+      columns: ['email'],
     },
   ],
 });

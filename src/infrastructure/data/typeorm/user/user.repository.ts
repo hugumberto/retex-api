@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { BaseRepository } from '../abstraction/base.repository';
@@ -12,8 +12,16 @@ export class UserRepository
   implements IUserRepository {
   constructor(
     @InjectRepository(userSchema)
-    userRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
   ) {
     super(userRepository);
+  }
+
+  async findOneWithRelations(query: Partial<User>): Promise<User> {
+    const normalizedQuery = this.normalizeQuery(query);
+    return this.userRepository.findOne({
+      where: normalizedQuery as FindOptionsWhere<User>,
+      relations: ['roles'],
+    });
   }
 }

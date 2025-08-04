@@ -1,28 +1,28 @@
-import { IsEnum, IsNotEmpty, IsString } from "class-validator";
-import { Role } from "../../../../domain/user/user-roles.entity";
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class CreateUserDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Nome deve ser uma string' })
+  @IsNotEmpty({ message: 'Nome é obrigatório' })
   firstName: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Sobrenome deve ser uma string' })
+  @IsNotEmpty({ message: 'Sobrenome é obrigatório' })
   lastName: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Email deve ser válido' })
+  @IsNotEmpty({ message: 'Email é obrigatório' })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Telefone deve ser uma string' })
+  @IsNotEmpty({ message: 'Telefone é obrigatório' })
   contactPhone: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Número do documento deve ser uma string' })
+  @IsNotEmpty({ message: 'Número do documento é obrigatório' })
   documentNumber: string;
 
-  @IsNotEmpty()
-  @IsEnum(Role)
-  role: Role
+  @IsString({ message: 'Senha deve ser uma string' })
+  @IsNotEmpty({ message: 'Senha é obrigatória' })
+  @MinLength(6, { message: 'Senha deve ter pelo menos 6 caracteres' })
+  password: string;
 }

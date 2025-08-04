@@ -9,6 +9,7 @@ import { routeSchema } from './route/route.schema';
 import { storageUnitSchema } from './storage-unit/storage-unit.schema';
 import { testZoneSchema } from './test-zone/test-zone.schema';
 import { userRoleSchema } from './user-role/user-role.schema';
+import { refreshTokenSchema } from './user/refresh-token.schema';
 import { userSchema } from './user/user.schema';
 
 @Module({
@@ -25,6 +26,7 @@ import { userSchema } from './user/user.schema';
       routeSchema,
       storageUnitSchema,
       userRoleSchema,
+      refreshTokenSchema,
     ]),
   ],
   exports: [TypeOrmModule],

@@ -15,6 +15,7 @@ import { StorageUnitRepository } from './infrastructure/data/typeorm/storage-uni
 import { TestZoneRepository } from './infrastructure/data/typeorm/test-zone/test-zone.repository';
 import { AppTypeORMModule } from './infrastructure/data/typeorm/typeorm.module';
 import { UserRoleRepository } from './infrastructure/data/typeorm/user-role/user-role.repository';
+import { RefreshTokenRepository } from './infrastructure/data/typeorm/user/refresh-token.repository';
 import { UserRepository } from './infrastructure/data/typeorm/user/user.repository';
 import { SanitizationService } from './infrastructure/services/sanitization/sanitization.service';
 
@@ -35,6 +36,7 @@ export class AppModule {
         routeRepository: RouteRepository,
         storageUnitRepository: StorageUnitRepository,
         userRoleRepository: UserRoleRepository,
+        refreshTokenRepository: RefreshTokenRepository,
         imports: [AppTypeORMModule],
       }),
       ServicesModule.register({
