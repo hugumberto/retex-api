@@ -27,11 +27,26 @@ async function bootstrap() {
     .setDescription('Api to provide data for retex project.')
     .setVersion('1.0')
     .addTag('retex')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+        description: 'Informe o token JWT no formato: Bearer <token>'
+      },
+      'bearer',
+    )
+    .addSecurityRequirements('bearer')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('swagger', app, document);
-  
+  SwaggerModule.setup('swagger', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+
   await app.listen(PORT);
 }
 

@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUserRoleRepository } from '../../../../domain/user/user-role.repository';
 import { UserRole } from '../../../../domain/user/user-roles.entity';
@@ -19,30 +19,36 @@ export class AddRoleToUserUseCase implements IUseCase<AddRoleToUserParamDto, Omi
   async call(param: AddRoleToUserParamDto): Promise<Omit<User, 'password'>> {
     const { userId, data } = param;
 
-    // Verificar se usuário existe
+    // Verificar se usuário existe com roles
     const user = await this.userRepository.findOneWithRelations({ id: userId });
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    // Verificar se usuário já possui esta role
-    const existingRole = user.roles?.find(userRole => userRole.role === data.role);
-    if (existingRole) {
-      throw new ConflictException('Usuário já possui esta role');
+    const currentRoles = user.roles?.map((ur) => ur.role) ?? [];
+    const incomingRoles = data.roles ?? [];
+
+    // Calcular diferenças
+    const rolesToAdd = incomingRoles.filter((role) => !currentRoles.includes(role));
+    const rolesToRemove = currentRoles.filter((role) => !incomingRoles.includes(role));
+
+    // Adicionar novas roles
+    for (const role of rolesToAdd) {
+      const newUserRole: Partial<UserRole> = { user, role };
+      await this.userRoleRepository.create(newUserRole);
     }
 
-    // Criar nova role para o usuário
-    const newUserRole: Partial<UserRole> = {
-      user,
-      role: data.role,
-    };
-
-    await this.userRoleRepository.create(newUserRole);
+    // Remover roles não enviadas
+    for (const role of rolesToRemove) {
+      const userRole = user.roles.find((ur) => ur.role === role);
+      if (userRole) {
+        await this.userRoleRepository.delete({ id: userRole.id } as Partial<UserRole>);
+      }
+    }
 
     // Buscar usuário atualizado com todas as roles
     const updatedUser = await this.userRepository.findOneWithRelations({ id: userId });
 
-    // Remover senha do retorno
     const { password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
   }

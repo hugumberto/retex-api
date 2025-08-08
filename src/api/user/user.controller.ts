@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AddRoleToUserUseCase } from '../../app/use-cases/user/add-role-to-user-use-case';
 import { AddRoleToUserDto } from '../../app/use-cases/user/add-role-to-user-use-case/add-role-to-user.dto';
 import { CreateUserUseCase } from '../../app/use-cases/user/create-user-use-case';
@@ -44,14 +44,15 @@ export class UserController {
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Listar todos os usuários' })
+  @ApiQuery({ name: 'role', required: false, enum: Role, description: 'Filtra usuários por role' })
   @ApiResponse({
     status: 200,
     description: 'Lista de usuários',
     type: Array
   })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
-  async getAllUsers(): Promise<Omit<User, 'password'>[]> {
-    return this.getAllUsersUseCase.call();
+  async getAllUsers(@Query('role') role?: Role): Promise<Omit<User, 'password'>[]> {
+    return this.getAllUsersUseCase.call({ role });
   }
 
   @Get(':id')
@@ -96,14 +97,13 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Adicionar role a usuário' })
+  @ApiOperation({ summary: 'Sincronizar roles do usuário (substitui as existentes pelas enviadas)' })
   @ApiResponse({
     status: 200,
-    description: 'Role adicionada com sucesso',
+    description: 'Roles sincronizadas com sucesso',
     type: Object
   })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
-  @ApiResponse({ status: 409, description: 'Usuário já possui esta role' })
   @ApiResponse({ status: 403, description: 'Acesso negado - apenas ADMINs' })
   async addRoleToUser(
     @Param('id') userId: string,

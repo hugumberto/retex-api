@@ -26,11 +26,11 @@ describe('GetUserByIdUseCase', () => {
   describe('call', () => {
     it('should return an user', async () => {
       const user = mock<User>();
-      userRepositoryMock.findOne.mockResolvedValue(user);
+      userRepositoryMock.findOneWithRelations.mockResolvedValue(user);
       const response = await getUserByIdUseCase.call('id');
 
       expect(response).toEqual(user);
-      expect(userRepositoryMock.findOne).toHaveBeenCalledWith({ id: 'id' });
+      expect(userRepositoryMock.findOneWithRelations).toHaveBeenCalledWith({ id: 'id' });
     });
   });
 });
