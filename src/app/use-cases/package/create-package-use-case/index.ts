@@ -54,7 +54,7 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
       email: packageDto.email,
       contactPhone: packageDto.contactPhone,
       documentNumber: packageDto.nif,
-      password: 'temp123456', // Senha temporária - deve ser alterada pelo usuário
+      password: packageDto.nif,
     };
 
     return dto;

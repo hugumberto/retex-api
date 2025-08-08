@@ -15,7 +15,7 @@ describe('GetWelcomeUseCase', () => {
   describe('call', () => {
     it('should return an welcome message', async () => {
       const response = await getWelcomeUseCase.call();
-      expect(response).toEqual({ message: 'Welcome to Fita Project 😎' });
+      expect(response).toEqual({ message: 'Welcome to Retex API 😎' });
     });
   });
 });

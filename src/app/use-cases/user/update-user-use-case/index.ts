@@ -2,7 +2,6 @@ import { ConflictException, Inject, Injectable, NotFoundException } from '@nestj
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
-import { ICryptoService } from '../../../services/interfaces/crypto.interface';
 import { ISanitizationService } from '../../../services/interfaces/sanitization.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
@@ -15,8 +14,6 @@ export class UpdateUserUseCase implements IUseCase<UpdateUserParamDto, Omit<User
     private readonly userRepository: IUserRepository,
     @Inject(SERVICE_TOKENS.SANITIZATION_SERVICE)
     private readonly sanitizationService: ISanitizationService,
-    @Inject(SERVICE_TOKENS.CRYPTO_SERVICE)
-    private readonly cryptoService: ICryptoService,
   ) { }
 
   async call(param: UpdateUserParamDto): Promise<Omit<User, 'password'>> {
@@ -50,11 +47,6 @@ export class UpdateUserUseCase implements IUseCase<UpdateUserParamDto, Omit<User
       if (userWithEmail && userWithEmail.id !== id) {
         throw new ConflictException('Email já está em uso por outro usuário');
       }
-    }
-
-    // Hash da senha se fornecida
-    if (data.password) {
-      updateData.password = await this.cryptoService.hashPassword(data.password);
     }
 
     // Atualizar usuário

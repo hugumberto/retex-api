@@ -21,7 +21,7 @@ describe('WelcomeController', () => {
         .get('/')
         .expect(HttpStatus.OK);
 
-      expect(body.message).toBe('Welcome to Fita Project 😎');
+      expect(body.message).toBe('Welcome to Retex API 😎');
     });
   });
 
