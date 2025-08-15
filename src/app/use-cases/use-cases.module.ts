@@ -5,6 +5,7 @@ import { ServicesModule } from '../services/services.module';
 import { AUTH_USE_CASES } from './auth';
 import { BRAND_USE_CASES } from './brand';
 import { PACKAGE_USE_CASES } from './package';
+import { ROUTE_USE_CASES } from './route';
 import { STORAGE_UNIT_USE_CASES } from './storage-unit';
 import { USER_USE_CASES } from './user';
 import { WELCOME_USE_CASES } from './welcome';
@@ -16,6 +17,7 @@ export class UseCasesModule {
       ...USER_USE_CASES,
       ...AUTH_USE_CASES,
       ...PACKAGE_USE_CASES,
+      ...ROUTE_USE_CASES,
       ...STORAGE_UNIT_USE_CASES,
       ...BRAND_USE_CASES
     ];

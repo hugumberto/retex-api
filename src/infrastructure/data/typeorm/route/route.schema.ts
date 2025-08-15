@@ -22,17 +22,17 @@ export const routeSchema = new EntitySchema<Route>({
     },
     endDate: {
       type: 'timestamp with time zone',
-      nullable: false,
+      nullable: true,
       name: 'end_date',
     },
     ...BaseTimestampColumns,
   },
   relations: {
-    user: {
+    driver: {
       type: 'many-to-one',
       target: 'user',
       joinColumn: {
-        name: 'user_id',
+        name: 'driver_id',
       },
       inverseSide: 'routes',
     },

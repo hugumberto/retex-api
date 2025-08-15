@@ -8,6 +8,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
 import { BrandController } from './brand/brand.controller';
 import { HealthController } from './health/health.controller';
 import { PackageController } from './package/package.controller';
+import { RouteController } from './route/route.controller';
 import { StorageUnitController } from './storage-unit/storage-unit.controller';
 import { UserController } from './user/user.controller';
 import { WelcomeController } from './welcome/welcome.controller';
@@ -24,6 +25,7 @@ import { WelcomeController } from './welcome/welcome.controller';
     AuthController,
     HealthController,
     PackageController,
+    RouteController,
     StorageUnitController,
     BrandController
   ],
