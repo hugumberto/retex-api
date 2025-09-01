@@ -28,11 +28,11 @@ export class PackageRepository extends BaseRepository<Package> implements IPacka
     }
 
     if (filters.collectDay) {
-      queryBuilder.andWhere('package.collect_day = :collectDay', { collectDay: filters.collectDay });
+      queryBuilder.andWhere('package.collectDay = :collectDay', { collectDay: filters.collectDay });
     }
 
     if (filters.collectTime) {
-      queryBuilder.andWhere('package.collect_time = :collectTime', { collectTime: filters.collectTime });
+      queryBuilder.andWhere('package.collectTime = :collectTime', { collectTime: filters.collectTime });
     }
 
     // Incluir relacionamentos
@@ -46,7 +46,7 @@ export class PackageRepository extends BaseRepository<Package> implements IPacka
     queryBuilder.skip(offset).take(pagination.limit);
 
     // Ordenar por data de criação (mais recentes primeiro)
-    queryBuilder.orderBy('package.created_at', 'DESC');
+    queryBuilder.orderBy('package.createdAt', 'DESC');
 
     // Executar consulta
     const [data, total] = await queryBuilder.getManyAndCount();

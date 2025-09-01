@@ -28,7 +28,7 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
     }
 
     if (filters.driverId) {
-      queryBuilder.andWhere('route.driver_id = :driverId', { driverId: filters.driverId });
+      queryBuilder.andWhere('route.driverId = :driverId', { driverId: filters.driverId });
     }
 
     // Incluir relacionamentos (SEM packages para performance)
@@ -42,7 +42,7 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
     queryBuilder.skip(offset).take(pagination.limit);
 
     // Ordenar por data de criação (mais recentes primeiro)
-    queryBuilder.orderBy('route.created_at', 'DESC');
+    queryBuilder.orderBy('route.createdAt', 'DESC');
 
     // Executar consulta
     const [data, total] = await queryBuilder.getManyAndCount();
