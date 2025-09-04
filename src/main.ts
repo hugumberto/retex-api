@@ -4,6 +4,7 @@ dotenv.config({ path: '.env' });
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 import { AppModule } from './app.module';
 
@@ -12,7 +13,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule.register(), {
     bufferLogs: true,
     cors: {
-      origin: '*',
+      origin: true,
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       preflightContinue: false,
       optionsSuccessStatus: 200,
@@ -22,6 +23,7 @@ async function bootstrap() {
   app.useLogger(app.get(Logger));
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
   app.useGlobalPipes(new ValidationPipe());
+  app.use(cookieParser());
 
   const config = new DocumentBuilder()
     .setTitle('Retex API')

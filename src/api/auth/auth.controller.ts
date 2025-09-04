@@ -1,5 +1,6 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 import { JwtPayload, LoginResult, RefreshTokenResult } from '../../app/services/interfaces/auth.interface';
 import { LoginUseCase } from '../../app/use-cases/auth/login-use-case';
 import { LoginDto } from '../../app/use-cases/auth/login-use-case/login.dto';
@@ -27,8 +28,10 @@ export class AuthController {
     type: Object
   })
   @ApiResponse({ status: 401, description: 'Credenciais inválidas' })
-  async login(@Body() loginDto: LoginDto): Promise<LoginResult> {
-    return this.loginUseCase.call(loginDto);
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response): Promise<LoginResult> {
+    const result = await this.loginUseCase.call(loginDto);
+    res.cookie('rt', result.refresh_token);
+    return result;
   }
 
   @Post('refresh')
