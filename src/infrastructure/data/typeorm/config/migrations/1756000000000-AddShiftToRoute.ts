@@ -6,7 +6,13 @@ export class AddShiftToRoute1756000000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
             ALTER TABLE "route"
-            ADD "shift" character varying NOT NULL
+            ADD "shift" character varying NOT NULL DEFAULT 'PADRÃO'
+        `);
+
+    // Remove o valor padrão após adicionar a coluna
+    await queryRunner.query(`
+            ALTER TABLE "route"
+            ALTER COLUMN "shift" DROP DEFAULT
         `);
   }
 
