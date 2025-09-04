@@ -25,6 +25,10 @@ export const routeSchema = new EntitySchema<Route>({
       nullable: true,
       name: 'end_date',
     },
+    shift: {
+      type: 'varchar',
+      nullable: false,
+    },
     ...BaseTimestampColumns,
   },
   relations: {

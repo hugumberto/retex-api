@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { CreateRouteUseCase } from "../../app/use-cases/route/create-route-use-case";
 import { CreateRouteDto } from "../../app/use-cases/route/create-route-use-case/create-route.dto";
+import { DeleteRouteUseCase } from "../../app/use-cases/route/delete-route-use-case";
 import { GetAllRoutesUseCase } from "../../app/use-cases/route/get-all-routes-use-case";
 import { GetAllRoutesDto } from "../../app/use-cases/route/get-all-routes-use-case/get-all-routes.dto";
 import { GetRouteByIdUseCase } from "../../app/use-cases/route/get-route-by-id-use-case";
@@ -11,6 +12,7 @@ import { UpdateRouteDto } from "../../app/use-cases/route/update-route-use-case/
 export class RouteController {
   constructor(
     private readonly createRouteUseCase: CreateRouteUseCase,
+    private readonly deleteRouteUseCase: DeleteRouteUseCase,
     private readonly getAllRoutesUseCase: GetAllRoutesUseCase,
     private readonly getRouteByIdUseCase: GetRouteByIdUseCase,
     private readonly updateRouteUseCase: UpdateRouteUseCase,
@@ -34,5 +36,10 @@ export class RouteController {
   @Put(':id')
   updateRoute(@Param('id') id: string, @Body() body: UpdateRouteDto) {
     return this.updateRouteUseCase.call({ id, data: body });
+  }
+
+  @Delete(':id')
+  deleteRoute(@Param('id') id: string) {
+    return this.deleteRouteUseCase.call(id);
   }
 } 
