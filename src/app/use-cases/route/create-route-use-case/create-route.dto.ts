@@ -1,4 +1,4 @@
-import { ArrayNotEmpty, IsArray, IsDateString, IsString, IsUUID } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsDateString, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class CreateRouteDto {
   @IsString()
@@ -12,4 +12,8 @@ export class CreateRouteDto {
 
   @IsDateString()
   startDate: string;
+
+  @IsString()
+  @IsNotEmpty()
+  shift: string;
 } 

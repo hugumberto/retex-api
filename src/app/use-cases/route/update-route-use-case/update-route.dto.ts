@@ -24,4 +24,8 @@ export class UpdateRouteDto {
   @IsOptional()
   @IsDateString()
   endDate?: string;
+
+  @IsOptional()
+  @IsString()
+  shift?: string;
 } 

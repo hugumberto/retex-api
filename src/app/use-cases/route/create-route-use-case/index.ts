@@ -59,6 +59,7 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
       driver: driver,
       packages: packages,
       startDate: new Date(param.startDate),
+      shift: param.shift,
     };
 
     return this.routeRepository.create(routeData);

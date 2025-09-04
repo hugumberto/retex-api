@@ -89,6 +89,10 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
       updateData.endDate = new Date(data.endDate);
     }
 
+    if (data.shift) {
+      updateData.shift = data.shift;
+    }
+
     // 6. Atualizar a route
     const [updatedRoute] = await this.routeRepository.update({ id }, updateData);
     return updatedRoute;
