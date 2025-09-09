@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { BaseRepository } from '../abstraction/base.repository';
@@ -25,6 +25,13 @@ export class StorageUnitRepository extends BaseRepository<StorageUnit> implement
   async findAllWithBrand(query: Partial<StorageUnit>): Promise<StorageUnit[]> {
     return this.storageUnitRepository.find({
       where: this.buildWhereClause(query) as any,
+      relations: ['brand'],
+    });
+  }
+
+  async findByIds(ids: string[]): Promise<StorageUnit[]> {
+    return this.storageUnitRepository.find({
+      where: { id: In(ids) },
       relations: ['brand'],
     });
   }
