@@ -1,0 +1,819 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2024-12-19T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v8.4.5",
+  "resources": [
+    {
+      "_id": "req_00_auth_login",
+      "parentId": "fld_auth",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/auth/login",
+      "name": "Login",
+      "description": "Fazer login do usuário",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703836800000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_01_auth_refresh",
+      "parentId": "fld_auth",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/auth/refresh",
+      "name": "Refresh Token",
+      "description": "Renovar tokens usando refresh token",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"refreshToken\": \"your_refresh_token_here\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703836700000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_02_auth_logout",
+      "parentId": "fld_auth",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/auth/logout",
+      "name": "Logout",
+      "description": "Fazer logout do usuário",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"refreshToken\": \"your_refresh_token_here\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703836600000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_03_auth_profile",
+      "parentId": "fld_auth",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/auth/profile",
+      "name": "Get Profile",
+      "description": "Obter perfil do usuário autenticado",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {% response 'body', 'req_00_auth_login', 'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'always', 60 %}",
+          "description": "",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703836500000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_10_user_create",
+      "parentId": "fld_user",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/user",
+      "name": "Create User",
+      "description": "Criar novo usuário",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao@example.com\",\n  \"password\": \"password123\",\n  \"document\": \"12345678901\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703836400000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_11_user_get_all",
+      "parentId": "fld_user",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/user",
+      "name": "Get All Users",
+      "description": "Listar todos os usuários (Admin only)",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "role",
+          "value": "",
+          "description": "Filtro opcional por role",
+          "id": "pair_1",
+          "disabled": true
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {% response 'body', 'req_00_auth_login', 'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'always', 60 %}",
+          "description": "",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703836300000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_12_user_get_by_id",
+      "parentId": "fld_user",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/user/USER_ID_HERE",
+      "name": "Get User by ID",
+      "description": "Buscar usuário por ID (Admin only)",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {% response 'body', 'req_00_auth_login', 'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'always', 60 %}",
+          "description": "",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703836200000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_13_user_update",
+      "parentId": "fld_user",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/user/USER_ID_HERE",
+      "name": "Update User",
+      "description": "Atualizar usuário (Admin only)",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"João Silva Updated\",\n  \"email\": \"joao.updated@example.com\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {% response 'body', 'req_00_auth_login', 'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'always', 60 %}",
+          "description": "",
+          "id": "pair_2"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703836100000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_14_user_add_roles",
+      "parentId": "fld_user",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/user/USER_ID_HERE/roles",
+      "name": "Add Roles to User",
+      "description": "Sincronizar roles do usuário (Admin only)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"roles\": [\"ADMIN\", \"USER\"]\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {% response 'body', 'req_00_auth_login', 'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'always', 60 %}",
+          "description": "",
+          "id": "pair_2"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703836000000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_20_package_create",
+      "parentId": "fld_package",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/package",
+      "name": "Create Package",
+      "description": "Criar novo pacote",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Pacote Exemplo\",\n  \"description\": \"Descrição do pacote\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703835900000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_21_package_get_created",
+      "parentId": "fld_package",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/package/created",
+      "name": "Get Created Packages",
+      "description": "Listar pacotes criados",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703835800000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_30_item_create",
+      "parentId": "fld_item",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/items",
+      "name": "Create Item",
+      "description": "Criar novo item",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Item Exemplo\",\n  \"description\": \"Descrição do item\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703835700000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_31_item_bind_storage_units",
+      "parentId": "fld_item",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/items/bind-storage-units",
+      "name": "Bind Items Storage Units",
+      "description": "Vincular itens a unidades de armazenamento",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"itemIds\": [\"item-id-1\", \"item-id-2\"],\n  \"storageUnitIds\": [\"storage-unit-id-1\"]\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703835600000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_40_route_create",
+      "parentId": "fld_route",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/route",
+      "name": "Create Route",
+      "description": "Criar nova rota",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Rota Exemplo\",\n  \"description\": \"Descrição da rota\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703835500000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_41_route_get_all",
+      "parentId": "fld_route",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/route",
+      "name": "Get All Routes",
+      "description": "Listar todas as rotas",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703835400000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_42_route_get_by_id",
+      "parentId": "fld_route",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/route/ROUTE_ID_HERE",
+      "name": "Get Route by ID",
+      "description": "Buscar rota por ID",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703835300000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_43_route_update",
+      "parentId": "fld_route",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/route/ROUTE_ID_HERE",
+      "name": "Update Route",
+      "description": "Atualizar rota",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Rota Atualizada\",\n  \"description\": \"Nova descrição da rota\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703835200000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_44_route_delete",
+      "parentId": "fld_route",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/route/ROUTE_ID_HERE",
+      "name": "Delete Route",
+      "description": "Deletar rota",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703835100000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_50_brand_create",
+      "parentId": "fld_brand",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/brand",
+      "name": "Create Brand",
+      "description": "Criar nova marca",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Marca Exemplo\",\n  \"description\": \"Descrição da marca\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703835000000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_51_brand_get_all",
+      "parentId": "fld_brand",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/brand",
+      "name": "Get All Brands",
+      "description": "Listar todas as marcas",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703834900000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_52_brand_get_by_id",
+      "parentId": "fld_brand",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/brand/BRAND_ID_HERE",
+      "name": "Get Brand by ID",
+      "description": "Buscar marca por ID",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703834800000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_53_brand_update",
+      "parentId": "fld_brand",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/brand/BRAND_ID_HERE",
+      "name": "Update Brand",
+      "description": "Atualizar marca",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Marca Atualizada\",\n  \"description\": \"Nova descrição da marca\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703834700000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_54_brand_delete",
+      "parentId": "fld_brand",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/brand/BRAND_ID_HERE",
+      "name": "Delete Brand",
+      "description": "Deletar marca",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703834600000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_60_storage_unit_create",
+      "parentId": "fld_storage_unit",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/storage-unit",
+      "name": "Create Storage Unit",
+      "description": "Criar nova unidade de armazenamento",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Unidade de Armazenamento Exemplo\",\n  \"description\": \"Descrição da unidade\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703834500000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_61_storage_unit_get_all",
+      "parentId": "fld_storage_unit",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/storage-unit",
+      "name": "Get All Storage Units",
+      "description": "Listar todas as unidades de armazenamento",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703834400000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_62_storage_unit_get_by_id",
+      "parentId": "fld_storage_unit",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/storage-unit/STORAGE_UNIT_ID_HERE",
+      "name": "Get Storage Unit by ID",
+      "description": "Buscar unidade de armazenamento por ID",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703834300000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_63_storage_unit_update",
+      "parentId": "fld_storage_unit",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/storage-unit/STORAGE_UNIT_ID_HERE",
+      "name": "Update Storage Unit",
+      "description": "Atualizar unidade de armazenamento",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Unidade Atualizada\",\n  \"description\": \"Nova descrição da unidade\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_1"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1703834200000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_64_storage_unit_delete",
+      "parentId": "fld_storage_unit",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/storage-unit/STORAGE_UNIT_ID_HERE",
+      "name": "Delete Storage Unit",
+      "description": "Deletar unidade de armazenamento",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703834100000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_70_welcome",
+      "parentId": "fld_general",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/",
+      "name": "Welcome",
+      "description": "Endpoint de boas-vindas",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703834000000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_71_health_check",
+      "parentId": "fld_general",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "url": "{{ _.base_url }}/health",
+      "name": "Health Check",
+      "description": "Verificar saúde da aplicação",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1703833900000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "fld_auth",
+      "parentId": "wrk_retex_api",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "name": "🔐 Authentication",
+      "description": "Endpoints de autenticação e autorização",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1703836800000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_user",
+      "parentId": "wrk_retex_api",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "name": "👥 Users",
+      "description": "Gerenciamento de usuários",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1703836700000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_package",
+      "parentId": "wrk_retex_api",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "name": "📦 Packages",
+      "description": "Gerenciamento de pacotes",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1703836600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_item",
+      "parentId": "wrk_retex_api",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "name": "📋 Items",
+      "description": "Gerenciamento de itens",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1703836500000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_route",
+      "parentId": "wrk_retex_api",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "name": "🛣️ Routes",
+      "description": "Gerenciamento de rotas",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1703836400000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_brand",
+      "parentId": "wrk_retex_api",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "name": "🏷️ Brands",
+      "description": "Gerenciamento de marcas",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1703836300000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_storage_unit",
+      "parentId": "wrk_retex_api",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "name": "🗄️ Storage Units",
+      "description": "Gerenciamento de unidades de armazenamento",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1703836200000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_general",
+      "parentId": "wrk_retex_api",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "name": "🌐 General",
+      "description": "Endpoints gerais da aplicação",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1703836100000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "wrk_retex_api",
+      "parentId": null,
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "name": "Retex API",
+      "description": "Collection da API Retex - Gerada automaticamente com base nos controllers",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_base_environment",
+      "parentId": "wrk_retex_api",
+      "modified": 1703836800000,
+      "created": 1703836800000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url"
+        ]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1703836800000,
+      "_type": "environment"
+    }
+  ]
+}

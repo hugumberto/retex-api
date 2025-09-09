@@ -7,6 +7,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { BrandController } from './brand/brand.controller';
 import { HealthController } from './health/health.controller';
+import { ItemController } from './item/item.controller';
 import { PackageController } from './package/package.controller';
 import { RouteController } from './route/route.controller';
 import { StorageUnitController } from './storage-unit/storage-unit.controller';
@@ -27,7 +28,8 @@ import { WelcomeController } from './welcome/welcome.controller';
     PackageController,
     RouteController,
     StorageUnitController,
-    BrandController
+    BrandController,
+    ItemController
   ],
   providers: [JwtAuthGuard, RolesGuard],
 })
