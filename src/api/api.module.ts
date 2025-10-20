@@ -5,6 +5,7 @@ import { UseCasesModule } from '../app/use-cases/use-cases.module';
 import { AuthController } from './auth/auth.controller';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { BlogPostController } from './blog-post/blog-post.controller';
 import { BrandController } from './brand/brand.controller';
 import { HealthController } from './health/health.controller';
 import { ItemController } from './item/item.controller';
@@ -29,7 +30,8 @@ import { WelcomeController } from './welcome/welcome.controller';
     RouteController,
     StorageUnitController,
     BrandController,
-    ItemController
+    ItemController,
+    BlogPostController
   ],
   providers: [JwtAuthGuard, RolesGuard],
 })
