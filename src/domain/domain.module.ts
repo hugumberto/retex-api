@@ -1,4 +1,5 @@
 import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
+import { IBlogPostRepository } from './blog-post/blog-post.repository';
 import { IBrandRepository } from './brand/brand.repository';
 import { IItemRepository } from './item/item.repository';
 import { IPackageRepository } from './package/package.repository';
@@ -20,6 +21,7 @@ export interface DomainModuleOptions {
   storageUnitRepository: Type<IStorageUnitRepository>;
   userRoleRepository: Type<IUserRoleRepository>;
   refreshTokenRepository: Type<IRefreshTokenRepository>;
+  blogPostRepository: Type<IBlogPostRepository>;
   imports?: Array<
     Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
   >;
@@ -68,6 +70,10 @@ export class DomainModule {
           provide: DOMAIN_TOKENS.REFRESH_TOKEN_REPOSITORY,
           useClass: options.refreshTokenRepository,
         },
+        {
+          provide: DOMAIN_TOKENS.BLOG_POST_REPOSITORY,
+          useClass: options.blogPostRepository,
+        },
       ],
       exports: [
         {
@@ -105,6 +111,10 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.REFRESH_TOKEN_REPOSITORY,
           useClass: options.refreshTokenRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.BLOG_POST_REPOSITORY,
+          useClass: options.blogPostRepository,
         },
       ],
     };

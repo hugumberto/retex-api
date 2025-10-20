@@ -7,6 +7,7 @@ import { UseCasesModule } from './app/use-cases/use-cases.module';
 import { getConfigValidation } from './config/config.schema';
 import { getLoggerConfig } from './config/logger.config';
 import { DomainModule } from './domain/domain.module';
+import { BlogPostRepository } from './infrastructure/data/typeorm/blog-post/blog-post.repository';
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
 import { PackageRepository } from './infrastructure/data/typeorm/package/package.repository';
@@ -37,6 +38,7 @@ export class AppModule {
         storageUnitRepository: StorageUnitRepository,
         userRoleRepository: UserRoleRepository,
         refreshTokenRepository: RefreshTokenRepository,
+        blogPostRepository: BlogPostRepository,
         imports: [AppTypeORMModule],
       }),
       ServicesModule.register({

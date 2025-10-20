@@ -1,0 +1,35 @@
+import { Type } from 'class-transformer';
+import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { BlogPostHighlight } from '../../../../domain/blog-post/blog-post-highlight.enum';
+
+export class UpsertBlogPostDto {
+  @IsOptional()
+  @IsUUID('4', { message: 'ID deve ser um UUID válido' })
+  id?: string;
+
+  @IsString({ message: 'Corpo do post deve ser uma string' })
+  @IsNotEmpty({ message: 'Corpo do post é obrigatório' })
+  body: string;
+
+  @IsString({ message: 'Slug deve ser uma string' })
+  @IsNotEmpty({ message: 'Slug é obrigatório' })
+  slug: string;
+
+  @IsString({ message: 'Título deve ser uma string' })
+  @IsNotEmpty({ message: 'Título é obrigatório' })
+  title: string;
+
+  @IsString({ message: 'Hero deve ser uma string' })
+  @IsNotEmpty({ message: 'Hero é obrigatório' })
+  hero: string;
+
+  @IsOptional()
+  @IsEnum(BlogPostHighlight, { message: 'Highlight deve ser NONE, FEATURED ou HIGHLIGHTED' })
+  highlight?: BlogPostHighlight = BlogPostHighlight.NONE;
+
+  @IsOptional()
+  @IsArray({ message: 'Tags deve ser um array' })
+  @IsString({ each: true, message: 'Cada tag deve ser uma string' })
+  @Type(() => String)
+  tags?: string[] = [];
+}
