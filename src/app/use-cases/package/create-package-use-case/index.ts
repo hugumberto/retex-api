@@ -1,4 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { IUnitOfWork } from "../../../../domain/interfaces/unit-of-work.interface";
 import { Package, PackageStatus } from "../../../../domain/package/package.entity";
 import { IPackageRepository } from "../../../../domain/package/package.repository";
 import { ITestZoneRepository } from "../../../../domain/test-zone/test-zone.repository";
@@ -17,34 +18,38 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
     private readonly packageRepository: IPackageRepository,
     @Inject(DOMAIN_TOKENS.TEST_ZONE_REPOSITORY)
     private readonly testZoneRepository: ITestZoneRepository,
+    @Inject(DOMAIN_TOKENS.UNIT_OF_WORK)
+    private readonly unitOfWork: IUnitOfWork,
     @Inject(SERVICE_TOKENS.SANITIZATION_SERVICE)
     private readonly sanitizationService: ISanitizationService,
     private readonly createUserUseCase: CreateUserUseCase
   ) { }
 
   async call(param: CreatePackageDto): Promise<Package> {
-    const user = await this.createUserUseCase.call(this.createUserDto(param))
+    return this.unitOfWork.runInTransaction(async () => {
+      const user = await this.createUserUseCase.call(this.createUserDto(param))
 
-    const sanitizedCity = this.sanitizationService.sanitizeString(param.address.city);
-    const testZone = await this.testZoneRepository.findByCity(sanitizedCity);
+      const sanitizedCity = this.sanitizationService.sanitizeString(param.address.city);
+      const testZone = await this.testZoneRepository.findByCity(sanitizedCity);
 
-    const packageStatus = testZone ? PackageStatus.CREATED : PackageStatus.OUT_OF_ZONE
+      const packageStatus = testZone ? PackageStatus.CREATED : PackageStatus.OUT_OF_ZONE
 
-    const packageDto: Partial<Package> = {
-      status: packageStatus,
-      user: user,
-      collectDay: param.dayOfWeek,
-      collectTime: param.timeOfDay,
-      address: {
-        ...param.address,
-        city: param.address.city,
-        zipCode: this.sanitizationService.sanitizeNumericString(param.address.zipCode),
-        lat: this.sanitizationService.sanitizeCoordinate(param.address.lat),
-        long: this.sanitizationService.sanitizeCoordinate(param.address.long),
-      },
-    }
+      const packageDto: Partial<Package> = {
+        status: packageStatus,
+        user: user,
+        collectDay: param.dayOfWeek,
+        collectTime: param.timeOfDay,
+        address: {
+          ...param.address,
+          city: param.address.city,
+          zipCode: this.sanitizationService.sanitizeNumericString(param.address.zipCode),
+          lat: this.sanitizationService.sanitizeCoordinate(param.address.lat),
+          long: this.sanitizationService.sanitizeCoordinate(param.address.long),
+        },
+      }
 
-    return this.packageRepository.create(packageDto)
+      return this.packageRepository.create(packageDto)
+    });
   }
 
   private createUserDto(packageDto: CreatePackageDto): CreateUserDto {

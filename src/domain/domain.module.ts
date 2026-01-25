@@ -1,6 +1,7 @@
 import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
 import { IBlogPostRepository } from './blog-post/blog-post.repository';
 import { IBrandRepository } from './brand/brand.repository';
+import { IUnitOfWork } from './interfaces/unit-of-work.interface';
 import { IItemRepository } from './item/item.repository';
 import { IPackageRepository } from './package/package.repository';
 import { IRouteRepository } from './route/route.repository';
@@ -22,6 +23,7 @@ export interface DomainModuleOptions {
   userRoleRepository: Type<IUserRoleRepository>;
   refreshTokenRepository: Type<IRefreshTokenRepository>;
   blogPostRepository: Type<IBlogPostRepository>;
+  unitOfWork: Type<IUnitOfWork>;
   imports?: Array<
     Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
   >;
@@ -74,6 +76,10 @@ export class DomainModule {
           provide: DOMAIN_TOKENS.BLOG_POST_REPOSITORY,
           useClass: options.blogPostRepository,
         },
+        {
+          provide: DOMAIN_TOKENS.UNIT_OF_WORK,
+          useClass: options.unitOfWork,
+        },
       ],
       exports: [
         {
@@ -115,6 +121,10 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.BLOG_POST_REPOSITORY,
           useClass: options.blogPostRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.UNIT_OF_WORK,
+          useClass: options.unitOfWork,
         },
       ],
     };

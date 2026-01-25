@@ -6724,6 +6724,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nestjs-cls@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "nestjs-cls@npm:6.2.0"
+  peerDependencies:
+    "@nestjs/common": ">= 10 < 12"
+    "@nestjs/core": ">= 10 < 12"
+    reflect-metadata: "*"
+    rxjs: ">= 7"
+  checksum: 10c0/f9234cd3358c57306ae512ce6e636cdc6da295b94512707eca2cf55b5ece7835ba637b57af5ee94a1c867eb0208178d9907dfc5c28a00827cb63df6413cb8326
+  languageName: node
+  linkType: hard
+
 "nestjs-pino@npm:^4.4.0":
   version: 4.4.0
   resolution: "nestjs-pino@npm:4.4.0"
@@ -7728,6 +7740,7 @@ __metadata:
     jest: "npm:^29.7.0"
     jest-mock-extended: "npm:^3.0.7"
     joi: "npm:^17.13.3"
+    nestjs-cls: "npm:^6.2.0"
     nestjs-pino: "npm:^4.4.0"
     passport: "npm:^0.7.0"
     passport-jwt: "npm:^4.0.1"

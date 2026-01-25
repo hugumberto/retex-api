@@ -7,6 +7,7 @@ import { UseCasesModule } from './app/use-cases/use-cases.module';
 import { getConfigValidation } from './config/config.schema';
 import { getLoggerConfig } from './config/logger.config';
 import { DomainModule } from './domain/domain.module';
+import { TypeORMUnitOfWork } from './infrastructure/data/typeorm/abstraction/unit-of-work';
 import { BlogPostRepository } from './infrastructure/data/typeorm/blog-post/blog-post.repository';
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
@@ -18,6 +19,8 @@ import { AppTypeORMModule } from './infrastructure/data/typeorm/typeorm.module';
 import { UserRoleRepository } from './infrastructure/data/typeorm/user-role/user-role.repository';
 import { RefreshTokenRepository } from './infrastructure/data/typeorm/user/refresh-token.repository';
 import { UserRepository } from './infrastructure/data/typeorm/user/user.repository';
+import { LocalStorageModule } from './infrastructure/services/local-storage/local-storage.module';
+import { LocalStorageService } from './infrastructure/services/local-storage/local-storage.service';
 import { SanitizationService } from './infrastructure/services/sanitization/sanitization.service';
 
 export class AppModule {
@@ -39,10 +42,13 @@ export class AppModule {
         userRoleRepository: UserRoleRepository,
         refreshTokenRepository: RefreshTokenRepository,
         blogPostRepository: BlogPostRepository,
+        unitOfWork: TypeORMUnitOfWork,
         imports: [AppTypeORMModule],
       }),
       ServicesModule.register({
         sanitizationService: SanitizationService,
+        localStorageService: LocalStorageService,
+        imports: [LocalStorageModule],
       }),
       ApiModule,
     ];

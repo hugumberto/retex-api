@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, MoreThan, Repository } from 'typeorm';
+import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
+import { SERVICE_TOKENS } from '../../../../app/services/tokens';
 import { RefreshToken } from '../../../../domain/user/refresh-token.entity';
 import { IRefreshTokenRepository } from '../../../../domain/user/refresh-token.repository';
 import { BaseRepository } from '../abstraction/base.repository';
@@ -12,20 +14,24 @@ export class RefreshTokenRepository
   implements IRefreshTokenRepository {
   constructor(
     @InjectRepository(refreshTokenSchema)
-    private readonly refreshTokenRepository: Repository<RefreshToken>,
+    refreshTokenRepository: Repository<RefreshToken>,
+    @Inject(SERVICE_TOKENS.LOCAL_STORAGE_SERVICE)
+    localStorageService: ILocalStorageService,
   ) {
-    super(refreshTokenRepository);
+    super(refreshTokenRepository, localStorageService);
   }
 
   async findByToken(token: string): Promise<RefreshToken | null> {
-    return this.refreshTokenRepository.findOne({
+    const repository = await this.getRepository();
+    return repository.findOne({
       where: { token, isRevoked: false },
       relations: ['user', 'user.roles'],
     });
   }
 
   async findValidTokensByUserId(userId: string): Promise<RefreshToken[]> {
-    return this.refreshTokenRepository.find({
+    const repository = await this.getRepository();
+    return repository.find({
       where: {
         user: { id: userId } as any,
         isRevoked: false,
@@ -36,14 +42,16 @@ export class RefreshTokenRepository
   }
 
   async revokeAllUserTokens(userId: string): Promise<void> {
-    await this.refreshTokenRepository.update(
+    const repository = await this.getRepository();
+    await repository.update(
       { user: { id: userId } as any },
       { isRevoked: true }
     );
   }
 
   async deleteExpiredTokens(): Promise<void> {
-    await this.refreshTokenRepository.delete({
+    const repository = await this.getRepository();
+    await repository.delete({
       expiresAt: LessThan(new Date()),
     });
   }

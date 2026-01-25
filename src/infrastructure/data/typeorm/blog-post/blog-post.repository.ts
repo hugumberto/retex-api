@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
+import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
+import { SERVICE_TOKENS } from '../../../../app/services/tokens';
 import { BlogPostHighlight } from '../../../../domain/blog-post/blog-post-highlight.enum';
 import { BlogPostStatus } from '../../../../domain/blog-post/blog-post-status.enum';
 import { BlogPost } from '../../../../domain/blog-post/blog-post.entity';
@@ -15,40 +17,47 @@ export class BlogPostRepository
   implements IBlogPostRepository {
   constructor(
     @InjectRepository(blogPostSchema)
-    private readonly blogPostRepository: Repository<BlogPost>,
+    blogPostRepository: Repository<BlogPost>,
+    @Inject(SERVICE_TOKENS.LOCAL_STORAGE_SERVICE)
+    localStorageService: ILocalStorageService,
   ) {
-    super(blogPostRepository);
+    super(blogPostRepository, localStorageService);
   }
 
   async findBySlug(slug: string): Promise<BlogPost> {
-    return this.blogPostRepository.findOne({
+    const repository = await this.getRepository();
+    return repository.findOne({
       where: { slug } as FindOptionsWhere<BlogPost>,
     });
   }
 
   async findByStatus(status: BlogPostStatus): Promise<BlogPost[]> {
-    return this.blogPostRepository.find({
+    const repository = await this.getRepository();
+    return repository.find({
       where: { status } as FindOptionsWhere<BlogPost>,
       order: { createdAt: 'DESC' },
     });
   }
 
   async findByHighlight(highlight: BlogPostHighlight): Promise<BlogPost[]> {
-    return this.blogPostRepository.find({
+    const repository = await this.getRepository();
+    return repository.find({
       where: { highlight } as FindOptionsWhere<BlogPost>,
       order: { createdAt: 'DESC' },
     });
   }
 
   async findPublishedPosts(): Promise<BlogPost[]> {
-    return this.blogPostRepository.find({
+    const repository = await this.getRepository();
+    return repository.find({
       where: { status: BlogPostStatus.PUBLISHED } as FindOptionsWhere<BlogPost>,
       order: { publishDate: 'DESC' },
     });
   }
 
   async findOrderedByHighlight(): Promise<BlogPost[]> {
-    return this.blogPostRepository.find({
+    const repository = await this.getRepository();
+    return repository.find({
       where: { status: BlogPostStatus.PUBLISHED } as FindOptionsWhere<BlogPost>,
       order: {
         highlight: 'DESC', // HIGHLIGHTED (2) > FEATURED (1) > NONE (0)
@@ -61,7 +70,8 @@ export class BlogPostRepository
     search: string | undefined,
     pagination: PaginationParams
   ): Promise<PaginatedResult<BlogPost>> {
-    const queryBuilder = this.blogPostRepository.createQueryBuilder('blog_post');
+    const repository = await this.getRepository();
+    const queryBuilder = repository.createQueryBuilder('blog_post');
 
     // Filtrar apenas posts publicados
     queryBuilder.where('blog_post.status = :status', { status: BlogPostStatus.PUBLISHED });
@@ -102,7 +112,8 @@ export class BlogPostRepository
     filters: BlogPostFilters,
     pagination: PaginationParams
   ): Promise<PaginatedResult<BlogPost>> {
-    const queryBuilder = this.blogPostRepository.createQueryBuilder('blog_post');
+    const repository = await this.getRepository();
+    const queryBuilder = repository.createQueryBuilder('blog_post');
 
     // Aplicar filtros
     if (filters.status) {

@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
+import { SERVICE_TOKENS } from '../../../../app/services/tokens';
 import { PaginatedResult, PaginationParams } from '../../../../domain/interfaces/pagination.interface';
 import { Route } from '../../../../domain/route/route.entity';
 import { IRouteRepository, RouteFilters } from '../../../../domain/route/route.repository';
@@ -11,16 +13,19 @@ import { routeSchema } from './route.schema';
 export class RouteRepository extends BaseRepository<Route> implements IRouteRepository {
   constructor(
     @InjectRepository(routeSchema)
-    private readonly routeRepository: Repository<Route>,
+    routeRepository: Repository<Route>,
+    @Inject(SERVICE_TOKENS.LOCAL_STORAGE_SERVICE)
+    localStorageService: ILocalStorageService,
   ) {
-    super(routeRepository);
+    super(routeRepository, localStorageService);
   }
 
   async findByFiltersWithPagination(
     filters: RouteFilters,
     pagination: PaginationParams
   ): Promise<PaginatedResult<Route>> {
-    const queryBuilder = this.routeRepository.createQueryBuilder('route');
+    const repository = await this.getRepository();
+    const queryBuilder = repository.createQueryBuilder('route');
 
     // Adicionar filtros
     if (filters.status) {
@@ -61,7 +66,8 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
   }
 
   async findOneWithAllRelations(id: string): Promise<Route> {
-    return this.routeRepository
+    const repository = await this.getRepository();
+    return repository
       .createQueryBuilder('route')
       .leftJoinAndSelect('route.driver', 'driver')
       .leftJoinAndSelect('driver.roles', 'driverRoles')

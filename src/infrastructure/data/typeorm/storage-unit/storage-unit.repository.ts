@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
+import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
+import { SERVICE_TOKENS } from '../../../../app/services/tokens';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { BaseRepository } from '../abstraction/base.repository';
@@ -10,27 +12,32 @@ import { storageUnitSchema } from './storage-unit.schema';
 export class StorageUnitRepository extends BaseRepository<StorageUnit> implements IStorageUnitRepository {
   constructor(
     @InjectRepository(storageUnitSchema)
-    private readonly storageUnitRepository: Repository<StorageUnit>,
+    storageUnitRepository: Repository<StorageUnit>,
+    @Inject(SERVICE_TOKENS.LOCAL_STORAGE_SERVICE)
+    localStorageService: ILocalStorageService,
   ) {
-    super(storageUnitRepository);
+    super(storageUnitRepository, localStorageService);
   }
 
   async findOneWithBrand(query: Partial<StorageUnit>): Promise<StorageUnit> {
-    return this.storageUnitRepository.findOne({
+    const repository = await this.getRepository();
+    return repository.findOne({
       where: this.buildWhereClause(query) as any,
       relations: ['brand'],
     });
   }
 
   async findAllWithBrand(query: Partial<StorageUnit>): Promise<StorageUnit[]> {
-    return this.storageUnitRepository.find({
+    const repository = await this.getRepository();
+    return repository.find({
       where: this.buildWhereClause(query) as any,
       relations: ['brand'],
     });
   }
 
   async findByIds(ids: string[]): Promise<StorageUnit[]> {
-    return this.storageUnitRepository.find({
+    const repository = await this.getRepository();
+    return repository.find({
       where: { id: In(ids) },
       relations: ['brand'],
     });

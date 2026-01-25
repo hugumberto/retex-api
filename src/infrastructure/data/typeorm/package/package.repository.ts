@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
+import { SERVICE_TOKENS } from '../../../../app/services/tokens';
 import { PaginatedResult, PaginationParams } from '../../../../domain/interfaces/pagination.interface';
 import { Package } from '../../../../domain/package/package.entity';
 import { IPackageRepository, PackageFilters } from '../../../../domain/package/package.repository';
@@ -11,16 +13,19 @@ import { packageSchema } from './package.schema';
 export class PackageRepository extends BaseRepository<Package> implements IPackageRepository {
   constructor(
     @InjectRepository(packageSchema)
-    private readonly packageRepository: Repository<Package>,
+    packageRepository: Repository<Package>,
+    @Inject(SERVICE_TOKENS.LOCAL_STORAGE_SERVICE)
+    localStorageService: ILocalStorageService,
   ) {
-    super(packageRepository);
+    super(packageRepository, localStorageService);
   }
 
   async findByFiltersWithPagination(
     filters: PackageFilters,
     pagination: PaginationParams
   ): Promise<PaginatedResult<Package>> {
-    const queryBuilder = this.packageRepository.createQueryBuilder('package');
+    const repository = await this.getRepository();
+    const queryBuilder = repository.createQueryBuilder('package');
 
     // Adicionar filtros
     if (filters.status) {
