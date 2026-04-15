@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pacote cadastrado</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    .header { background: #1a1a2e; padding: 32px; text-align: center; }
+    .header h1 { color: #fff; margin: 0; font-size: 24px; }
+    .body { padding: 32px; color: #333; }
+    .body p { line-height: 1.6; }
+    .details { background: #f9f9f9; border-radius: 6px; padding: 16px 24px; margin: 24px 0; }
+    .details table { width: 100%; border-collapse: collapse; }
+    .details td { padding: 8px 0; font-size: 14px; }
+    .details td:first-child { color: #666; width: 40%; }
+    .details td:last-child { font-weight: bold; }
+    .footer { text-align: center; padding: 24px; font-size: 12px; color: #aaa; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Pacote cadastrado com sucesso!</h1>
+    </div>
+    <div class="body">
+      <p>Olá, <strong>{{firstName}} {{lastName}}</strong>!</p>
+      <p>Seu pacote foi cadastrado em nosso sistema. Confira os detalhes abaixo:</p>
+
+      <div class="details">
+        <table>
+          <tr>
+            <td>Status</td>
+            <td>{{status}}</td>
+          </tr>
+          <tr>
+            <td>Endereço</td>
+            <td>{{address.street}}, {{address.number}}{{#if address.complement}} — {{address.complement}}{{/if}}</td>
+          </tr>
+          <tr>
+            <td>Cidade</td>
+            <td>{{address.city}} — {{address.countryDivision}}</td>
+          </tr>
+          <tr>
+            <td>CEP</td>
+            <td>{{address.zipCode}}</td>
+          </tr>
+          {{#if collectDay}}
+          <tr>
+            <td>Dia de coleta</td>
+            <td>{{collectDay}}</td>
+          </tr>
+          {{/if}}
+          {{#if collectTime}}
+          <tr>
+            <td>Horário de coleta</td>
+            <td>{{collectTime}}</td>
+          </tr>
+          {{/if}}
+        </table>
+      </div>
+
+      <p>Em caso de dúvidas, entre em contato com nossa equipe.</p>
+    </div>
+    <div class="footer">
+      <p>© {{year}} Retex. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</body>
+</html>
