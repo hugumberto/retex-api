@@ -26,16 +26,16 @@
     </div>
     <div class="body">
       <p>Olá, <strong>{{firstName}} {{lastName}}</strong>!</p>
-      <p>Seu pacote foi cadastrado em nosso sistema. Confira os detalhes abaixo:</p>
+      <p>O seu pacote foi registado no nosso sistema. Consulte os detalhes abaixo:</p>
 
       <div class="details">
         <table>
           <tr>
-            <td>Status</td>
+            <td>Estado</td>
             <td>{{status}}</td>
           </tr>
           <tr>
-            <td>Endereço</td>
+            <td>Morada</td>
             <td>{{address.street}}, {{address.number}}{{#if address.complement}} — {{address.complement}}{{/if}}</td>
           </tr>
           <tr>
@@ -43,25 +43,25 @@
             <td>{{address.city}} — {{address.countryDivision}}</td>
           </tr>
           <tr>
-            <td>CEP</td>
+            <td>Código Postal</td>
             <td>{{address.zipCode}}</td>
           </tr>
           {{#if collectDay}}
           <tr>
-            <td>Dia de coleta</td>
+            <td>Dia de recolha</td>
             <td>{{collectDay}}</td>
           </tr>
           {{/if}}
           {{#if collectTime}}
           <tr>
-            <td>Horário de coleta</td>
+            <td>Hora de recolha</td>
             <td>{{collectTime}}</td>
           </tr>
           {{/if}}
         </table>
       </div>
 
-      <p>Em caso de dúvidas, entre em contato com nossa equipe.</p>
+      <p>Em caso de dúvidas, entre em contacto com a nossa equipa.</p>
     </div>
     <div class="footer">
       <p>© {{year}} Retex. Todos os direitos reservados.</p>

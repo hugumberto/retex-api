@@ -66,18 +66,47 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
   private async sendConfirmationEmail(param: CreatePackageDto, pkg: Package): Promise<void> {
     await this.emailService.send({
       to: param.email,
-      subject: 'Seu pacote foi cadastrado!',
+      subject: 'O seu pacote foi registado!',
       template: 'package-confirmation',
       context: {
         firstName: param.firstName,
         lastName: param.lastName,
-        status: pkg.status,
+        status: this.formatStatus(pkg.status),
         address: pkg.address,
-        collectDay: pkg.collectDay,
+        collectDay: this.formatCollectDay(pkg.collectDay),
         collectTime: pkg.collectTime,
         year: new Date().getFullYear(),
       },
     });
+  }
+
+  private formatStatus(status: PackageStatus): string {
+    const labels: Record<PackageStatus, string> = {
+      [PackageStatus.CREATED]: 'Criado',
+      [PackageStatus.OUT_OF_ZONE]: 'Fora de zona',
+      [PackageStatus.WAITING_FOR_COLLECTION]: 'A aguardar recolha',
+      [PackageStatus.COLLECTED]: 'Recolhido',
+      [PackageStatus.IN_TRANSIT]: 'Em trânsito',
+      [PackageStatus.IN_HOUSE]: 'Em armazém',
+      [PackageStatus.CANCELLED]: 'Cancelado',
+      [PackageStatus.SCREENING]: 'Em triagem',
+      [PackageStatus.STOCKED]: 'Armazenado',
+    };
+    return labels[status] ?? status;
+  }
+
+  private formatCollectDay(day: string | undefined): string | undefined {
+    if (!day) return undefined;
+    const labels: Record<string, string> = {
+      MONDAY: 'Segunda-feira',
+      TUESDAY: 'Terça-feira',
+      WEDNESDAY: 'Quarta-feira',
+      THURSDAY: 'Quinta-feira',
+      FRIDAY: 'Sexta-feira',
+      SATURDAY: 'Sábado',
+      SUNDAY: 'Domingo',
+    };
+    return labels[day.toUpperCase()] ?? day;
   }
 
   private createUserDto(packageDto: CreatePackageDto): CreateUserDto {
