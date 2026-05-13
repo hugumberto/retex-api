@@ -20,6 +20,8 @@ import { AppTypeORMModule } from './infrastructure/data/typeorm/typeorm.module';
 import { UserRoleRepository } from './infrastructure/data/typeorm/user-role/user-role.repository';
 import { RefreshTokenRepository } from './infrastructure/data/typeorm/user/refresh-token.repository';
 import { UserRepository } from './infrastructure/data/typeorm/user/user.repository';
+import { EmailModule } from './infrastructure/services/email/email.module';
+import { EmailService } from './infrastructure/services/email/email.service';
 import { LocalStorageModule } from './infrastructure/services/local-storage/local-storage.module';
 import { LocalStorageService } from './infrastructure/services/local-storage/local-storage.service';
 import { SanitizationService } from './infrastructure/services/sanitization/sanitization.service';
@@ -49,7 +51,8 @@ export class AppModule {
       ServicesModule.register({
         sanitizationService: SanitizationService,
         localStorageService: LocalStorageService,
-        imports: [LocalStorageModule],
+        emailService: EmailService,
+        imports: [LocalStorageModule, EmailModule],
       }),
       ApiModule,
     ];
