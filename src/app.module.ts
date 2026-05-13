@@ -2,6 +2,7 @@ import { DynamicModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino/LoggerModule';
 import { ApiModule } from './api/api.module';
+import { SeedModule } from './app/services/seed/seed.module';
 import { ServicesModule } from './app/services/services.module';
 import { UseCasesModule } from './app/use-cases/use-cases.module';
 import { getConfigValidation } from './config/config.schema';
@@ -52,6 +53,10 @@ export class AppModule {
       }),
       ApiModule,
     ];
+
+    if (process.env.NODE_ENV === 'development') {
+      imports.push(SeedModule);
+    }
 
     if (process.env.NODE_ENV !== 'test') {
       imports.push(
