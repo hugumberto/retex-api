@@ -1,5 +1,6 @@
 import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
 import { CryptoService } from './crypto/crypto.service';
+import { IEmailService } from './interfaces/email.interface';
 import { ISanitizationService } from './interfaces/sanitization.interface';
 import { ILocalStorageService } from './local-storage/local-storage.service';
 import { SERVICE_TOKENS } from './tokens';
@@ -7,6 +8,7 @@ import { SERVICE_TOKENS } from './tokens';
 export interface ServicesModuleOptions {
   sanitizationService: Type<ISanitizationService>;
   localStorageService: Type<ILocalStorageService>;
+  emailService: Type<IEmailService>;
   imports?: Array<
     Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
   >;
@@ -30,7 +32,11 @@ export class ServicesModule {
         {
           provide: SERVICE_TOKENS.LOCAL_STORAGE_SERVICE,
           useClass: options.localStorageService,
-        }
+        },
+        {
+          provide: SERVICE_TOKENS.EMAIL_SERVICE,
+          useClass: options.emailService,
+        },
       ],
       exports: [...Object.values(SERVICE_TOKENS)],
     };

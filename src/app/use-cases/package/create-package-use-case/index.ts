@@ -1,9 +1,10 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { IUnitOfWork } from "../../../../domain/interfaces/unit-of-work.interface";
 import { Package, PackageStatus } from "../../../../domain/package/package.entity";
 import { IPackageRepository } from "../../../../domain/package/package.repository";
 import { ITestZoneRepository } from "../../../../domain/test-zone/test-zone.repository";
 import { DOMAIN_TOKENS } from "../../../../domain/tokens";
+import { IEmailService } from "../../../services/interfaces/email.interface";
 import { ISanitizationService } from "../../../services/interfaces/sanitization.interface";
 import { SERVICE_TOKENS } from "../../../services/tokens";
 import { IUseCase } from "../../interfaces/use-case.interface";
@@ -13,6 +14,8 @@ import { CreatePackageDto } from "./create-package.dto";
 
 @Injectable()
 export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package> {
+  private readonly logger = new Logger(CreatePackageUseCase.name);
+
   constructor(
     @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
     private readonly packageRepository: IPackageRepository,
@@ -22,11 +25,13 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
     private readonly unitOfWork: IUnitOfWork,
     @Inject(SERVICE_TOKENS.SANITIZATION_SERVICE)
     private readonly sanitizationService: ISanitizationService,
+    @Inject(SERVICE_TOKENS.EMAIL_SERVICE)
+    private readonly emailService: IEmailService,
     private readonly createUserUseCase: CreateUserUseCase
   ) { }
 
   async call(param: CreatePackageDto): Promise<Package> {
-    return this.unitOfWork.runInTransaction(async () => {
+    const pkg = await this.unitOfWork.runInTransaction(async () => {
       const user = await this.createUserUseCase.call(this.createUserDto(param))
 
       const sanitizedCity = this.sanitizationService.sanitizeString(param.address.city);
@@ -50,6 +55,58 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
 
       return this.packageRepository.create(packageDto)
     });
+
+    this.sendConfirmationEmail(param, pkg).catch((err) =>
+      this.logger.error(`Falha ao enviar email de confirmação para ${param.email}: ${err.message}`),
+    );
+
+    return pkg;
+  }
+
+  private async sendConfirmationEmail(param: CreatePackageDto, pkg: Package): Promise<void> {
+    await this.emailService.send({
+      to: param.email,
+      subject: 'O seu pacote foi registado!',
+      template: 'package-confirmation',
+      context: {
+        firstName: param.firstName,
+        lastName: param.lastName,
+        status: this.formatStatus(pkg.status),
+        address: pkg.address,
+        collectDay: this.formatCollectDay(pkg.collectDay),
+        collectTime: pkg.collectTime,
+        year: new Date().getFullYear(),
+      },
+    });
+  }
+
+  private formatStatus(status: PackageStatus): string {
+    const labels: Record<PackageStatus, string> = {
+      [PackageStatus.CREATED]: 'Criado',
+      [PackageStatus.OUT_OF_ZONE]: 'Fora de zona',
+      [PackageStatus.WAITING_FOR_COLLECTION]: 'A aguardar recolha',
+      [PackageStatus.COLLECTED]: 'Recolhido',
+      [PackageStatus.IN_TRANSIT]: 'Em trânsito',
+      [PackageStatus.IN_HOUSE]: 'Em armazém',
+      [PackageStatus.CANCELLED]: 'Cancelado',
+      [PackageStatus.SCREENING]: 'Em triagem',
+      [PackageStatus.STOCKED]: 'Armazenado',
+    };
+    return labels[status] ?? status;
+  }
+
+  private formatCollectDay(day: string | undefined): string | undefined {
+    if (!day) return undefined;
+    const labels: Record<string, string> = {
+      MONDAY: 'Segunda-feira',
+      TUESDAY: 'Terça-feira',
+      WEDNESDAY: 'Quarta-feira',
+      THURSDAY: 'Quinta-feira',
+      FRIDAY: 'Sexta-feira',
+      SATURDAY: 'Sábado',
+      SUNDAY: 'Domingo',
+    };
+    return labels[day.toUpperCase()] ?? day;
   }
 
   private createUserDto(packageDto: CreatePackageDto): CreateUserDto {
