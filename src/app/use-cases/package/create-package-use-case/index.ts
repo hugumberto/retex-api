@@ -71,6 +71,8 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
       context: {
         firstName: param.firstName,
         lastName: param.lastName,
+        fullName: `${param.firstName} ${param.lastName}`,
+        packageId: pkg.id,
         status: this.formatStatus(pkg.status),
         address: pkg.address,
         collectDay: this.formatCollectDay(pkg.collectDay),
