@@ -55,6 +55,11 @@ export const userSchema = new EntitySchema<User>({
       nullable: false,
       name: 'status',
     },
+    parentId: {
+      type: 'uuid',
+      nullable: true,
+      name: 'parent_id',
+    },
     ...BaseTimestampColumns,
   },
   relations: {
@@ -81,6 +86,19 @@ export const userSchema = new EntitySchema<User>({
         name: 'user_id',
       },
       inverseSide: 'user',
+    },
+    parent: {
+      type: 'many-to-one',
+      target: 'user',
+      joinColumn: {
+        name: 'parent_id',
+      },
+      nullable: true,
+    },
+    subUsers: {
+      type: 'one-to-many',
+      target: 'user',
+      inverseSide: 'parent',
     },
   },
   indices: [

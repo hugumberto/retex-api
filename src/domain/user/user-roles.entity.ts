@@ -11,4 +11,5 @@ export enum Role {
   DRIVER = "DRIVER",
   OPS = "OPS",
   ADMIN = "ADMIN",
+  SUB_USER = "SUB_USER",
 }
