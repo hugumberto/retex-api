@@ -1,5 +1,6 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
+import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { ISanitizationService } from '../../../services/interfaces/sanitization.interface';
@@ -49,10 +50,12 @@ export class UpdateUserUseCase implements IUseCase<UpdateUserParamDto, Omit<User
       }
     }
 
-    // Atualizar usuário
     const [updatedUser] = await this.userRepository.update({ id }, updateData);
 
-    // Remover senha do retorno
+    if (updateData.status === UserStatus.INACTIVE) {
+      await this.userRepository.update({ parentId: id }, { status: UserStatus.INACTIVE });
+    }
+
     const { password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
   }

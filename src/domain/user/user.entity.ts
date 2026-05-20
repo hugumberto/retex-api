@@ -12,6 +12,9 @@ export interface User extends Entity {
   documentNumber: string;
   password: string;
   status: UserStatus;
+  parentId?: string;
+  parent?: User;
+  subUsers?: User[];
   packages?: Package[];
   routes?: Route[];
   roles: UserRole[];

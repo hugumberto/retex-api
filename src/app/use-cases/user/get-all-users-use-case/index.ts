@@ -5,7 +5,7 @@ import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
-export interface GetAllUsersParamDto { role?: Role }
+export interface GetAllUsersParamDto { role?: Role; parentId?: string }
 
 @Injectable()
 export class GetAllUsersUseCase implements IUseCase<GetAllUsersParamDto, Omit<User, 'password'>[]> {
@@ -15,11 +15,11 @@ export class GetAllUsersUseCase implements IUseCase<GetAllUsersParamDto, Omit<Us
   ) { }
 
   async call(param?: GetAllUsersParamDto): Promise<Omit<User, 'password'>[]> {
-    const users = await this.userRepository.findWithRelations({}, { role: param?.role });
+    const query: Partial<User> = {};
+    if (param?.parentId) query.parentId = param.parentId;
 
-    return users.map(user => {
-      const { password, ...userWithoutPassword } = user;
-      return userWithoutPassword;
-    });
+    const users = await this.userRepository.findWithRelations(query, { role: param?.role });
+
+    return users.map(({ password, ...rest }) => rest);
   }
 } 

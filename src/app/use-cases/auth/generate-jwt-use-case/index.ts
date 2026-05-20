@@ -13,6 +13,7 @@ export class GenerateJwtUseCase implements IUseCase<User, JwtResult> {
       sub: user.id,
       email: user.email,
       roles: user.roles.map(role => role.role),
+      ...(user.parentId && { parentId: user.parentId }),
     };
 
     const access_token = this.jwtService.sign(payload);
