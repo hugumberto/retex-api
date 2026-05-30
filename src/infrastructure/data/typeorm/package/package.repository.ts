@@ -91,6 +91,8 @@ export class PackageRepository
       .leftJoinAndSelect('package.user', 'user')
       .leftJoinAndSelect('package.route', 'route')
       .leftJoinAndSelect('package.items', 'items')
+      .leftJoinAndSelect('items.brand', 'brand')
+      .leftJoinAndSelect('items.storageUnit', 'storageUnit')
       .where('package.id = :id', { id })
       .getOne();
   }
