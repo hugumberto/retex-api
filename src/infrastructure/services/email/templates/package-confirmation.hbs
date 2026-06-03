@@ -1,287 +1,71 @@
 <!DOCTYPE html>
 <html lang="pt">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registo efetuado com sucesso</title>
+  <title>Pacote cadastrado</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    .header { background: #1a1a2e; padding: 32px; text-align: center; }
+    .header h1 { color: #fff; margin: 0; font-size: 24px; }
+    .body { padding: 32px; color: #333; }
+    .body p { line-height: 1.6; }
+    .details { background: #f9f9f9; border-radius: 6px; padding: 16px 24px; margin: 24px 0; }
+    .details table { width: 100%; border-collapse: collapse; }
+    .details td { padding: 8px 0; font-size: 14px; }
+    .details td:first-child { color: #666; width: 40%; }
+    .details td:last-child { font-weight: bold; }
+    .footer { text-align: center; padding: 24px; font-size: 12px; color: #aaa; }
+  </style>
 </head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Pacote cadastrado com sucesso!</h1>
+    </div>
+    <div class="body">
+      <p>Olá, <strong>{{firstName}} {{lastName}}</strong>!</p>
+      <p>O seu pacote foi registado no nosso sistema. Consulte os detalhes abaixo:</p>
 
-<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f4;">
-    <tr>
-      <td align="center" style="padding:40px 16px;">
-        <table width="600" cellpadding="0" cellspacing="0" border="0"
-          style="max-width:600px;width:100%;background-color:#ffffff;">
-
-          <!-- Logo -->
+      <div class="details">
+        <table>
           <tr>
-            <td align="center" style="padding:32px 40px 24px;">
-              <img
-                src="https://media.discordapp.net/attachments/1214192167552294932/1506265999740112986/image.png?ex=6a0da307&is=6a0c5187&hm=f2ea6225ac8580a0e804d0feb323f749990813c888a0161601c485724c647cd8&=&format=png&quality=lossless"
-                alt="RETEX" width="120" style="display:block;" />
-            </td>
+            <td>Estado</td>
+            <td>{{status}}</td>
           </tr>
-
-          <!-- Hero image -->
           <tr>
-            <td style="padding:0;">
-              <img
-                src="https://media.discordapp.net/attachments/1214192167552294932/1506406969282662511/b3075b90fe57ca1d4824feb8efe68e30961af680.png?ex=6a0e2651&is=6a0cd4d1&hm=5ba67896a973a589e75840fc6bd7295710fad5b791422d22fdb7e4b67451ecde&=&format=png&quality=lossless&width=1522&height=856"
-                alt="" width="600" height="120px"
-                style="display:block;width:100%;max-width:600px;object-fit:cover;opacity:49%" />
-            </td>
+            <td>Morada</td>
+            <td>{{address.street}}, {{address.number}}{{#if address.complement}} — {{address.complement}}{{/if}}</td>
           </tr>
-
-          <!-- Success message -->
           <tr>
-            <td align="center" style="padding:28px 40px 8px;">
-              <table cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td valign="middle" style="padding-right:8px;">
-                    <img
-                      src="https://media.discordapp.net/attachments/1214192167552294932/1506412254097309868/image.png?ex=6a0e2b3d&is=6a0cd9bd&hm=299f3f515fe41675edd142f09c50cc6681221ea405b0c109a8e7bf584d56bd9a&=&format=png&quality=lossless"
-                      alt="" width="20" height="20" style="display:block;" />
-                  </td>
-                  <td valign="middle"
-                    style="font-size:12px;font-weight:bold;letter-spacing:1px;color:#02748E;text-transform:uppercase;">
-                    O SEU REGISTO FOI EFETUADO COM SUCESSO
-                  </td>
-                </tr>
-              </table>
-            </td>
+            <td>Cidade</td>
+            <td>{{address.city}} — {{address.countryDivision}}</td>
           </tr>
-
-          <!-- Body -->
           <tr>
-            <td style="padding:20px 40px 32px;">
-              <p style="margin:0 0 12px;font-size:15px;color:#333333;">
-                Olá, <a href="#" style="color:#02748E;text-decoration:none;font-weight:bold;">{{firstName}}
-                  {{lastName}}</a>!
-              </p>
-              <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
-                Informamos que o registo do processo <strong>nº{{packageId}}</strong>, foi efetuado com sucesso.
-              </p>
-              <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
-                Encontre no final deste email, os detalhes da sua encomenda.
-              </p>
-              <p style="margin:0 0 20px;font-size:15px;color:#333333;line-height:1.6;">
-                Caso necessite de mais informações sobre o seu processo, não hesite em contactar-nos através do
-                <a href="https://www.retex.pt/#form"
-                  style="color:#02748E;text-decoration:none;font-weight:bold;">formulário de contacto</a>,
-                disponível <a href="https://www.retex.pt/#form"
-                  style="color:#02748E;text-decoration:none;font-weight:bold;">aqui</a>.
-              </p>
-              <p style="margin:0;font-size:15px;color:#333333;">
-                A sua equipa <strong>RETEX Portugal</strong>
-              </p>
-            </td>
+            <td>Código Postal</td>
+            <td>{{address.zipCode}}</td>
           </tr>
-
-          <!-- Details section header -->
+          {{#if collectDay}}
           <tr>
-            <td align="center" style="padding:0 40px 20px;">
-              <p
-                style="margin:0;font-size:12px;font-weight:bold;letter-spacing:1px;color:#02748E;text-transform:uppercase;">
-                DETALHES DO PROCESSO DE REGISTO
-              </p>
-            </td>
+            <td>Dia de recolha</td>
+            <td>{{collectDay}}</td>
           </tr>
-
-          <!-- Details card -->
+          {{/if}}
+          {{#if collectTime}}
           <tr>
-            <td style="padding:0 40px 40px;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                style="border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;background-color:#F6F6F6;">
-
-                <!-- Nome -->
-                <tr>
-                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;width:45%;border-bottom:1px solid #f0f0f0;">
-                    Nome</td>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#013364;font-weight:500;border-bottom:1px solid #f0f0f0;">
-                    {{fullName}}</td>
-                </tr>
-
-                <!-- Status -->
-                <tr>
-                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;border-bottom:1px solid #f0f0f0;">Status
-                  </td>
-                  <td style="padding:14px 8px;border-bottom:1px solid #f0f0f0;">
-                    <span
-                      style="display:inline-block;background-color:#CFECDA;color:#59C35F;font-size:12px;font-weight:bold;padding:4px 12px;border-radius:20px;letter-spacing:0.5px;">
-                      {{status}}
-                    </span>
-                  </td>
-                </tr>
-
-                <!-- Endereço -->
-                <tr>
-                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;border-bottom:1px solid #f0f0f0;">Endereço
-                  </td>
-                  <td style="padding:14px 20px;font-size:14px;color:#013364;border-bottom:1px solid #f0f0f0;">
-                    {{address.street}}, {{address.number}}{{#if address.complement}} — {{address.complement}}{{/if}}
-                  </td>
-                </tr>
-
-                <!-- Cidade -->
-                <tr>
-                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;border-bottom:1px solid #f0f0f0;">Cidade
-                  </td>
-                  <td style="padding:14px 20px;font-size:14px;color:#013364;border-bottom:1px solid #f0f0f0;">
-                    {{address.city}}, {{address.countryDivision}}
-                  </td>
-                </tr>
-
-                <!-- Código-Postal -->
-                <tr>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#7F7F7F;{{#if collectDay}}border-bottom:1px solid #f0f0f0;{{/if}}">
-                    Código-Postal</td>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#013364;{{#if collectDay}}border-bottom:1px solid #f0f0f0;{{/if}}">
-                    {{address.zipCode}}</td>
-                </tr>
-
-                {{#if collectDay}}
-                <!-- Dia de recolha -->
-                <tr>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#7F7F7F;{{#if collectTime}}border-bottom:1px solid #f0f0f0;{{/if}}">
-                    Dia de recolha</td>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#013364;font-weight:500;{{#if collectTime}}border-bottom:1px solid #f0f0f0;{{/if}}">
-                    {{collectDay}}</td>
-                </tr>
-                {{/if}}
-
-                {{#if collectTime}}
-                <!-- Horário de recolha -->
-                <tr>
-                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;">Horário de recolha</td>
-                  <td style="padding:14px 20px;font-size:14px;color:#013364;font-weight:500;">{{collectTime}}</td>
-                </tr>
-                {{/if}}
-
-              </table>
-            </td>
+            <td>Hora de recolha</td>
+            <td>{{collectTime}}</td>
           </tr>
-
-          <!-- Divider -->
-          <tr>
-            <td style="padding:0 40px;">
-              <hr style="border:none;border-top:1px solid #e8e8e8;margin:0;" />
-            </td>
-          </tr>
-
-          <!-- Como funciona -->
-          <tr>
-            <td align="center" style="padding:40px 40px 48px;">
-              <p style="margin:0 0 4px;font-size:13px;color:#7F7F7F;">O nosso serviço</p>
-              <p style="margin:0 0 32px;font-size:26px;font-weight:bold;color:#013364;">Como funciona?</p>
-
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <!-- Efetuar registo -->
-                  <td align="center" style="width:33%;padding:0 8px;">
-                    <table cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td align="center" style="padding-bottom:12px;">
-                          <img
-                            src="https://media.discordapp.net/attachments/1214192167552294932/1506411591208534076/image.png?ex=6a0e2a9f&is=6a0cd91f&hm=96913cb52c075e456c3b8964dec853a0c6b86f8210179dcc4799df53487833cd&=&format=png&quality=lossless"
-                            alt="Efetuar Registo" width="32" height="32" style="display:block;" />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td align="center"
-                          style="font-size:11px;font-weight:bold;letter-spacing:1px;color:#013364;text-transform:uppercase;">
-                          EFETUAR REGISTO</td>
-                      </tr>
-                    </table>
-                  </td>
-
-                  <!-- Agendar recolha -->
-                  <td align="center" style="width:33%;padding:0 8px;">
-                    <table cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td align="center" style="padding-bottom:12px;">
-                          <img
-                            src="https://media.discordapp.net/attachments/1214192167552294932/1506411613752787005/image.png?ex=6a0e2aa4&is=6a0cd924&hm=045c0de0d61bdc7a4872e4b9a8f1bc20bcb1cdea07d4f042ff02526fa14ee051&=&format=png&quality=lossless"
-                            alt="Agendar Recolha" width="32" height="32" style="display:block;" />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td align="center"
-                          style="font-size:11px;font-weight:bold;letter-spacing:1px;color:#013364;text-transform:uppercase;">
-                          AGENDAR RECOLHA</td>
-                      </tr>
-                    </table>
-                  </td>
-
-                  <!-- Agora é connosco -->
-                  <td align="center" style="width:33%;padding:0 8px;">
-                    <table cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td align="center" style="padding-bottom:12px;">
-                          <img
-                            src="https://media.discordapp.net/attachments/1214192167552294932/1506411637975023838/image.png?ex=6a0e2aaa&is=6a0cd92a&hm=09a880a74504145dc8681d3498fa7eb01d5e7a366b955952e95be3c51ace046d&=&format=png&quality=lossless"
-                            alt="Agora é Connosco" width="32" height="32" style="display:block;" />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td align="center"
-                          style="font-size:11px;font-weight:bold;letter-spacing:1px;color:#013364;text-transform:uppercase;">
-                          AGORA É CONNOSCO</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color:#013364;padding:8px 40px;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td valign="middle">
-                    <img
-                      src="https://media.discordapp.net/attachments/1214192167552294932/1506406362110885888/image.png?ex=6a0e25c0&is=6a0cd440&hm=7e768a2dae6124c19c54faf35c0ab5c0e3716acc63919dd3841f016cee1fde5f&=&format=png&quality=lossless"
-                      alt="RETEX" width="80" style="display:block;" />
-                  </td>
-                  <td align="center" valign="middle" style="font-size:12px;color:#ffffff;">
-                    &copy;{{year}} RETEX
-                  </td>
-                  <td align="right" valign="middle">
-                    <table cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="padding-left:12px;">
-                          <a href="https://www.instagram.com/retex.pt" style="text-decoration:none;">
-                            <img
-                              src="https://media.discordapp.net/attachments/1214192167552294932/1506411681847312487/image.png?ex=6a0e2ab4&is=6a0cd934&hm=91aafbb3d09908ea752cf5da6d55179c51d74b41de0fe400de9c1aa9fc083677&=&format=png&quality=lossless"
-                              alt="Instagram" width="24" height="24" style="display:block;" />
-                          </a>
-                        </td>
-                        <td style="padding-left:12px;">
-                          <a href="https://www.linkedin.com/company/retex-portugal" style="text-decoration:none;">
-                            <img
-                              src="https://media.discordapp.net/attachments/1214192167552294932/1506411706774192258/image.png?ex=6a0e2aba&is=6a0cd93a&hm=ea5a138c3c32f56f16c0bb0513e8569cf169f5970fc1268f83a16b2df0c7060b&=&format=png&quality=lossless"
-                              alt="LinkedIn" width="24" height="24" style="display:block;" />
-                          </a>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
+          {{/if}}
         </table>
-      </td>
-    </tr>
-  </table>
-</body>
+      </div>
 
+      <p>Em caso de dúvidas, entre em contacto com a nossa equipa.</p>
+    </div>
+    <div class="footer">
+      <p>© {{year}} Retex. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</body>
 </html>
