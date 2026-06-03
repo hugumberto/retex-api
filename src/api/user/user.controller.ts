@@ -1,11 +1,28 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AddRoleToUserUseCase } from '../../app/use-cases/user/add-role-to-user-use-case';
 import { AddRoleToUserDto } from '../../app/use-cases/user/add-role-to-user-use-case/add-role-to-user.dto';
 import { CreateUserUseCase } from '../../app/use-cases/user/create-user-use-case';
 import { CreateUserDto } from '../../app/use-cases/user/create-user-use-case/create-user.dto';
 import { GetAllUsersUseCase } from '../../app/use-cases/user/get-all-users-use-case';
 import { GetUserByIdUseCase } from '../../app/use-cases/user/get-user-by-id-use-case';
+import { ResetUserPasswordUseCase } from '../../app/use-cases/user/reset-user-password-use-case';
+import { ResetUserPasswordDto } from '../../app/use-cases/user/reset-user-password-use-case/reset-user-password.dto';
 import { UpdateUserUseCase } from '../../app/use-cases/user/update-user-use-case';
 import { UpdateUserDto } from '../../app/use-cases/user/update-user-use-case/update-user.dto';
 import { Role } from '../../domain/user/user-roles.entity';
@@ -22,18 +39,21 @@ export class UserController {
     private readonly getUserByIdUseCase: GetUserByIdUseCase,
     private readonly getAllUsersUseCase: GetAllUsersUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly resetUserPasswordUseCase: ResetUserPasswordUseCase,
     private readonly addRoleToUserUseCase: AddRoleToUserUseCase,
-  ) { }
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Criar novo usuário' })
   @ApiResponse({
     status: 201,
     description: 'Usuário criado com sucesso',
-    type: Object
+    type: Object,
   })
   @ApiResponse({ status: 409, description: 'Usuário já existe' })
-  async createUser(@Body() createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
+  async createUser(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<Omit<User, 'password'>> {
     const user = await this.createUserUseCase.call(createUserDto);
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
@@ -44,14 +64,21 @@ export class UserController {
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Listar todos os usuários' })
-  @ApiQuery({ name: 'role', required: false, enum: Role, description: 'Filtra usuários por role' })
+  @ApiQuery({
+    name: 'role',
+    required: false,
+    enum: Role,
+    description: 'Filtra usuários por role',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lista de usuários',
-    type: Array
+    type: Array,
   })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
-  async getAllUsers(@Query('role') role?: Role): Promise<Omit<User, 'password'>[]> {
+  async getAllUsers(
+    @Query('role') role?: Role,
+  ): Promise<Omit<User, 'password'>[]> {
     return this.getAllUsersUseCase.call({ role });
   }
 
@@ -63,7 +90,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Usuário encontrado',
-    type: Object
+    type: Object,
   })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
@@ -71,6 +98,20 @@ export class UserController {
     const user = await this.getUserByIdUseCase.call(id);
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  }
+
+  @Put('reset-password')
+  @ApiOperation({ summary: 'Resetar senha do usuário' })
+  @ApiResponse({
+    status: 200,
+    description: 'Senha atualizada com sucesso',
+    type: Object,
+  })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
+  async resetUserPassword(
+    @Body() resetUserPasswordDto: ResetUserPasswordDto,
+  ): Promise<Omit<User, 'password'>> {
+    return this.resetUserPasswordUseCase.call(resetUserPasswordDto);
   }
 
   @Put(':id')
@@ -81,14 +122,14 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Usuário atualizado com sucesso',
-    type: Object
+    type: Object,
   })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   @ApiResponse({ status: 409, description: 'Email ou documento já em uso' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   async updateUser(
     @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<Omit<User, 'password'>> {
     return this.updateUserUseCase.call({ id, data: updateUserDto });
   }
@@ -97,17 +138,20 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Sincronizar roles do usuário (substitui as existentes pelas enviadas)' })
+  @ApiOperation({
+    summary:
+      'Sincronizar roles do usuário (substitui as existentes pelas enviadas)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Roles sincronizadas com sucesso',
-    type: Object
+    type: Object,
   })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   @ApiResponse({ status: 403, description: 'Acesso negado - apenas ADMINs' })
   async addRoleToUser(
     @Param('id') userId: string,
-    @Body() addRoleDto: AddRoleToUserDto
+    @Body() addRoleDto: AddRoleToUserDto,
   ): Promise<Omit<User, 'password'>> {
     return this.addRoleToUserUseCase.call({ userId, data: addRoleDto });
   }
