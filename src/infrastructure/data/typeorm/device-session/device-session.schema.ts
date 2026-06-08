@@ -13,7 +13,7 @@ export const deviceSessionSchema = new EntitySchema<DeviceSession>({
     ...BaseTimestampColumns,
   },
   indices: [
-    { columns: ['user_id'] },
-    { columns: ['user_id', 'active'] },
+    { name: 'IDX_DEVICE_SESSION_USER_ID', columns: ['userId'] },
+    { name: 'IDX_DEVICE_SESSION_USER_ID_ACTIVE', columns: ['userId', 'active'] },
   ],
 });

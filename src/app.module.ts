@@ -33,6 +33,7 @@ export class AppModule {
   static register(): DynamicModule {
     const imports = [
       ConfigModule.forRoot({
+        isGlobal: true,
         validate: getConfigValidation,
         ignoreEnvVars: process.env.NODE_ENV === 'development',
       }),

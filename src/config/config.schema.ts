@@ -13,7 +13,7 @@ export const envSchema = z.object({
   SMTP_USER: z.string(),
   SMTP_PASS: z.string(),
   SMTP_FROM: z.string(),
-  GOOGLE_APPLICATION_CREDENTIALS: z.string(),
+  GOOGLE_VISION_API_KEY: z.string(),
 });
 
 export function getConfigValidation(env: Record<string, string>) {
