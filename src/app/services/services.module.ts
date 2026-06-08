@@ -1,6 +1,7 @@
 import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
 import { CryptoService } from './crypto/crypto.service';
 import { IEmailService } from './interfaces/email.interface';
+import { IGoogleVisionService } from './interfaces/google-vision.interface';
 import { ISanitizationService } from './interfaces/sanitization.interface';
 import { ILocalStorageService } from './local-storage/local-storage.service';
 import { SERVICE_TOKENS } from './tokens';
@@ -9,6 +10,7 @@ export interface ServicesModuleOptions {
   sanitizationService: Type<ISanitizationService>;
   localStorageService: Type<ILocalStorageService>;
   emailService: Type<IEmailService>;
+  googleVisionService: Type<IGoogleVisionService>;
   imports?: Array<
     Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
   >;
@@ -36,6 +38,10 @@ export class ServicesModule {
         {
           provide: SERVICE_TOKENS.EMAIL_SERVICE,
           useClass: options.emailService,
+        },
+        {
+          provide: SERVICE_TOKENS.GOOGLE_VISION_SERVICE,
+          useClass: options.googleVisionService,
         },
       ],
       exports: [...Object.values(SERVICE_TOKENS)],

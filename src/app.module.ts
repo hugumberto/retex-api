@@ -11,6 +11,7 @@ import { DomainModule } from './domain/domain.module';
 import { TypeORMUnitOfWork } from './infrastructure/data/typeorm/abstraction/unit-of-work';
 import { BlogPostRepository } from './infrastructure/data/typeorm/blog-post/blog-post.repository';
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
+import { DeviceSessionRepository } from './infrastructure/data/typeorm/device-session/device-session.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
 import { PackageRepository } from './infrastructure/data/typeorm/package/package.repository';
 import { RouteRepository } from './infrastructure/data/typeorm/route/route.repository';
@@ -22,6 +23,8 @@ import { RefreshTokenRepository } from './infrastructure/data/typeorm/user/refre
 import { UserRepository } from './infrastructure/data/typeorm/user/user.repository';
 import { EmailModule } from './infrastructure/services/email/email.module';
 import { EmailService } from './infrastructure/services/email/email.service';
+import { GoogleVisionModule } from './infrastructure/services/google-vision/google-vision.module';
+import { GoogleVisionService } from './infrastructure/services/google-vision/google-vision.service';
 import { LocalStorageModule } from './infrastructure/services/local-storage/local-storage.module';
 import { LocalStorageService } from './infrastructure/services/local-storage/local-storage.service';
 import { SanitizationService } from './infrastructure/services/sanitization/sanitization.service';
@@ -45,6 +48,7 @@ export class AppModule {
         userRoleRepository: UserRoleRepository,
         refreshTokenRepository: RefreshTokenRepository,
         blogPostRepository: BlogPostRepository,
+        deviceSessionRepository: DeviceSessionRepository,
         unitOfWork: TypeORMUnitOfWork,
         imports: [AppTypeORMModule],
       }),
@@ -52,7 +56,8 @@ export class AppModule {
         sanitizationService: SanitizationService,
         localStorageService: LocalStorageService,
         emailService: EmailService,
-        imports: [LocalStorageModule, EmailModule],
+        googleVisionService: GoogleVisionService,
+        imports: [LocalStorageModule, EmailModule, GoogleVisionModule],
       }),
       ApiModule,
     ];

@@ -7,12 +7,14 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { BlogPostController } from './blog-post/blog-post.controller';
 import { BrandController } from './brand/brand.controller';
+import { DeviceSessionController } from './device-session/device-session.controller';
 import { HealthController } from './health/health.controller';
 import { ItemController } from './item/item.controller';
 import { PackageController } from './package/package.controller';
 import { RouteController } from './route/route.controller';
 import { StorageUnitController } from './storage-unit/storage-unit.controller';
 import { UserController } from './user/user.controller';
+import { VisionController } from './vision/vision.controller';
 import { WelcomeController } from './welcome/welcome.controller';
 
 @Module({
@@ -31,7 +33,9 @@ import { WelcomeController } from './welcome/welcome.controller';
     StorageUnitController,
     BrandController,
     ItemController,
-    BlogPostController
+    BlogPostController,
+    DeviceSessionController,
+    VisionController,
   ],
   providers: [JwtAuthGuard, RolesGuard],
 })

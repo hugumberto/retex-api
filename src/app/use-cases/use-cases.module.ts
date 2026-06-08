@@ -5,11 +5,13 @@ import { ServicesModule } from '../services/services.module';
 import { AUTH_USE_CASES } from './auth';
 import { BLOG_POST_USE_CASES } from './blog-post';
 import { BRAND_USE_CASES } from './brand';
+import { DEVICE_SESSION_USE_CASES } from './device-session';
 import { ITEM_USE_CASES } from './item/item.use-cases';
 import { PACKAGE_USE_CASES } from './package';
 import { ROUTE_USE_CASES } from './route';
 import { STORAGE_UNIT_USE_CASES } from './storage-unit';
 import { USER_USE_CASES } from './user';
+import { VISION_USE_CASES } from './vision';
 import { WELCOME_USE_CASES } from './welcome';
 
 export class UseCasesModule {
@@ -23,7 +25,9 @@ export class UseCasesModule {
       ...STORAGE_UNIT_USE_CASES,
       ...BRAND_USE_CASES,
       ...ITEM_USE_CASES,
-      ...BLOG_POST_USE_CASES
+      ...BLOG_POST_USE_CASES,
+      ...DEVICE_SESSION_USE_CASES,
+      ...VISION_USE_CASES,
     ];
 
     return {
