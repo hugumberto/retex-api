@@ -8,6 +8,6 @@ export class UpdatePackageDto {
 
   @IsOptional()
   @IsNumber()
-  @Min(0)
+  @Min(1)
   weight?: number;
 }
