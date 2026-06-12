@@ -11,7 +11,6 @@ import { DomainModule } from './domain/domain.module';
 import { TypeORMUnitOfWork } from './infrastructure/data/typeorm/abstraction/unit-of-work';
 import { BlogPostRepository } from './infrastructure/data/typeorm/blog-post/blog-post.repository';
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
-import { DeviceSessionRepository } from './infrastructure/data/typeorm/device-session/device-session.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
 import { PackageRepository } from './infrastructure/data/typeorm/package/package.repository';
 import { RouteRepository } from './infrastructure/data/typeorm/route/route.repository';
@@ -49,7 +48,6 @@ export class AppModule {
         userRoleRepository: UserRoleRepository,
         refreshTokenRepository: RefreshTokenRepository,
         blogPostRepository: BlogPostRepository,
-        deviceSessionRepository: DeviceSessionRepository,
         unitOfWork: TypeORMUnitOfWork,
         imports: [AppTypeORMModule],
       }),

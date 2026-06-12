@@ -17,6 +17,14 @@ export interface ClothingColor {
   pixelFraction: number;
 }
 
+export interface ClothingClassification {
+  position: 'superior' | 'inferior' | 'completo' | null;
+  season: 'primavera-verao' | 'outono-inverno' | null;
+  gender: 'masculino' | 'feminino' | 'unisex' | null;
+  ageGroup: 'adulto' | 'infantil' | null;
+  brand: string | null;
+}
+
 export interface AnalyzeImageResult {
   labels: VisionLabel[];
   objects: VisionLabel[];
@@ -25,6 +33,7 @@ export interface AnalyzeImageResult {
     materials: VisionLabel[];
     styles: VisionLabel[];
     patterns: VisionLabel[];
+    classification: ClothingClassification;
   };
   colors: ClothingColor[];
 }

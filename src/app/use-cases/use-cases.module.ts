@@ -5,7 +5,6 @@ import { ServicesModule } from '../services/services.module';
 import { AUTH_USE_CASES } from './auth';
 import { BLOG_POST_USE_CASES } from './blog-post';
 import { BRAND_USE_CASES } from './brand';
-import { DEVICE_SESSION_USE_CASES } from './device-session';
 import { ITEM_USE_CASES } from './item/item.use-cases';
 import { PACKAGE_USE_CASES } from './package';
 import { ROUTE_USE_CASES } from './route';
@@ -26,7 +25,6 @@ export class UseCasesModule {
       ...BRAND_USE_CASES,
       ...ITEM_USE_CASES,
       ...BLOG_POST_USE_CASES,
-      ...DEVICE_SESSION_USE_CASES,
       ...VISION_USE_CASES,
     ];
 

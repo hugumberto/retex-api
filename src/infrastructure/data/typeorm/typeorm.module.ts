@@ -4,7 +4,6 @@ import { blogPostSchema } from './blog-post/blog-post.schema';
 import { brandSchema } from './brand/brand.schema';
 import { TEST_DATABASE_CONFIG } from './config/typeorm-test.config';
 import { DATABASE_CONFIG } from './config/typeorm.config';
-import { deviceSessionSchema } from './device-session/device-session.schema';
 import { itemSchema } from './item/item.schema';
 import { packageSchema } from './package/package.schema';
 import { routeSchema } from './route/route.schema';
@@ -30,7 +29,6 @@ import { userSchema } from './user/user.schema';
       userRoleSchema,
       refreshTokenSchema,
       blogPostSchema,
-      deviceSessionSchema,
     ]),
   ],
   exports: [TypeOrmModule],

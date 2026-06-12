@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
 
+import * as express from 'express';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -24,6 +25,8 @@ async function bootstrap() {
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
   const config = new DocumentBuilder()
     .setTitle('Retex API')
