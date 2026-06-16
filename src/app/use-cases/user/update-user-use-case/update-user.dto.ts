@@ -19,10 +19,6 @@ export class UpdateUserDto {
   contactPhone?: string;
 
   @IsOptional()
-  @IsString({ message: 'Número do documento deve ser uma string' })
-  documentNumber?: string;
-
-  @IsOptional()
   @IsEnum(UserStatus, { message: 'Status deve ser ACTIVE ou INACTIVE' })
   status?: UserStatus;
 } 

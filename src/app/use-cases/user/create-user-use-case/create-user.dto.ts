@@ -17,10 +17,6 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Telefone é obrigatório' })
   contactPhone: string;
 
-  @IsString({ message: 'Número do documento deve ser uma string' })
-  @IsNotEmpty({ message: 'Número do documento é obrigatório' })
-  documentNumber: string;
-
   @IsString({ message: 'Senha deve ser uma string' })
   @IsNotEmpty({ message: 'Senha é obrigatória' })
   @MinLength(6, { message: 'Senha deve ter pelo menos 6 caracteres' })

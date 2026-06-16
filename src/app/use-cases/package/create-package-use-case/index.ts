@@ -115,8 +115,7 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
       lastName: packageDto.lastName,
       email: packageDto.email,
       contactPhone: packageDto.contactPhone,
-      documentNumber: packageDto.nif,
-      password: packageDto.nif,
+      password: packageDto.contactPhone,
     };
 
     return dto;

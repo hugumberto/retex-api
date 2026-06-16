@@ -32,7 +32,6 @@ export class SeedService implements OnApplicationBootstrap {
       lastName: 'Retex',
       email: adminEmail,
       contactPhone: '000000000',
-      documentNumber: '000000000',
       password: hashedPassword,
       status: UserStatus.ACTIVE,
     });

@@ -2,8 +2,6 @@ import { ConflictException, Inject, Injectable, NotFoundException } from '@nestj
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
-import { ISanitizationService } from '../../../services/interfaces/sanitization.interface';
-import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { UpdateUserParamDto } from './update-user-param.dto';
 
@@ -12,8 +10,6 @@ export class UpdateUserUseCase implements IUseCase<UpdateUserParamDto, Omit<User
   constructor(
     @Inject(DOMAIN_TOKENS.USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
-    @Inject(SERVICE_TOKENS.SANITIZATION_SERVICE)
-    private readonly sanitizationService: ISanitizationService,
   ) { }
 
   async call(param: UpdateUserParamDto): Promise<Omit<User, 'password'>> {
@@ -27,19 +23,6 @@ export class UpdateUserUseCase implements IUseCase<UpdateUserParamDto, Omit<User
 
     // Preparar dados para atualização
     const updateData: Partial<User> = { ...data };
-
-    // Sanitizar documento se fornecido
-    if (data.documentNumber) {
-      updateData.documentNumber = this.sanitizationService.sanitizeNumericString(data.documentNumber);
-
-      // Verificar se documento já existe em outro usuário
-      const userWithDocument = await this.userRepository.findOne({
-        documentNumber: updateData.documentNumber
-      });
-      if (userWithDocument && userWithDocument.id !== id) {
-        throw new ConflictException('Documento já está em uso por outro usuário');
-      }
-    }
 
     // Verificar se email já existe em outro usuário
     if (data.email) {

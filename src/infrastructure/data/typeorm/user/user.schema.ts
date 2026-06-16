@@ -36,13 +36,6 @@ export const userSchema = new EntitySchema<User>({
       length: 20,
       name: 'contact_phone',
     },
-    documentNumber: {
-      type: 'varchar',
-      nullable: false,
-      length: 20,
-      unique: true,
-      name: 'document_number',
-    },
     password: {
       type: 'varchar',
       nullable: false,
@@ -84,11 +77,6 @@ export const userSchema = new EntitySchema<User>({
     },
   },
   indices: [
-    {
-      name: 'IDX_USER_DOCUMENT_NUMBER',
-      unique: true,
-      columns: ['documentNumber'],
-    },
     {
       name: 'IDX_USER_EMAIL',
       unique: true,

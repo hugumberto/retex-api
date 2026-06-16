@@ -74,10 +74,6 @@ export class CreatePackageDto {
   @IsOptional()
   timeOfDay?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  nif: string;
-
   @ValidateNested()
   @Type(() => AddressDto)
   address: AddressDto;

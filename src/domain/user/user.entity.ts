@@ -9,7 +9,6 @@ export interface User extends Entity {
   lastName: string;
   email: string;
   contactPhone: string;
-  documentNumber: string;
   password: string;
   status: UserStatus;
   packages?: Package[];
