@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { UserType } from '../../../../domain/user/user-type.enum';
 
 export class CreateUserDto {
   @IsString({ message: 'Nome deve ser uma string' })
@@ -21,4 +22,8 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Senha é obrigatória' })
   @MinLength(6, { message: 'Senha deve ter pelo menos 6 caracteres' })
   password: string;
+
+  @IsEnum(UserType, { message: 'userType deve ser PERSON ou COMPANY' })
+  @IsNotEmpty({ message: 'userType é obrigatório' })
+  userType: UserType;
 }

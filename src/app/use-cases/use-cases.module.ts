@@ -2,6 +2,7 @@ import { DynamicModule } from '@nestjs/common';
 import { DomainModule } from '../../domain/domain.module';
 import { AuthModule } from '../services/auth/auth.module';
 import { ServicesModule } from '../services/services.module';
+import { ADDRESS_USE_CASES } from './address';
 import { AUTH_USE_CASES } from './auth';
 import { BLOG_POST_USE_CASES } from './blog-post';
 import { BRAND_USE_CASES } from './brand';
@@ -17,6 +18,7 @@ export class UseCasesModule {
     const providers = [
       ...WELCOME_USE_CASES,
       ...USER_USE_CASES,
+      ...ADDRESS_USE_CASES,
       ...AUTH_USE_CASES,
       ...PACKAGE_USE_CASES,
       ...ROUTE_USE_CASES,

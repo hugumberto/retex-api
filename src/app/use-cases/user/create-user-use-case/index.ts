@@ -38,6 +38,7 @@ export class CreateUserUseCase implements IUseCase<CreateUserDto, User> {
       contactPhone: param.contactPhone,
       password: hashedPassword,
       status: UserStatus.ACTIVE,
+      userType: param.userType,
     };
 
     user = await this.userRepository.create(user);

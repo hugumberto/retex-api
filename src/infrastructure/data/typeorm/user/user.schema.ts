@@ -1,5 +1,6 @@
 import { EntitySchema } from 'typeorm';
 import { UserStatus } from '../../../../domain/user/user-status.enum';
+import { UserType } from '../../../../domain/user/user-type.enum';
 import { User } from '../../../../domain/user/user.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
 
@@ -48,6 +49,12 @@ export const userSchema = new EntitySchema<User>({
       nullable: false,
       name: 'status',
     },
+    userType: {
+      type: 'enum',
+      enum: UserType,
+      nullable: false,
+      name: 'user_type',
+    },
     ...BaseTimestampColumns,
   },
   relations: {
@@ -70,6 +77,14 @@ export const userSchema = new EntitySchema<User>({
     roles: {
       type: 'one-to-many',
       target: 'user_role',
+      joinColumn: {
+        name: 'user_id',
+      },
+      inverseSide: 'user',
+    },
+    addresses: {
+      type: 'one-to-many',
+      target: 'user_address',
       joinColumn: {
         name: 'user_id',
       },

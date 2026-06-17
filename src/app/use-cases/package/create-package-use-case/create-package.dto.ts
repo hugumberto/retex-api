@@ -1,70 +1,13 @@
-import { Type } from 'class-transformer';
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-
-export class AddressDto {
-  @IsString()
-  @IsNotEmpty()
-  street: string;
-
-  @IsString()
-  @IsNotEmpty()
-  number: string;
-
-  @IsString()
-  @IsOptional()
-  complement?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  city: string;
-
-  @IsString()
-  @IsNotEmpty()
-  cityDivision: string;
-
-  @IsString()
-  @IsNotEmpty()
-  country: string;
-
-  @IsString()
-  @IsNotEmpty()
-  countryDivision: string;
-
-  @IsString()
-  @IsNotEmpty()
-  zipCode: string;
-
-  @IsString()
-  @IsNotEmpty()
-  lat: string;
-
-  @IsString()
-  @IsNotEmpty()
-  long: string;
-}
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreatePackageDto {
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
-  firstName: string;
+  userId: string;
 
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
-  lastName: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  contactPhone: string;
+  addressId: string;
 
   @IsString()
   @IsOptional()
@@ -73,8 +16,4 @@ export class CreatePackageDto {
   @IsString()
   @IsOptional()
   timeOfDay?: string;
-
-  @ValidateNested()
-  @Type(() => AddressDto)
-  address: AddressDto;
-} 
+}

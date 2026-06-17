@@ -9,6 +9,7 @@ import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { ICryptoService } from '../../../services/interfaces/crypto.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
+import { UserType } from '../../../../domain/user/user-type.enum';
 
 describe('CreateUserUseCase', () => {
   let createUserUseCase: CreateUserUseCase;
@@ -44,6 +45,7 @@ describe('CreateUserUseCase', () => {
         email: 'john@email.com',
         contactPhone: '99999999',
         password: 'secret',
+        userType: UserType.PERSON,
       });
 
       expect(response).toEqual(

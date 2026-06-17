@@ -9,6 +9,7 @@ import { getConfigValidation } from './config/config.schema';
 import { getLoggerConfig } from './config/logger.config';
 import { DomainModule } from './domain/domain.module';
 import { TypeORMUnitOfWork } from './infrastructure/data/typeorm/abstraction/unit-of-work';
+import { AddressRepository } from './infrastructure/data/typeorm/address/address.repository';
 import { BlogPostRepository } from './infrastructure/data/typeorm/blog-post/blog-post.repository';
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
@@ -36,6 +37,7 @@ export class AppModule {
       UseCasesModule.register(),
       DomainModule.register({
         userRepository: UserRepository,
+        addressRepository: AddressRepository,
         testZoneRepository: TestZoneRepository,
         brandRepository: BrandRepository,
         itemRepository: ItemRepository,

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { addressSchema } from './address/address.schema';
 import { blogPostSchema } from './blog-post/blog-post.schema';
 import { brandSchema } from './brand/brand.schema';
 import { TEST_DATABASE_CONFIG } from './config/typeorm-test.config';
@@ -20,6 +21,7 @@ import { userSchema } from './user/user.schema';
     ),
     TypeOrmModule.forFeature([
       userSchema,
+      addressSchema,
       testZoneSchema,
       brandSchema,
       itemSchema,

@@ -1,4 +1,5 @@
 import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
+import { IAddressRepository } from './address/address.repository';
 import { IBlogPostRepository } from './blog-post/blog-post.repository';
 import { IBrandRepository } from './brand/brand.repository';
 import { IUnitOfWork } from './interfaces/unit-of-work.interface';
@@ -14,6 +15,7 @@ import { IUserRepository } from './user/user.repository';
 
 export interface DomainModuleOptions {
   userRepository: Type<IUserRepository>;
+  addressRepository: Type<IAddressRepository>;
   testZoneRepository: Type<ITestZoneRepository>;
   brandRepository: Type<IBrandRepository>;
   itemRepository: Type<IItemRepository>;
@@ -39,6 +41,10 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.USER_REPOSITORY,
           useClass: options.userRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.ADDRESS_REPOSITORY,
+          useClass: options.addressRepository,
         },
         {
           provide: DOMAIN_TOKENS.TEST_ZONE_REPOSITORY,
@@ -85,6 +91,10 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.USER_REPOSITORY,
           useClass: options.userRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.ADDRESS_REPOSITORY,
+          useClass: options.addressRepository,
         },
         {
           provide: DOMAIN_TOKENS.TEST_ZONE_REPOSITORY,
