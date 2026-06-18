@@ -39,8 +39,8 @@ export class CreateAddressUseCase implements IUseCase<CreateAddressDto, Address>
       country: param.country,
       countryDivision: param.countryDivision,
       zipCode: this.sanitizationService.sanitizeNumericString(param.zipCode),
-      lat: parseFloat(param.lat),
-      long: parseFloat(param.long),
+      lat: this.sanitizationService.sanitizeCoordinate(param.lat),
+      long: this.sanitizationService.sanitizeCoordinate(param.long),
       isDefault: param.isDefault ?? false,
     });
   }
