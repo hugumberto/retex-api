@@ -1,11 +1,13 @@
 import { mockDeep } from 'jest-mock-extended';
 import { Repository } from 'typeorm';
+import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
 import { BaseRepository } from './base.repository';
 
 describe('BaseRepository', () => {
   const repository = mockDeep<Repository<any>>();
+  const localStorageService = mockDeep<ILocalStorageService>();
   const makeSut = () => {
-    return new BaseRepository<any>(repository as any);
+    return new BaseRepository<any>(repository as any, localStorageService);
   };
 
   describe('create', () => {

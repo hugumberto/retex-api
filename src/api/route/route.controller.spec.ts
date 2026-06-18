@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateRouteUseCase } from '../../app/use-cases/route/create-route-use-case';
+import { DeleteRouteUseCase } from '../../app/use-cases/route/delete-route-use-case';
 import { GetAllRoutesUseCase } from '../../app/use-cases/route/get-all-routes-use-case';
 import { GetRouteByIdUseCase } from '../../app/use-cases/route/get-route-by-id-use-case';
 import { UpdateRouteUseCase } from '../../app/use-cases/route/update-route-use-case';
@@ -8,6 +9,7 @@ import { RouteController } from './route.controller';
 describe('RouteController', () => {
   let controller: RouteController;
   let createRouteUseCase: CreateRouteUseCase;
+  let deleteRouteUseCase: DeleteRouteUseCase;
   let getAllRoutesUseCase: GetAllRoutesUseCase;
   let getRouteByIdUseCase: GetRouteByIdUseCase;
   let updateRouteUseCase: UpdateRouteUseCase;
@@ -18,6 +20,12 @@ describe('RouteController', () => {
       providers: [
         {
           provide: CreateRouteUseCase,
+          useValue: {
+            call: jest.fn(),
+          },
+        },
+        {
+          provide: DeleteRouteUseCase,
           useValue: {
             call: jest.fn(),
           },
@@ -45,6 +53,7 @@ describe('RouteController', () => {
 
     controller = module.get<RouteController>(RouteController);
     createRouteUseCase = module.get<CreateRouteUseCase>(CreateRouteUseCase);
+    deleteRouteUseCase = module.get<DeleteRouteUseCase>(DeleteRouteUseCase);
     getAllRoutesUseCase = module.get<GetAllRoutesUseCase>(GetAllRoutesUseCase);
     getRouteByIdUseCase = module.get<GetRouteByIdUseCase>(GetRouteByIdUseCase);
     updateRouteUseCase = module.get<UpdateRouteUseCase>(UpdateRouteUseCase);
@@ -60,6 +69,7 @@ describe('RouteController', () => {
         driverId: 'driver-uuid-123',
         packageIds: ['package-1', 'package-2'],
         startDate: '2024-01-15T10:00:00Z',
+        shift: 'MORNING',
       };
 
       const expectedResult = {
