@@ -9,9 +9,9 @@ export interface Package extends Entity {
   user: User;
   route?: Route;
   weight?: number;
-  collectDay: string;
-  collectTime: string;
-  address: Address;
+  collectDay?: string;
+  collectTime?: string;
+  address?: Address;
   addressId?: string;
   items?: Item[];
 }
