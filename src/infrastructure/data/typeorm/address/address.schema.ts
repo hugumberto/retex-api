@@ -14,7 +14,7 @@ export const addressSchema = new EntitySchema<Address>({
       type: 'uuid',
       nullable: false,
       name: 'user_id',
-    }
+    },
     street: {
       type: 'varchar',
       nullable: false,
