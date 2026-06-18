@@ -55,9 +55,8 @@ export const packageSchema = new EntitySchema<Package>({
       joinColumn: {
         name: 'address_id',
       },
-      inverseSide: null,
       nullable: true,
-    },
+    }
     route: {
       type: 'many-to-one',
       target: 'route',
