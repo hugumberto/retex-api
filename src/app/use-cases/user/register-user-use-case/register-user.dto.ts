@@ -1,12 +1,15 @@
 import { Type } from 'class-transformer';
 import {
+  IsDateString,
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
   MinLength,
   ValidateNested,
 } from 'class-validator';
+import { Gender } from '../../../../domain/user/gender.enum';
 
 export class RegisterAddressDto {
   @IsString()
@@ -14,40 +17,40 @@ export class RegisterAddressDto {
   street: string;
 
   @IsString()
-  @IsNotEmpty()
-  number: string;
+  @IsOptional()
+  number?: string;
 
   @IsString()
   @IsOptional()
   complement?: string;
 
   @IsString()
-  @IsNotEmpty()
-  city: string;
+  @IsOptional()
+  city?: string;
 
   @IsString()
-  @IsNotEmpty()
-  cityDivision: string;
+  @IsOptional()
+  cityDivision?: string;
 
   @IsString()
-  @IsNotEmpty()
-  country: string;
+  @IsOptional()
+  country?: string;
 
   @IsString()
-  @IsNotEmpty()
-  countryDivision: string;
+  @IsOptional()
+  countryDivision?: string;
 
   @IsString()
   @IsNotEmpty()
   zipCode: string;
 
   @IsString()
-  @IsNotEmpty()
-  lat: string;
+  @IsOptional()
+  lat?: string;
 
   @IsString()
-  @IsNotEmpty()
-  long: string;
+  @IsOptional()
+  long?: string;
 }
 
 export class RegisterUserDto {
@@ -64,13 +67,21 @@ export class RegisterUserDto {
   email: string;
 
   @IsString({ message: 'Telefone deve ser uma string' })
-  @IsNotEmpty({ message: 'Telefone é obrigatório' })
-  contactPhone: string;
+  @IsOptional()
+  contactPhone?: string;
 
   @IsString({ message: 'Senha deve ser uma string' })
-  @IsNotEmpty({ message: 'Senha é obrigatória' })
+  @IsOptional()
   @MinLength(6, { message: 'Senha deve ter pelo menos 6 caracteres' })
-  password: string;
+  password?: string;
+
+  @IsOptional()
+  @IsEnum(Gender)
+  gender?: Gender;
+
+  @IsOptional()
+  @IsDateString()
+  dateOfBirth?: string;
 
   @ValidateNested()
   @Type(() => RegisterAddressDto)

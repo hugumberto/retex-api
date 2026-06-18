@@ -1,4 +1,5 @@
 import { EntitySchema } from 'typeorm';
+import { Gender } from '../../../../domain/user/gender.enum';
 import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { UserType } from '../../../../domain/user/user-type.enum';
 import { User } from '../../../../domain/user/user.entity';
@@ -54,6 +55,17 @@ export const userSchema = new EntitySchema<User>({
       enum: UserType,
       nullable: false,
       name: 'user_type',
+    },
+    gender: {
+      type: 'enum',
+      enum: Gender,
+      nullable: true,
+      name: 'gender',
+    },
+    dateOfBirth: {
+      type: 'date',
+      nullable: true,
+      name: 'date_of_birth',
     },
     ...BaseTimestampColumns,
   },
