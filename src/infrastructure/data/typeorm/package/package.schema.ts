@@ -1,5 +1,8 @@
 import { EntitySchema } from 'typeorm';
-import { Package, PackageStatus } from '../../../../domain/package/package.entity';
+import {
+  Package,
+  PackageStatus,
+} from '../../../../domain/package/package.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
 
 export const packageSchema = new EntitySchema<Package>({
@@ -56,7 +59,7 @@ export const packageSchema = new EntitySchema<Package>({
         name: 'address_id',
       },
       nullable: true,
-    }
+    },
     route: {
       type: 'many-to-one',
       target: 'route',
