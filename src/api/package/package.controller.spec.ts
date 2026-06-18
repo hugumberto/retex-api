@@ -68,18 +68,8 @@ describe('PackageController', () => {
         lastName: 'Doe',
         email: 'john@example.com',
         contactPhone: '123456789',
-        nif: '123456789',
-        address: {
-          street: 'Street',
-          number: '1',
-          city: 'Lisbon',
-          cityDivision: 'Lisbon',
-          country: 'Portugal',
-          countryDivision: 'Lisbon',
-          zipCode: '1000-001',
-          lat: '38.7223',
-          long: '-9.1393',
-        },
+        userId: 'user-id',
+        addressId: 'address-id',
       };
       const expectedResult = { id: 'package-id', ...body };
 
