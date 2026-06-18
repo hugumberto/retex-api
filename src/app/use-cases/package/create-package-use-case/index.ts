@@ -1,7 +1,10 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { IAddressRepository } from '../../../../domain/address/address.repository';
 import { IUnitOfWork } from '../../../../domain/interfaces/unit-of-work.interface';
-import { Package, PackageStatus } from '../../../../domain/package/package.entity';
+import {
+  Package,
+  PackageStatus,
+} from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
 import { ITestZoneRepository } from '../../../../domain/test-zone/test-zone.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -13,7 +16,9 @@ import { IUseCase } from '../../interfaces/use-case.interface';
 import { CreatePackageDto } from './create-package.dto';
 
 @Injectable()
-export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package> {
+export class CreatePackageUseCase
+  implements IUseCase<CreatePackageDto, Package>
+{
   private readonly logger = new Logger(CreatePackageUseCase.name);
 
   constructor(
@@ -31,7 +36,7 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
     private readonly sanitizationService: ISanitizationService,
     @Inject(SERVICE_TOKENS.EMAIL_SERVICE)
     private readonly emailService: IEmailService,
-  ) { }
+  ) {}
 
   async call(param: CreatePackageDto): Promise<Package> {
     const user = await this.userRepository.findOne({ id: param.userId });
@@ -39,15 +44,21 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
       throw new NotFoundException('Utilizador não encontrado');
     }
 
-    const address = await this.addressRepository.findOne({ id: param.addressId });
+    const address = await this.addressRepository.findOne({
+      id: param.addressId,
+    });
     if (!address || address.userId !== param.userId) {
       throw new NotFoundException('Endereço não encontrado');
     }
 
     const pkg = await this.unitOfWork.runInTransaction(async () => {
-      const sanitizedCity = this.sanitizationService.sanitizeString(address.city);
+      const sanitizedCity = this.sanitizationService.sanitizeString(
+        address.city,
+      );
       const testZone = await this.testZoneRepository.findByCity(sanitizedCity);
-      const packageStatus = testZone ? PackageStatus.CREATED : PackageStatus.OUT_OF_ZONE;
+      const packageStatus = testZone
+        ? PackageStatus.CREATED
+        : PackageStatus.OUT_OF_ZONE;
 
       const packageDto: Partial<Package> = {
         status: packageStatus,
@@ -61,7 +72,9 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
     });
 
     this.sendConfirmationEmail(user, address, pkg).catch((err) =>
-      this.logger.error(`Falha ao enviar email de confirmação para ${user.email}: ${err.message}`),
+      this.logger.error(
+        `Falha ao enviar email de confirmação para ${user.email}: ${err.message}`,
+      ),
     );
 
     return pkg;
@@ -79,6 +92,8 @@ export class CreatePackageUseCase implements IUseCase<CreatePackageDto, Package>
       context: {
         firstName: user.firstName,
         lastName: user.lastName,
+        fullName: `${user.firstName} ${user.lastName}`,
+        packageId: pkg.id,
         status: this.formatStatus(pkg.status),
         address,
         collectDay: this.formatCollectDay(pkg.collectDay),
