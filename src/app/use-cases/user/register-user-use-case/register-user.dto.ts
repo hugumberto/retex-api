@@ -83,6 +83,7 @@ export class RegisterUserDto {
   @IsDateString()
   dateOfBirth?: string;
 
+  @IsNotEmpty()
   @ValidateNested()
   @Type(() => RegisterAddressDto)
   address: RegisterAddressDto;
