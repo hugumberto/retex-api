@@ -72,8 +72,8 @@ export class RegisterUserUseCase implements IUseCase<RegisterUserDto, Omit<User,
         country: param.address.country ?? '',
         countryDivision: param.address.countryDivision ?? '',
         zipCode: this.sanitizationService.sanitizeNumericString(param.address.zipCode),
-        lat: parseFloat(param.address.lat ?? '0'),
-        long: parseFloat(param.address.long ?? '0'),
+        lat: this.sanitizationService.sanitizeCoordinate(param.address.lat ?? '0'),
+        long: this.sanitizationService.sanitizeCoordinate(param.address.long ?? '0'),
         isDefault: true,
       });
 
