@@ -12,9 +12,9 @@ export const addressSchema = new EntitySchema<Address>({
     },
     userId: {
       type: 'uuid',
-      nullable: true,
+      nullable: false,
       name: 'user_id',
-    },
+    }
     street: {
       type: 'varchar',
       nullable: false,
