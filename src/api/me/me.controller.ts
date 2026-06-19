@@ -11,13 +11,17 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { Request } from 'express';
 import { CreateAddressUseCase } from '../../app/use-cases/address/create-address-use-case';
 import { DeleteAddressUseCase } from '../../app/use-cases/address/delete-address-use-case';
 import { GetUserAddressesUseCase } from '../../app/use-cases/address/get-user-addresses-use-case';
 import { SetDefaultAddressUseCase } from '../../app/use-cases/address/set-default-address-use-case';
+import { GetUserPackagesUseCase } from '../../app/use-cases/package';
+import { UpdateMePasswordUseCase, UpdateUserUseCase } from '../../app/use-cases/user';
 import { Address } from '../../domain/address/address.entity';
+import { Package } from '../../domain/package/package.entity';
+import { User } from '../../domain/user/user.entity';
 import { JwtPayload } from '../../app/services/interfaces/auth.interface';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -35,6 +39,14 @@ class CreateMeAddressDto {
   @IsBoolean() @IsOptional() isDefault?: boolean;
 }
 
+class UpdateMeDto {
+  @IsString() @IsNotEmpty() contactPhone: string;
+}
+
+class UpdateMePasswordDto {
+  @IsString() @IsNotEmpty() @MinLength(6) newPassword: string;
+}
+
 @ApiTags('me')
 @Controller('me')
 @UseGuards(JwtAuthGuard)
@@ -45,7 +57,41 @@ export class MeController {
     private readonly getUserAddressesUseCase: GetUserAddressesUseCase,
     private readonly setDefaultAddressUseCase: SetDefaultAddressUseCase,
     private readonly deleteAddressUseCase: DeleteAddressUseCase,
+    private readonly getUserPackagesUseCase: GetUserPackagesUseCase,
+    private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly updateMePasswordUseCase: UpdateMePasswordUseCase,
   ) {}
+
+  @Patch()
+  @ApiOperation({ summary: 'Actualizar dados do utilizador autenticado' })
+  @ApiResponse({ status: 200, description: 'Utilizador actualizado' })
+  updateMe(
+    @Req() req: Request,
+    @Body() dto: UpdateMeDto,
+  ): Promise<Omit<User, 'password'>> {
+    const { sub } = req['user'] as JwtPayload;
+    return this.updateUserUseCase.call({ id: sub, data: { contactPhone: dto.contactPhone } });
+  }
+
+  @Patch('password')
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Alterar palavra-passe do utilizador autenticado' })
+  @ApiResponse({ status: 204, description: 'Palavra-passe actualizada' })
+  updatePassword(
+    @Req() req: Request,
+    @Body() dto: UpdateMePasswordDto,
+  ): Promise<void> {
+    const { sub } = req['user'] as JwtPayload;
+    return this.updateMePasswordUseCase.call({ userId: sub, newPassword: dto.newPassword });
+  }
+
+  @Get('packages')
+  @ApiOperation({ summary: 'Listar solicitações de coleta do utilizador autenticado' })
+  @ApiResponse({ status: 200, description: 'Lista de pacotes', type: Array })
+  getMyPackages(@Req() req: Request): Promise<Package[]> {
+    const { sub } = req['user'] as JwtPayload;
+    return this.getUserPackagesUseCase.call({ userId: sub });
+  }
 
   @Get('address')
   @ApiOperation({ summary: 'Listar endereços do utilizador autenticado' })
