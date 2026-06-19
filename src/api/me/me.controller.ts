@@ -44,6 +44,7 @@ class UpdateMeDto {
 }
 
 class UpdateMePasswordDto {
+  @IsString() @IsNotEmpty() currentPassword: string;
   @IsString() @IsNotEmpty() @MinLength(6) newPassword: string;
 }
 
@@ -82,7 +83,7 @@ export class MeController {
     @Body() dto: UpdateMePasswordDto,
   ): Promise<void> {
     const { sub } = req['user'] as JwtPayload;
-    return this.updateMePasswordUseCase.call({ userId: sub, newPassword: dto.newPassword });
+    return this.updateMePasswordUseCase.call({ userId: sub, currentPassword: dto.currentPassword, newPassword: dto.newPassword });
   }
 
   @Get('packages')
