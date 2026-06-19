@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { ICryptoService } from '../../../services/interfaces/crypto.interface';
@@ -24,7 +24,7 @@ export class UpdateMePasswordUseCase implements IUseCase<UpdateMePasswordParam, 
     const user = await this.userRepository.findOne({ id: userId });
     if (!user) throw new NotFoundException('Utilizador não encontrado');
     const isValid = await this.cryptoService.comparePassword(currentPassword, user.password);
-    if (!isValid) throw new UnauthorizedException('Palavra-passe actual incorrecta');
+    if (!isValid) throw new BadRequestException('Palavra-passe actual incorrecta');
     const hashedPassword = await this.cryptoService.hashPassword(newPassword);
     await this.userRepository.update({ id: userId }, { password: hashedPassword });
   }
