@@ -9,6 +9,8 @@ import { itemSchema } from './item/item.schema';
 import { packageSchema } from './package/package.schema';
 import { routeSchema } from './route/route.schema';
 import { storageUnitSchema } from './storage-unit/storage-unit.schema';
+import { faqCategorySchema } from './faq/faq-category.schema';
+import { faqItemSchema } from './faq/faq-item.schema';
 import { testZoneSchema } from './test-zone/test-zone.schema';
 import { userRoleSchema } from './user-role/user-role.schema';
 import { refreshTokenSchema } from './user/refresh-token.schema';
@@ -31,6 +33,8 @@ import { userSchema } from './user/user.schema';
       userRoleSchema,
       refreshTokenSchema,
       blogPostSchema,
+      faqCategorySchema,
+      faqItemSchema,
     ]),
   ],
   exports: [TypeOrmModule],

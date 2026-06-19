@@ -6,6 +6,7 @@ import { ADDRESS_USE_CASES } from './address';
 import { AUTH_USE_CASES } from './auth';
 import { BLOG_POST_USE_CASES } from './blog-post';
 import { BRAND_USE_CASES } from './brand';
+import { FAQ_USE_CASES } from './faq';
 import { TEST_ZONE_USE_CASES } from './test-zone';
 import { ITEM_USE_CASES } from './item/item.use-cases';
 import { PACKAGE_USE_CASES } from './package';
@@ -27,7 +28,8 @@ export class UseCasesModule {
       ...BRAND_USE_CASES,
       ...ITEM_USE_CASES,
       ...BLOG_POST_USE_CASES,
-      ...TEST_ZONE_USE_CASES
+      ...TEST_ZONE_USE_CASES,
+      ...FAQ_USE_CASES,
     ];
 
     return {

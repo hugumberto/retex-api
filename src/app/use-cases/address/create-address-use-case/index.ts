@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Address } from '../../../../domain/address/address.entity';
 import { IAddressRepository } from '../../../../domain/address/address.repository';
 import { ITestZoneRepository } from '../../../../domain/test-zone/test-zone.repository';
@@ -26,6 +26,18 @@ export class CreateAddressUseCase implements IUseCase<CreateAddressDto, Address>
     const user = await this.userRepository.findOne({ id: param.userId });
     if (!user) {
       throw new NotFoundException('Utilizador não encontrado');
+    }
+
+    const existingAddresses = await this.addressRepository.findByUser(param.userId);
+    const normalizedZip = this.sanitizationService.sanitizeNumericString(param.zipCode);
+    const isDuplicate = existingAddresses.some(
+      (a) =>
+        a.street.toLowerCase() === param.street.toLowerCase() &&
+        a.number.toLowerCase() === param.number.toLowerCase() &&
+        a.zipCode === normalizedZip,
+    );
+    if (isDuplicate) {
+      throw new ConflictException('Já existe um endereço com esta morada');
     }
 
     if (param.isDefault) {

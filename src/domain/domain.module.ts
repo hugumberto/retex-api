@@ -2,6 +2,8 @@ import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
 import { IAddressRepository } from './address/address.repository';
 import { IBlogPostRepository } from './blog-post/blog-post.repository';
 import { IBrandRepository } from './brand/brand.repository';
+import { IFaqCategoryRepository } from './faq/faq-category.repository';
+import { IFaqItemRepository } from './faq/faq-item.repository';
 import { IUnitOfWork } from './interfaces/unit-of-work.interface';
 import { IItemRepository } from './item/item.repository';
 import { IPackageRepository } from './package/package.repository';
@@ -25,6 +27,8 @@ export interface DomainModuleOptions {
   userRoleRepository: Type<IUserRoleRepository>;
   refreshTokenRepository: Type<IRefreshTokenRepository>;
   blogPostRepository: Type<IBlogPostRepository>;
+  faqCategoryRepository: Type<IFaqCategoryRepository>;
+  faqItemRepository: Type<IFaqItemRepository>;
   unitOfWork: Type<IUnitOfWork>;
   imports?: Array<
     Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
@@ -83,6 +87,14 @@ export class DomainModule {
           useClass: options.blogPostRepository,
         },
         {
+          provide: DOMAIN_TOKENS.FAQ_CATEGORY_REPOSITORY,
+          useClass: options.faqCategoryRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.FAQ_ITEM_REPOSITORY,
+          useClass: options.faqItemRepository,
+        },
+        {
           provide: DOMAIN_TOKENS.UNIT_OF_WORK,
           useClass: options.unitOfWork,
         },
@@ -131,6 +143,14 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.BLOG_POST_REPOSITORY,
           useClass: options.blogPostRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.FAQ_CATEGORY_REPOSITORY,
+          useClass: options.faqCategoryRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.FAQ_ITEM_REPOSITORY,
+          useClass: options.faqItemRepository,
         },
         {
           provide: DOMAIN_TOKENS.UNIT_OF_WORK,

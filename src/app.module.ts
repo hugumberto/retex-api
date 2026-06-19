@@ -11,6 +11,8 @@ import { DomainModule } from './domain/domain.module';
 import { TypeORMUnitOfWork } from './infrastructure/data/typeorm/abstraction/unit-of-work';
 import { AddressRepository } from './infrastructure/data/typeorm/address/address.repository';
 import { BlogPostRepository } from './infrastructure/data/typeorm/blog-post/blog-post.repository';
+import { FaqCategoryRepository } from './infrastructure/data/typeorm/faq/faq-category.repository';
+import { FaqItemRepository } from './infrastructure/data/typeorm/faq/faq-item.repository';
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
 import { PackageRepository } from './infrastructure/data/typeorm/package/package.repository';
@@ -47,6 +49,8 @@ export class AppModule {
         userRoleRepository: UserRoleRepository,
         refreshTokenRepository: RefreshTokenRepository,
         blogPostRepository: BlogPostRepository,
+        faqCategoryRepository: FaqCategoryRepository,
+        faqItemRepository: FaqItemRepository,
         unitOfWork: TypeORMUnitOfWork,
         imports: [AppTypeORMModule],
       }),

@@ -6,6 +6,7 @@ import { AuthController } from './auth/auth.controller';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { BlogPostController } from './blog-post/blog-post.controller';
+import { FaqController } from './faq/faq.controller';
 import { TestZoneController } from './test-zone/test-zone.controller';
 import { BrandController } from './brand/brand.controller';
 import { MeController } from './me/me.controller';
@@ -35,7 +36,8 @@ import { WelcomeController } from './welcome/welcome.controller';
     BrandController,
     ItemController,
     BlogPostController,
-    TestZoneController
+    TestZoneController,
+    FaqController,
   ],
   providers: [JwtAuthGuard, RolesGuard],
 })
