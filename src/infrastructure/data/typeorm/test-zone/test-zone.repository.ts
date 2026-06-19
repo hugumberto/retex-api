@@ -28,4 +28,9 @@ export class TestZoneRepository
     });
     return testZone || null;
   }
-} 
+
+  async findAll(): Promise<TestZone[]> {
+    const repository = await this.getRepository();
+    return repository.find({ order: { createdAt: 'DESC' } });
+  }
+}

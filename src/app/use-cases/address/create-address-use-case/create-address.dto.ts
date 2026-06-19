@@ -22,28 +22,28 @@ export class CreateAddressDto {
   city: string;
 
   @IsString()
-  @IsNotEmpty()
-  cityDivision: string;
+  @IsOptional()
+  cityDivision?: string;
 
   @IsString()
-  @IsNotEmpty()
-  country: string;
+  @IsOptional()
+  country?: string;
 
   @IsString()
-  @IsNotEmpty()
-  countryDivision: string;
+  @IsOptional()
+  countryDivision?: string;
 
   @IsString()
   @IsNotEmpty()
   zipCode: string;
 
   @IsString()
-  @IsNotEmpty()
-  lat: string;
+  @IsOptional()
+  lat?: string;
 
   @IsString()
-  @IsNotEmpty()
-  long: string;
+  @IsOptional()
+  long?: string;
 
   @IsBoolean()
   @IsOptional()

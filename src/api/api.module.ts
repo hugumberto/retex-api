@@ -6,7 +6,9 @@ import { AuthController } from './auth/auth.controller';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { BlogPostController } from './blog-post/blog-post.controller';
+import { TestZoneController } from './test-zone/test-zone.controller';
 import { BrandController } from './brand/brand.controller';
+import { MeController } from './me/me.controller';
 import { HealthController } from './health/health.controller';
 import { ItemController } from './item/item.controller';
 import { PackageController } from './package/package.controller';
@@ -23,6 +25,7 @@ import { WelcomeController } from './welcome/welcome.controller';
   ],
   controllers: [
     WelcomeController,
+    MeController,
     UserController,
     AuthController,
     HealthController,
@@ -31,7 +34,8 @@ import { WelcomeController } from './welcome/welcome.controller';
     StorageUnitController,
     BrandController,
     ItemController,
-    BlogPostController
+    BlogPostController,
+    TestZoneController
   ],
   providers: [JwtAuthGuard, RolesGuard],
 })

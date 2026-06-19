@@ -31,4 +31,13 @@ export class AddressRepository
       await this.update({ userId, isDefault: true } as Partial<Address>, { isDefault: false } as Partial<Address>);
     }
   }
+
+  async updateServiceZoneByCity(sanitizedCity: string, value: boolean): Promise<void> {
+    const repo = await this.getRepository();
+    await repo.createQueryBuilder()
+      .update('user_address')
+      .set({ isInServiceZone: value })
+      .where('LOWER(city) = :city', { city: sanitizedCity })
+      .execute();
+  }
 }

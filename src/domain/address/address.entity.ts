@@ -15,4 +15,5 @@ export interface Address extends Entity {
   lat: number;
   long: number;
   isDefault: boolean;
+  isInServiceZone: boolean;
 }

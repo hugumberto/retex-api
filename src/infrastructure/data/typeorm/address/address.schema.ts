@@ -83,6 +83,12 @@ export const addressSchema = new EntitySchema<Address>({
       default: false,
       name: 'is_default',
     },
+    isInServiceZone: {
+      type: 'boolean',
+      nullable: false,
+      default: false,
+      name: 'is_in_service_zone',
+    },
     ...BaseTimestampColumns,
   },
   relations: {

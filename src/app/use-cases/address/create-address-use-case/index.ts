@@ -1,6 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Address } from '../../../../domain/address/address.entity';
 import { IAddressRepository } from '../../../../domain/address/address.repository';
+import { ITestZoneRepository } from '../../../../domain/test-zone/test-zone.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { ISanitizationService } from '../../../services/interfaces/sanitization.interface';
@@ -15,6 +16,8 @@ export class CreateAddressUseCase implements IUseCase<CreateAddressDto, Address>
     private readonly addressRepository: IAddressRepository,
     @Inject(DOMAIN_TOKENS.USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
+    @Inject(DOMAIN_TOKENS.TEST_ZONE_REPOSITORY)
+    private readonly testZoneRepository: ITestZoneRepository,
     @Inject(SERVICE_TOKENS.SANITIZATION_SERVICE)
     private readonly sanitizationService: ISanitizationService,
   ) { }
@@ -29,19 +32,26 @@ export class CreateAddressUseCase implements IUseCase<CreateAddressDto, Address>
       await this.addressRepository.unsetDefault(param.userId);
     }
 
+    const sanitizedCity = this.sanitizationService.sanitizeString(param.city);
+    const testZone = await this.testZoneRepository.findByCity(sanitizedCity);
+
+    const lat = param.lat ? this.sanitizationService.sanitizeCoordinate(param.lat) : 0;
+    const long = param.long ? this.sanitizationService.sanitizeCoordinate(param.long) : 0;
+
     return this.addressRepository.create({
       userId: param.userId,
       street: param.street,
       number: param.number,
       complement: param.complement,
       city: param.city,
-      cityDivision: param.cityDivision,
-      country: param.country,
-      countryDivision: param.countryDivision,
+      cityDivision: param.cityDivision ?? '',
+      country: param.country ?? '',
+      countryDivision: param.countryDivision ?? '',
       zipCode: this.sanitizationService.sanitizeNumericString(param.zipCode),
-      lat: this.sanitizationService.sanitizeCoordinate(param.lat),
-      long: this.sanitizationService.sanitizeCoordinate(param.long),
+      lat: isNaN(lat) ? 0 : lat,
+      long: isNaN(long) ? 0 : long,
       isDefault: param.isDefault ?? false,
+      isInServiceZone: !!testZone,
     });
   }
 }
