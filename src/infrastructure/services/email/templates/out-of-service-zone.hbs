@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registo Retex</title>
+</head>
+
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f4;">
+    <tr>
+      <td align="center" style="padding:40px 16px;">
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+          style="max-width:600px;width:100%;background-color:#ffffff;">
+
+          <!-- Logo -->
+          <tr>
+            <td align="center" style="padding:32px 40px 24px;">
+              <img
+                src="https://www.retex.pt/assets/logo.png"
+                alt="RETEX" width="120" style="display:block;" />
+            </td>
+          </tr>
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="padding:8px 40px 4px;">
+              <p style="margin:0;font-size:12px;font-weight:bold;letter-spacing:1px;color:#02748E;text-transform:uppercase;">
+                OBRIGADO PELO SEU REGISTO
+              </p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:20px 40px 32px;">
+              <p style="margin:0 0 12px;font-size:15px;color:#333333;">
+                Olá, <strong style="color:#02748E;">{{firstName}} {{lastName}}</strong>!
+              </p>
+              <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
+                Recebemos o seu registo. De momento, a sua zona{{#if city}} (<strong>{{city}}</strong>){{/if}}
+                ainda está <strong>fora da nossa zona de atuação</strong>, pelo que ainda não é possível ativar a conta.
+              </p>
+              <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
+                Não se preocupe — guardámos os seus dados e iremos <strong>notificá-lo por email</strong> assim que a Retex
+                estiver disponível na sua zona. Nessa altura poderá definir a sua palavra-passe e ativar a conta.
+              </p>
+              <p style="margin:0;font-size:15px;color:#333333;">
+                A sua equipa <strong>RETEX Portugal</strong>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#013364;padding:16px 40px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td valign="middle">
+                    <img
+                      src="https://www.retex.pt/assets/logo-white.png"
+                      alt="RETEX" width="80" style="display:block;" />
+                  </td>
+                  <td align="right" valign="middle" style="font-size:12px;color:#ffffff;">
+                    &copy;{{year}} RETEX
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

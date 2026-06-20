@@ -5,6 +5,7 @@ import { UseCasesModule } from '../app/use-cases/use-cases.module';
 import { AuthController } from './auth/auth.controller';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { BlogCategoryController } from './blog-category/blog-category.controller';
 import { BlogPostController } from './blog-post/blog-post.controller';
 import { FaqController } from './faq/faq.controller';
 import { TestZoneController } from './test-zone/test-zone.controller';
@@ -36,6 +37,7 @@ import { WelcomeController } from './welcome/welcome.controller';
     BrandController,
     ItemController,
     BlogPostController,
+    BlogCategoryController,
     TestZoneController,
     FaqController,
   ],

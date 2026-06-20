@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { addressSchema } from './address/address.schema';
+import { blogCategorySchema } from './blog-post/blog-category.schema';
 import { blogPostSchema } from './blog-post/blog-post.schema';
 import { brandSchema } from './brand/brand.schema';
 import { TEST_DATABASE_CONFIG } from './config/typeorm-test.config';
@@ -33,6 +34,7 @@ import { userSchema } from './user/user.schema';
       userRoleSchema,
       refreshTokenSchema,
       blogPostSchema,
+      blogCategorySchema,
       faqCategorySchema,
       faqItemSchema,
     ]),

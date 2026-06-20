@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
-import { CreateTestZoneDto, CreateTestZoneUseCase, DeleteTestZoneUseCase, GetAllTestZonesUseCase } from '../../app/use-cases/test-zone';
+import { CreateTestZoneDto, CreateTestZoneUseCase, DeleteTestZoneUseCase, GetAllTestZonesUseCase, NotifyZoneInactiveUsersUseCase } from '../../app/use-cases/test-zone';
 import { Role } from '../../domain/user/user-roles.entity';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -13,6 +13,7 @@ export class TestZoneController {
     private readonly createTestZoneUseCase: CreateTestZoneUseCase,
     private readonly getAllTestZonesUseCase: GetAllTestZonesUseCase,
     private readonly deleteTestZoneUseCase: DeleteTestZoneUseCase,
+    private readonly notifyZoneInactiveUsersUseCase: NotifyZoneInactiveUsersUseCase,
   ) {}
 
   @Get()
@@ -23,6 +24,11 @@ export class TestZoneController {
   @Post()
   async create(@Body() dto: CreateTestZoneDto) {
     return this.createTestZoneUseCase.call(dto);
+  }
+
+  @Post(':id/notify')
+  async notify(@Param('id') id: string): Promise<{ notified: number }> {
+    return this.notifyZoneInactiveUsersUseCase.call({ zoneId: id });
   }
 
   @Delete(':id')

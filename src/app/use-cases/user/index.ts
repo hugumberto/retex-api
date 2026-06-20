@@ -1,3 +1,4 @@
+import { ActivateUserUseCase } from './activate-user-use-case';
 import { AddRoleToUserUseCase } from './add-role-to-user-use-case';
 import { CreateUserUseCase } from './create-user-use-case';
 import { GetAllUsersUseCase } from './get-all-users-use-case';
@@ -16,8 +17,10 @@ export const USER_USE_CASES = [
   AddRoleToUserUseCase,
   RegisterUserUseCase,
   UpdateMePasswordUseCase,
+  ActivateUserUseCase,
 ];
 
+export * from './activate-user-use-case';
 export * from './add-role-to-user-use-case';
 export * from './create-user-use-case';
 export * from './get-all-users-use-case';

@@ -10,6 +10,7 @@ import { getLoggerConfig } from './config/logger.config';
 import { DomainModule } from './domain/domain.module';
 import { TypeORMUnitOfWork } from './infrastructure/data/typeorm/abstraction/unit-of-work';
 import { AddressRepository } from './infrastructure/data/typeorm/address/address.repository';
+import { BlogCategoryRepository } from './infrastructure/data/typeorm/blog-post/blog-category.repository';
 import { BlogPostRepository } from './infrastructure/data/typeorm/blog-post/blog-post.repository';
 import { FaqCategoryRepository } from './infrastructure/data/typeorm/faq/faq-category.repository';
 import { FaqItemRepository } from './infrastructure/data/typeorm/faq/faq-item.repository';
@@ -49,6 +50,7 @@ export class AppModule {
         userRoleRepository: UserRoleRepository,
         refreshTokenRepository: RefreshTokenRepository,
         blogPostRepository: BlogPostRepository,
+        blogCategoryRepository: BlogCategoryRepository,
         faqCategoryRepository: FaqCategoryRepository,
         faqItemRepository: FaqItemRepository,
         unitOfWork: TypeORMUnitOfWork,

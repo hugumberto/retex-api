@@ -61,6 +61,18 @@ export const blogPostSchema = new EntitySchema<BlogPost>({
     },
     ...BaseTimestampColumns,
   },
+  relations: {
+    categories: {
+      type: 'many-to-many',
+      target: 'blog_category',
+      inverseSide: 'posts',
+      joinTable: {
+        name: 'blog_post_categories',
+        joinColumn: { name: 'post_id', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
+      },
+    },
+  },
   indices: [
     {
       name: 'IDX_BLOG_POST_SLUG',

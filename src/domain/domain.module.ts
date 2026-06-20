@@ -1,5 +1,6 @@
 import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
 import { IAddressRepository } from './address/address.repository';
+import { IBlogCategoryRepository } from './blog-post/blog-category.repository';
 import { IBlogPostRepository } from './blog-post/blog-post.repository';
 import { IBrandRepository } from './brand/brand.repository';
 import { IFaqCategoryRepository } from './faq/faq-category.repository';
@@ -27,6 +28,7 @@ export interface DomainModuleOptions {
   userRoleRepository: Type<IUserRoleRepository>;
   refreshTokenRepository: Type<IRefreshTokenRepository>;
   blogPostRepository: Type<IBlogPostRepository>;
+  blogCategoryRepository: Type<IBlogCategoryRepository>;
   faqCategoryRepository: Type<IFaqCategoryRepository>;
   faqItemRepository: Type<IFaqItemRepository>;
   unitOfWork: Type<IUnitOfWork>;
@@ -87,6 +89,10 @@ export class DomainModule {
           useClass: options.blogPostRepository,
         },
         {
+          provide: DOMAIN_TOKENS.BLOG_CATEGORY_REPOSITORY,
+          useClass: options.blogCategoryRepository,
+        },
+        {
           provide: DOMAIN_TOKENS.FAQ_CATEGORY_REPOSITORY,
           useClass: options.faqCategoryRepository,
         },
@@ -143,6 +149,10 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.BLOG_POST_REPOSITORY,
           useClass: options.blogPostRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.BLOG_CATEGORY_REPOSITORY,
+          useClass: options.blogCategoryRepository,
         },
         {
           provide: DOMAIN_TOKENS.FAQ_CATEGORY_REPOSITORY,

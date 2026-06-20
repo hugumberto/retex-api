@@ -32,4 +32,9 @@ export class UpsertBlogPostDto {
   @IsString({ each: true, message: 'Cada tag deve ser uma string' })
   @Type(() => String)
   tags?: string[] = [];
+
+  @IsOptional()
+  @IsArray({ message: 'Categorias deve ser um array' })
+  @IsUUID('4', { each: true, message: 'Cada categoria deve ser um UUID válido' })
+  categoryIds?: string[];
 }

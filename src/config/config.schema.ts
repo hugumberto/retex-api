@@ -13,6 +13,7 @@ export const envSchema = z.object({
   SMTP_USER: z.string(),
   SMTP_PASS: z.string(),
   SMTP_FROM: z.string(),
+  PORTAL_URL: z.string(),
 });
 
 export function getConfigValidation(env: Record<string, string>) {

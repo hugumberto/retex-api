@@ -29,6 +29,8 @@ import { CreateUserUseCase } from '../../app/use-cases/user/create-user-use-case
 import { CreateUserDto } from '../../app/use-cases/user/create-user-use-case/create-user.dto';
 import { GetAllUsersUseCase } from '../../app/use-cases/user/get-all-users-use-case';
 import { GetUserByIdUseCase } from '../../app/use-cases/user/get-user-by-id-use-case';
+import { ActivateUserUseCase } from '../../app/use-cases/user/activate-user-use-case';
+import { ActivateUserDto } from '../../app/use-cases/user/activate-user-use-case/activate-user.dto';
 import { RegisterUserUseCase } from '../../app/use-cases/user/register-user-use-case';
 import { RegisterUserDto } from '../../app/use-cases/user/register-user-use-case/register-user.dto';
 import { ResetUserPasswordUseCase } from '../../app/use-cases/user/reset-user-password-use-case';
@@ -53,6 +55,7 @@ export class UserController {
     private readonly resetUserPasswordUseCase: ResetUserPasswordUseCase,
     private readonly addRoleToUserUseCase: AddRoleToUserUseCase,
     private readonly registerUserUseCase: RegisterUserUseCase,
+    private readonly activateUserUseCase: ActivateUserUseCase,
     private readonly createAddressUseCase: CreateAddressUseCase,
     private readonly getUserAddressesUseCase: GetUserAddressesUseCase,
     private readonly setDefaultAddressUseCase: SetDefaultAddressUseCase,
@@ -71,8 +74,22 @@ export class UserController {
   @ApiResponse({ status: 409, description: 'Email já em uso' })
   async registerUser(
     @Body() dto: RegisterUserDto,
-  ): Promise<Omit<User, 'password'>> {
+  ): Promise<Omit<User, 'password'> & { inServiceZone: boolean }> {
     return this.registerUserUseCase.call(dto);
+  }
+
+  @Post('activate')
+  @ApiOperation({
+    summary: 'Ativar conta com token de ativação e definir senha',
+  })
+  @ApiResponse({ status: 201, description: 'Conta ativada com sucesso', type: Object })
+  @ApiResponse({ status: 400, description: 'Token expirado ou endereço fora da zona' })
+  @ApiResponse({ status: 404, description: 'Token de ativação inválido' })
+  @ApiResponse({ status: 409, description: 'Conta já ativada' })
+  async activateUser(
+    @Body() dto: ActivateUserDto,
+  ): Promise<Omit<User, 'password'>> {
+    return this.activateUserUseCase.call(dto);
   }
 
   @Post()

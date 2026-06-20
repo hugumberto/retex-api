@@ -4,6 +4,7 @@ import { FindOptionsWhere, Repository } from 'typeorm';
 import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
 import { SERVICE_TOKENS } from '../../../../app/services/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
+import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { BaseRepository } from '../abstraction/base.repository';
@@ -45,5 +46,15 @@ export class UserRepository
       where: where as FindOptionsWhere<User>,
       relations: ['roles'],
     });
+  }
+
+  async findInactiveUsersByCity(sanitizedCity: string): Promise<User[]> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('u')
+      .innerJoin('user_address', 'a', 'a.user_id = u.id AND a.is_default = true')
+      .where('u.status = :status', { status: UserStatus.INACTIVE })
+      .andWhere('LOWER(a.city) = :city', { city: sanitizedCity })
+      .getMany();
   }
 }
