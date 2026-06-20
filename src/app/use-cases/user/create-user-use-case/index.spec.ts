@@ -64,6 +64,7 @@ describe('CreateUserUseCase', () => {
           contactPhone: '99999999',
           password: 'hashed_password',
           status: UserStatus.ACTIVE,
+          userType: UserType.PERSON,
         })
       );
     });

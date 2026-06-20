@@ -34,8 +34,11 @@ export class AddressRepository
 
   async updateServiceZoneByCity(sanitizedCity: string, value: boolean): Promise<void> {
     const repo = await this.getRepository();
+    // Passar o schema (em vez de 'user_address' string) garante que o TypeORM
+    // mapeia `isInServiceZone` -> coluna `is_in_service_zone`. Com o alvo-string
+    // não havia metadata e o UPDATE referia uma coluna inexistente.
     await repo.createQueryBuilder()
-      .update('user_address')
+      .update(addressSchema)
       .set({ isInServiceZone: value })
       // city_normalized é guardada já sanitizada (sem acentos, minúsculas), tal
       // como o argumento — assim cidades com acentos também casam.

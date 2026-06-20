@@ -17,6 +17,10 @@ async function bootstrap() {
   const PORT = parseInt(process.env.PORT) || 3000;
   const app = await NestFactory.create(AppModule.register(), {
     bufferLogs: true,
+    // Desativa o body parser default (limite 100kb) para que os parsers
+    // registados abaixo com BODY_LIMIT sejam os únicos — senão o default corre
+    // primeiro e dá 413 em uploads grandes (ex.: hero base64 do blog).
+    bodyParser: false,
     cors: {
       origin: true,
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
