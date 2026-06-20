@@ -45,9 +45,9 @@ import { WelcomeController } from './welcome/welcome.controller';
   providers: [
     JwtAuthGuard,
     RolesGuard,
-    // Secure-by-default: autentica e valida roles em TODAS as rotas, exceto as
-    // marcadas com @Public(). A ordem importa — JwtAuthGuard preenche
-    // request.user antes de o RolesGuard validar as roles.
+    // Secure-by-default: autentica TODAS as rotas, exceto as marcadas com @Public().
+    // As roles são validadas apenas nas rotas/classes marcadas com @Roles().
+    // A ordem importa — JwtAuthGuard preenche request.user antes de o RolesGuard validar as roles.
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
