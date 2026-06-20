@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -29,45 +29,42 @@ describe('UpdatePackageUseCase', () => {
     updatePackageUseCase = module.get(UpdatePackageUseCase);
   });
 
-  describe('call', () => {
-    it('should update status and weight when weight is greater than zero', async () => {
-      const existingPackage = mock<Package>();
-      const updatedPackage = mock<Package>();
+  const pkgOwnedBy = (ownerId: string) =>
+    ({ id: 'package-id', user: { id: ownerId } } as unknown as Package);
 
-      packageRepositoryMock.findOne.mockResolvedValue(existingPackage);
-      packageRepositoryMock.update.mockResolvedValue([updatedPackage]);
+  describe('privileged (ADMIN/OPS)', () => {
+    it('updates status and weight on any package', async () => {
+      const updated = mock<Package>();
+      packageRepositoryMock.findOneWithAllRelations.mockResolvedValue(
+        pkgOwnedBy('someone-else'),
+      );
+      packageRepositoryMock.update.mockResolvedValue([updated]);
 
       const response = await updatePackageUseCase.call({
         id: 'package-id',
-        data: {
-          status: PackageStatus.IN_TRANSIT,
-          weight: 12.5,
-        },
+        data: { status: PackageStatus.IN_TRANSIT, weight: 12.5 },
+        requesterId: 'ops-id',
+        isPrivileged: true,
       });
 
       expect(packageRepositoryMock.update).toHaveBeenCalledWith(
         { id: 'package-id' },
-        {
-          status: PackageStatus.IN_TRANSIT,
-          weight: 12.5,
-        },
+        { status: PackageStatus.IN_TRANSIT, weight: 12.5 },
       );
-      expect(response).toEqual(updatedPackage);
+      expect(response).toEqual(updated);
     });
 
-    it('should ignore weight when it is zero and update only status', async () => {
-      const existingPackage = mock<Package>();
-      const updatedPackage = mock<Package>();
-
-      packageRepositoryMock.findOne.mockResolvedValue(existingPackage);
-      packageRepositoryMock.update.mockResolvedValue([updatedPackage]);
+    it('ignores zero weight', async () => {
+      packageRepositoryMock.findOneWithAllRelations.mockResolvedValue(
+        pkgOwnedBy('x'),
+      );
+      packageRepositoryMock.update.mockResolvedValue([mock<Package>()]);
 
       await updatePackageUseCase.call({
         id: 'package-id',
-        data: {
-          status: PackageStatus.COLLECTED,
-          weight: 0,
-        },
+        data: { status: PackageStatus.COLLECTED, weight: 0 },
+        requesterId: 'ops-id',
+        isPrivileged: true,
       });
 
       expect(packageRepositoryMock.update).toHaveBeenCalledWith(
@@ -75,32 +72,69 @@ describe('UpdatePackageUseCase', () => {
         { status: PackageStatus.COLLECTED },
       );
     });
+  });
 
-    it('should return package without updating when only zero weight is provided', async () => {
-      const existingPackage = mock<Package>();
+  describe('non-privileged (USER)', () => {
+    it('lets the owner cancel and ignores weight', async () => {
+      packageRepositoryMock.findOneWithAllRelations.mockResolvedValue(
+        pkgOwnedBy('me-id'),
+      );
+      packageRepositoryMock.update.mockResolvedValue([mock<Package>()]);
 
-      packageRepositoryMock.findOne.mockResolvedValue(existingPackage);
-
-      const response = await updatePackageUseCase.call({
+      await updatePackageUseCase.call({
         id: 'package-id',
-        data: {
-          weight: 0,
-        },
+        data: { status: PackageStatus.CANCELLED, weight: 99 },
+        requesterId: 'me-id',
+        isPrivileged: false,
       });
 
-      expect(packageRepositoryMock.update).not.toHaveBeenCalled();
-      expect(response).toEqual(existingPackage);
+      expect(packageRepositoryMock.update).toHaveBeenCalledWith(
+        { id: 'package-id' },
+        { status: PackageStatus.CANCELLED },
+      );
     });
 
-    it('should throw not found when package does not exist', async () => {
-      packageRepositoryMock.findOne.mockResolvedValue(undefined);
+    it('hides another user\'s package (404)', async () => {
+      packageRepositoryMock.findOneWithAllRelations.mockResolvedValue(
+        pkgOwnedBy('someone-else'),
+      );
 
       await expect(
         updatePackageUseCase.call({
-          id: 'missing-id',
-          data: { status: PackageStatus.IN_TRANSIT },
+          id: 'package-id',
+          data: { status: PackageStatus.CANCELLED },
+          requesterId: 'me-id',
+          isPrivileged: false,
         }),
       ).rejects.toThrow(NotFoundException);
     });
+
+    it('forbids the owner from non-cancel transitions', async () => {
+      packageRepositoryMock.findOneWithAllRelations.mockResolvedValue(
+        pkgOwnedBy('me-id'),
+      );
+
+      await expect(
+        updatePackageUseCase.call({
+          id: 'package-id',
+          data: { status: PackageStatus.STOCKED },
+          requesterId: 'me-id',
+          isPrivileged: false,
+        }),
+      ).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  it('throws not found when the package does not exist', async () => {
+    packageRepositoryMock.findOneWithAllRelations.mockResolvedValue(undefined);
+
+    await expect(
+      updatePackageUseCase.call({
+        id: 'missing-id',
+        data: { status: PackageStatus.IN_TRANSIT },
+        requesterId: 'ops-id',
+        isPrivileged: true,
+      }),
+    ).rejects.toThrow(NotFoundException);
   });
 });
