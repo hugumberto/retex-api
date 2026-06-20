@@ -24,6 +24,11 @@ export const packageSchema = new EntitySchema<Package>({
       scale: 2,
       nullable: true,
     },
+    estimatedVolumes: {
+      type: 'integer',
+      nullable: true,
+      name: 'estimated_volumes',
+    },
     collectDay: {
       type: 'varchar',
       nullable: true,

@@ -9,6 +9,7 @@ export interface Package extends Entity {
   user: User;
   route?: Route;
   weight?: number;
+  estimatedVolumes?: number;
   collectDay?: string;
   collectTime?: string;
   address?: Address;

@@ -66,6 +66,7 @@ export class CreatePackageUseCase
         address: address,
         collectDay: param.dayOfWeek,
         collectTime: param.timeOfDay,
+        estimatedVolumes: param.estimatedVolumes,
       };
 
       return this.packageRepository.create(packageDto);
