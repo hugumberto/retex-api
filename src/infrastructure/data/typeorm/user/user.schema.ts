@@ -76,7 +76,7 @@ export const userSchema = new EntitySchema<User>({
       select: false,
     },
     activationTokenExpiresAt: {
-      type: 'timestamp',
+      type: 'timestamp with time zone',
       nullable: true,
       name: 'activation_token_expires_at',
       select: false,
@@ -90,7 +90,7 @@ export const userSchema = new EntitySchema<User>({
       select: false,
     },
     resetTokenExpiresAt: {
-      type: 'timestamp',
+      type: 'timestamp with time zone',
       nullable: true,
       name: 'reset_token_expires_at',
       select: false,

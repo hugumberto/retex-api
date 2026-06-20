@@ -20,7 +20,7 @@ export class CreateUserDto {
 
   @IsString({ message: 'Senha deve ser uma string' })
   @IsNotEmpty({ message: 'Senha é obrigatória' })
-  @MinLength(6, { message: 'Senha deve ter pelo menos 6 caracteres' })
+  @MinLength(8, { message: 'Senha deve ter pelo menos 8 caracteres' })
   password: string;
 
   @IsEnum(UserType, { message: 'userType deve ser PERSON ou COMPANY' })

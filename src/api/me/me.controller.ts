@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, Matches, MinLength } from 'class-validator';
 import { Request } from 'express';
 import { CreateAddressUseCase } from '../../app/use-cases/address/create-address-use-case';
 import { DeleteAddressUseCase } from '../../app/use-cases/address/delete-address-use-case';
@@ -34,8 +34,8 @@ class CreateMeAddressDto {
   @IsString() @IsOptional() country?: string;
   @IsString() @IsOptional() countryDivision?: string;
   @IsString() @IsNotEmpty() zipCode: string;
-  @IsString() @IsOptional() lat?: string;
-  @IsString() @IsOptional() long?: string;
+  @IsString() @IsOptional() @Matches(/^(-?\d+(\.\d+)?)?$/, { message: 'lat deve ser um número' }) lat?: string;
+  @IsString() @IsOptional() @Matches(/^(-?\d+(\.\d+)?)?$/, { message: 'long deve ser um número' }) long?: string;
   @IsBoolean() @IsOptional() isDefault?: boolean;
 }
 
@@ -45,7 +45,7 @@ class UpdateMeDto {
 
 class UpdateMePasswordDto {
   @IsString() @IsNotEmpty() currentPassword: string;
-  @IsString() @IsNotEmpty() @MinLength(6) newPassword: string;
+  @IsString() @IsNotEmpty() @MinLength(8) newPassword: string;
 }
 
 @ApiTags('me')
@@ -64,8 +64,8 @@ export class MeController {
   ) {}
 
   @Patch()
-  @ApiOperation({ summary: 'Actualizar dados do utilizador autenticado' })
-  @ApiResponse({ status: 200, description: 'Utilizador actualizado' })
+  @ApiOperation({ summary: 'Atualizar dados do usuário autenticado' })
+  @ApiResponse({ status: 200, description: 'Usuário atualizado' })
   updateMe(
     @Req() req: Request,
     @Body() dto: UpdateMeDto,
@@ -76,8 +76,8 @@ export class MeController {
 
   @Patch('password')
   @HttpCode(204)
-  @ApiOperation({ summary: 'Alterar palavra-passe do utilizador autenticado' })
-  @ApiResponse({ status: 204, description: 'Palavra-passe actualizada' })
+  @ApiOperation({ summary: 'Alterar senha do usuário autenticado' })
+  @ApiResponse({ status: 204, description: 'Senha atualizada' })
   updatePassword(
     @Req() req: Request,
     @Body() dto: UpdateMePasswordDto,
@@ -87,7 +87,7 @@ export class MeController {
   }
 
   @Get('packages')
-  @ApiOperation({ summary: 'Listar solicitações de coleta do utilizador autenticado' })
+  @ApiOperation({ summary: 'Listar solicitações de coleta do usuário autenticado' })
   @ApiResponse({ status: 200, description: 'Lista de pacotes', type: Array })
   getMyPackages(@Req() req: Request): Promise<Package[]> {
     const { sub } = req['user'] as JwtPayload;
@@ -95,7 +95,7 @@ export class MeController {
   }
 
   @Get('address')
-  @ApiOperation({ summary: 'Listar endereços do utilizador autenticado' })
+  @ApiOperation({ summary: 'Listar endereços do usuário autenticado' })
   @ApiResponse({ status: 200, description: 'Lista de endereços', type: Array })
   getAddresses(@Req() req: Request): Promise<Address[]> {
     const { sub } = req['user'] as JwtPayload;
@@ -103,7 +103,7 @@ export class MeController {
   }
 
   @Post('address')
-  @ApiOperation({ summary: 'Adicionar endereço ao utilizador autenticado' })
+  @ApiOperation({ summary: 'Adicionar endereço ao usuário autenticado' })
   @ApiResponse({ status: 201, description: 'Endereço criado', type: Object })
   createAddress(
     @Req() req: Request,
@@ -115,7 +115,7 @@ export class MeController {
 
   @Patch('address/:addrId/default')
   @ApiOperation({ summary: 'Definir endereço como padrão' })
-  @ApiResponse({ status: 200, description: 'Endereço padrão actualizado', type: Object })
+  @ApiResponse({ status: 200, description: 'Endereço padrão atualizado', type: Object })
   setDefault(
     @Req() req: Request,
     @Param('addrId') addressId: string,
@@ -126,7 +126,7 @@ export class MeController {
 
   @Delete('address/:addrId')
   @HttpCode(204)
-  @ApiOperation({ summary: 'Remover endereço do utilizador autenticado' })
+  @ApiOperation({ summary: 'Remover endereço do usuário autenticado' })
   @ApiResponse({ status: 204, description: 'Endereço removido' })
   deleteAddress(
     @Req() req: Request,

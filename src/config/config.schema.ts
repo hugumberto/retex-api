@@ -14,7 +14,7 @@ export const envSchema = z.object({
   SMTP_PASS: z.string(),
   SMTP_FROM: z.string(),
   PORTAL_URL: z.string(),
-  JWT_SECRET: z.string(),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET deve ter pelo menos 32 caracteres'),
   JWT_EXPIRES_IN: z.string().default('1d'),
 });
 

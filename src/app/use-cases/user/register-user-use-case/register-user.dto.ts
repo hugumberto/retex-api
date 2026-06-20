@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   MinLength,
   ValidateNested,
 } from 'class-validator';
@@ -46,10 +47,12 @@ export class RegisterAddressDto {
 
   @IsString()
   @IsOptional()
+  @Matches(/^(-?\d+(\.\d+)?)?$/, { message: 'lat deve ser um número' })
   lat?: string;
 
   @IsString()
   @IsOptional()
+  @Matches(/^(-?\d+(\.\d+)?)?$/, { message: 'long deve ser um número' })
   long?: string;
 }
 
@@ -72,7 +75,7 @@ export class RegisterUserDto {
 
   @IsString({ message: 'Senha deve ser uma string' })
   @IsOptional()
-  @MinLength(6, { message: 'Senha deve ter pelo menos 6 caracteres' })
+  @MinLength(8, { message: 'Senha deve ter pelo menos 8 caracteres' })
   password?: string;
 
   @IsOptional()

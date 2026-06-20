@@ -9,6 +9,10 @@ import { json, urlencoded } from 'express';
 import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 import { AppModule } from './app.module';
 
+// Limite de payload partilhado por json/urlencoded (uploads de imagens em base64
+// nos posts de blog/hero justificam um limite acima do default do Express).
+const BODY_LIMIT = '10mb';
+
 async function bootstrap() {
   const PORT = parseInt(process.env.PORT) || 3000;
   const app = await NestFactory.create(AppModule.register(), {
@@ -23,10 +27,18 @@ async function bootstrap() {
   });
   app.useLogger(app.get(Logger));
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      // Remove propriedades não declaradas nos DTOs e ativa a coerção de tipos
+      // (DTOs com @Type/@IsInt). forbidNonWhitelisted fica off para não quebrar
+      // clientes que enviem campos extra — apenas os ignoramos.
+      whitelist: true,
+      transform: true,
+    }),
+  );
   app.use(cookieParser());
-  app.use(json({ limit: '10mb' }));
-  app.use(urlencoded({ limit: '10mb', extended: true }));
+  app.use(json({ limit: BODY_LIMIT }));
+  app.use(urlencoded({ limit: BODY_LIMIT, extended: true }));
 
   const config = new DocumentBuilder()
     .setTitle('Retex API')

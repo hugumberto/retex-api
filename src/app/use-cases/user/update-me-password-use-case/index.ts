@@ -22,9 +22,9 @@ export class UpdateMePasswordUseCase implements IUseCase<UpdateMePasswordParam, 
 
   async call({ userId, currentPassword, newPassword }: UpdateMePasswordParam): Promise<void> {
     const user = await this.userRepository.findOne({ id: userId });
-    if (!user) throw new NotFoundException('Utilizador não encontrado');
+    if (!user) throw new NotFoundException('Usuário não encontrado');
     const isValid = await this.cryptoService.comparePassword(currentPassword, user.password);
-    if (!isValid) throw new BadRequestException('Palavra-passe actual incorrecta');
+    if (!isValid) throw new BadRequestException('Senha atual incorreta');
     const hashedPassword = await this.cryptoService.hashPassword(newPassword);
     await this.userRepository.update({ id: userId }, { password: hashedPassword });
   }
