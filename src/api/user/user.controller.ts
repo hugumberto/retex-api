@@ -31,6 +31,10 @@ import { GetAllUsersUseCase } from '../../app/use-cases/user/get-all-users-use-c
 import { GetUserByIdUseCase } from '../../app/use-cases/user/get-user-by-id-use-case';
 import { ActivateUserUseCase } from '../../app/use-cases/user/activate-user-use-case';
 import { ActivateUserDto } from '../../app/use-cases/user/activate-user-use-case/activate-user.dto';
+import { ConfirmResetPasswordUseCase } from '../../app/use-cases/user/confirm-reset-password-use-case';
+import { ConfirmResetPasswordDto } from '../../app/use-cases/user/confirm-reset-password-use-case/confirm-reset-password.dto';
+import { ForgotPasswordUseCase } from '../../app/use-cases/user/forgot-password-use-case';
+import { ForgotPasswordDto } from '../../app/use-cases/user/forgot-password-use-case/forgot-password.dto';
 import { RegisterUserUseCase } from '../../app/use-cases/user/register-user-use-case';
 import { RegisterUserDto } from '../../app/use-cases/user/register-user-use-case/register-user.dto';
 import { ResetUserPasswordUseCase } from '../../app/use-cases/user/reset-user-password-use-case';
@@ -56,6 +60,8 @@ export class UserController {
     private readonly addRoleToUserUseCase: AddRoleToUserUseCase,
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly activateUserUseCase: ActivateUserUseCase,
+    private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
+    private readonly confirmResetPasswordUseCase: ConfirmResetPasswordUseCase,
     private readonly createAddressUseCase: CreateAddressUseCase,
     private readonly getUserAddressesUseCase: GetUserAddressesUseCase,
     private readonly setDefaultAddressUseCase: SetDefaultAddressUseCase,
@@ -90,6 +96,26 @@ export class UserController {
     @Body() dto: ActivateUserDto,
   ): Promise<Omit<User, 'password'>> {
     return this.activateUserUseCase.call(dto);
+  }
+
+  @Post('forgot-password')
+  @ApiOperation({ summary: 'Pedir email para repor a palavra-passe' })
+  @ApiResponse({
+    status: 201,
+    description: 'Se o email estiver registado, enviamos um link de reposição',
+  })
+  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ ok: true }> {
+    return this.forgotPasswordUseCase.call(dto);
+  }
+
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Definir nova palavra-passe com token de reposição' })
+  @ApiResponse({ status: 201, description: 'Palavra-passe atualizada', type: Object })
+  @ApiResponse({ status: 400, description: 'Token de reset inválido ou expirado' })
+  async confirmResetPassword(
+    @Body() dto: ConfirmResetPasswordDto,
+  ): Promise<Omit<User, 'password'>> {
+    return this.confirmResetPasswordUseCase.call(dto);
   }
 
   @Post()
@@ -150,12 +176,16 @@ export class UserController {
   }
 
   @Put('reset-password')
-  @ApiOperation({ summary: 'Resetar senha do usuário' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Resetar senha do usuário (admin)' })
   @ApiResponse({
     status: 200,
     description: 'Senha atualizada com sucesso',
     type: Object,
   })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async resetUserPassword(
     @Body() resetUserPasswordDto: ResetUserPasswordDto,

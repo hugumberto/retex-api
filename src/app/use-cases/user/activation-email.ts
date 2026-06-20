@@ -24,3 +24,25 @@ export function buildActivationEmail(
     },
   };
 }
+
+/**
+ * Constrói o email de reposição de palavra-passe (link com token, válido 1h).
+ */
+export function buildPasswordResetEmail(
+  user: Pick<User, 'firstName' | 'lastName' | 'email'>,
+  token: string,
+): SendEmailOptions {
+  const resetUrl = `${process.env.PORTAL_URL}/auth/reset-password?token=${token}`;
+
+  return {
+    to: user.email,
+    subject: 'Repor a palavra-passe Retex',
+    template: 'password-reset',
+    context: {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      resetUrl,
+      year: new Date().getFullYear(),
+    },
+  };
+}

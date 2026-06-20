@@ -1,6 +1,8 @@
 import { ActivateUserUseCase } from './activate-user-use-case';
 import { AddRoleToUserUseCase } from './add-role-to-user-use-case';
+import { ConfirmResetPasswordUseCase } from './confirm-reset-password-use-case';
 import { CreateUserUseCase } from './create-user-use-case';
+import { ForgotPasswordUseCase } from './forgot-password-use-case';
 import { GetAllUsersUseCase } from './get-all-users-use-case';
 import { GetUserByIdUseCase } from './get-user-by-id-use-case';
 import { RegisterUserUseCase } from './register-user-use-case';
@@ -18,10 +20,14 @@ export const USER_USE_CASES = [
   RegisterUserUseCase,
   UpdateMePasswordUseCase,
   ActivateUserUseCase,
+  ForgotPasswordUseCase,
+  ConfirmResetPasswordUseCase,
 ];
 
 export * from './activate-user-use-case';
 export * from './add-role-to-user-use-case';
+export * from './confirm-reset-password-use-case';
+export * from './forgot-password-use-case';
 export * from './create-user-use-case';
 export * from './get-all-users-use-case';
 export * from './get-user-by-id-use-case';

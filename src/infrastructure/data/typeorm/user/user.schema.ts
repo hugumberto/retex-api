@@ -79,6 +79,18 @@ export const userSchema = new EntitySchema<User>({
       nullable: true,
       name: 'activation_token_expires_at',
     },
+    resetToken: {
+      type: 'varchar',
+      nullable: true,
+      length: 255,
+      name: 'reset_token',
+      unique: true,
+    },
+    resetTokenExpiresAt: {
+      type: 'timestamp',
+      nullable: true,
+      name: 'reset_token_expires_at',
+    },
     ...BaseTimestampColumns,
   },
   relations: {

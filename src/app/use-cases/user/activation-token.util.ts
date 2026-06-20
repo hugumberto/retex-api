@@ -18,3 +18,18 @@ export function isActivationTokenValid(user: Pick<User, 'activationToken' | 'act
     new Date(user.activationTokenExpiresAt).getTime() > Date.now()
   );
 }
+
+/** Validade do token de reset de password: 1 hora. */
+export const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
+
+export function generateResetToken(): { token: string; expiresAt: Date } {
+  return {
+    token: randomBytes(32).toString('hex'),
+    expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
+  };
+}
+
+/** Verdadeiro se o token já expirou (ou não tem data de expiração). */
+export function isTokenExpired(expiresAt?: Date | null): boolean {
+  return !expiresAt || new Date(expiresAt).getTime() <= Date.now();
+}

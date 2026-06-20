@@ -19,6 +19,8 @@ export interface User extends Entity {
   dateOfBirth?: Date;
   activationToken?: string | null;
   activationTokenExpiresAt?: Date | null;
+  resetToken?: string | null;
+  resetTokenExpiresAt?: Date | null;
   packages?: Package[];
   routes?: Route[];
   roles: UserRole[];
