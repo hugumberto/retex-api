@@ -50,7 +50,7 @@ export class RegisterUserUseCase implements IUseCase<RegisterUserDto, RegisterUs
       throw new ConflictException('Usuário com este email já existe');
     }
 
-    const rawPassword = param.password ?? randomBytes(16).toString('hex');
+    const rawPassword = param.password ?? randomBytes(32).toString('hex');
     const hashedPassword = await this.cryptoService.hashPassword(rawPassword);
 
     // Zona de atuação é baseada na cidade: in-zone sse existir uma test_zone para ela.
