@@ -21,6 +21,7 @@ import { UpdateFaqCategoryUseCase } from '../../app/use-cases/faq/update-faq-cat
 import { UpdateFaqItemUseCase } from '../../app/use-cases/faq/update-faq-item-use-case';
 import { FaqStatus } from '../../domain/faq/faq-category.entity';
 import { Role } from '../../domain/user/user-roles.entity';
+import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -61,6 +62,7 @@ export class FaqController {
   ) {}
 
   @Get()
+  @Public()
   getPublic() {
     return this.getPublicFaqUseCase.call();
   }

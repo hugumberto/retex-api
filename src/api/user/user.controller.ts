@@ -44,6 +44,7 @@ import { UpdateUserDto } from '../../app/use-cases/user/update-user-use-case/upd
 import { Address } from '../../domain/address/address.entity';
 import { Role } from '../../domain/user/user-roles.entity';
 import { User } from '../../domain/user/user.entity';
+import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -69,6 +70,7 @@ export class UserController {
   ) {}
 
   @Post('register')
+  @Public()
   @ApiOperation({
     summary: 'Registo público de utilizador (tipo sempre PERSON)',
   })
@@ -85,6 +87,7 @@ export class UserController {
   }
 
   @Post('activate')
+  @Public()
   @ApiOperation({
     summary: 'Ativar conta com token de ativação e definir senha',
   })
@@ -99,6 +102,7 @@ export class UserController {
   }
 
   @Post('forgot-password')
+  @Public()
   @ApiOperation({ summary: 'Pedir email para repor a palavra-passe' })
   @ApiResponse({
     status: 201,
@@ -109,6 +113,7 @@ export class UserController {
   }
 
   @Post('reset-password')
+  @Public()
   @ApiOperation({ summary: 'Definir nova palavra-passe com token de reposição' })
   @ApiResponse({ status: 201, description: 'Palavra-passe atualizada', type: Object })
   @ApiResponse({ status: 400, description: 'Token de reset inválido ou expirado' })
@@ -119,12 +124,16 @@ export class UserController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Criar novo usuário' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Criar novo usuário (admin)' })
   @ApiResponse({
     status: 201,
     description: 'Usuário criado com sucesso',
     type: Object,
   })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
   @ApiResponse({ status: 409, description: 'Usuário já existe' })
   async createUser(
     @Body() createUserDto: CreateUserDto,

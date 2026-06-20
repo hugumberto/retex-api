@@ -8,8 +8,11 @@ import {
   UpdateStorageUnitDto,
   UpdateStorageUnitUseCase
 } from '../../app/use-cases/storage-unit';
+import { Role } from '../../domain/user/user-roles.entity';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('storage-unit')
+@Roles(Role.ADMIN, Role.OPS)
 export class StorageUnitController {
   constructor(
     private readonly createStorageUnitUseCase: CreateStorageUnitUseCase,

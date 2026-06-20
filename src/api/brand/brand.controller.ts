@@ -8,8 +8,11 @@ import {
   UpdateBrandDto,
   UpdateBrandUseCase
 } from '../../app/use-cases/brand';
+import { Role } from '../../domain/user/user-roles.entity';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('brand')
+@Roles(Role.ADMIN, Role.OPS)
 export class BrandController {
   constructor(
     private readonly createBrandUseCase: CreateBrandUseCase,

@@ -6,8 +6,10 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
+import { JwtPayload } from '../../app/services/interfaces/auth.interface';
 import { CreatePackageUseCase } from '../../app/use-cases/package/create-package-use-case';
 import { CreatePackageDto } from '../../app/use-cases/package/create-package-use-case/create-package.dto';
 import { GetAllPackagesUseCase } from '../../app/use-cases/package/get-all-packages-use-case';
@@ -18,8 +20,14 @@ import { UpdatePackageUseCase } from '../../app/use-cases/package/update-package
 import { UpdatePackageDto } from '../../app/use-cases/package/update-package-use-case/update-package.dto';
 import { Role } from '../../domain/user/user-roles.entity';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
+
+function requesterFrom(req: Request): { id: string; isPrivileged: boolean } {
+  const user = req['user'] as JwtPayload;
+  const isPrivileged = !!user?.roles?.some(
+    (role) => role === Role.ADMIN || role === Role.OPS,
+  );
+  return { id: user?.sub, isPrivileged };
+}
 
 @Controller('package')
 export class PackageController {
@@ -32,29 +40,46 @@ export class PackageController {
   ) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.OPS)
   getAll() {
     return this.getAllPackagesUseCase.call();
   }
 
   @Post()
-  createPackage(@Body() body: CreatePackageDto) {
-    return this.createPackageUseCase.call(body);
+  @Roles(Role.ADMIN, Role.OPS, Role.USER)
+  createPackage(@Req() req: Request, @Body() body: CreatePackageDto) {
+    const { id, isPrivileged } = requesterFrom(req);
+    // Um USER só pode criar pacotes para si próprio; ADMIN/OPS podem indicar o userId.
+    const userId = isPrivileged ? body.userId : id;
+    return this.createPackageUseCase.call({ ...body, userId });
   }
 
   @Get('created')
+  @Roles(Role.ADMIN, Role.OPS, Role.DRIVER)
   getCreatedPackages(@Query() query: GetCreatedPackagesDto) {
     return this.getCreatedPackagesUseCase.call(query);
   }
 
   @Get(':id')
-  getPackageById(@Param('id') id: string) {
-    return this.getPackageByIdUseCase.call(id);
+  @Roles(Role.ADMIN, Role.OPS, Role.USER)
+  getPackageById(@Req() req: Request, @Param('id') id: string) {
+    const { id: requesterId, isPrivileged } = requesterFrom(req);
+    return this.getPackageByIdUseCase.call({ id, requesterId, isPrivileged });
   }
 
   @Patch(':id')
-  updatePackage(@Param('id') id: string, @Body() body: UpdatePackageDto) {
-    return this.updatePackageUseCase.call({ id, data: body });
+  @Roles(Role.ADMIN, Role.OPS, Role.USER)
+  updatePackage(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() body: UpdatePackageDto,
+  ) {
+    const { id: requesterId, isPrivileged } = requesterFrom(req);
+    return this.updatePackageUseCase.call({
+      id,
+      data: body,
+      requesterId,
+      isPrivileged,
+    });
   }
 }

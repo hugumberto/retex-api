@@ -18,6 +18,7 @@ import { GetAllBlogCategoriesUseCase } from '../../app/use-cases/blog-category/g
 import { UpdateBlogCategoryUseCase } from '../../app/use-cases/blog-category/update-blog-category-use-case';
 import { BlogCategoryStatus } from '../../domain/blog-post/blog-category.entity';
 import { Role } from '../../domain/user/user-roles.entity';
+import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -43,6 +44,7 @@ export class BlogCategoryController {
   ) {}
 
   @Get('public')
+  @Public()
   @ApiOperation({ summary: 'Listar categorias ativas (endpoint público)' })
   getPublic() {
     return this.getAllBlogCategoriesUseCase.call({ onlyActive: true });

@@ -14,6 +14,7 @@ import { BlogPostStatus } from '../../domain/blog-post/blog-post-status.enum';
 import { BlogPost } from '../../domain/blog-post/blog-post.entity';
 import { PaginatedResult } from '../../domain/interfaces/pagination.interface';
 import { Role } from '../../domain/user/user-roles.entity';
+import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -80,6 +81,7 @@ export class BlogPostController {
   }
 
   @Get('public')
+  @Public()
   @ApiOperation({ summary: 'Listar posts publicados (endpoint público)' })
   @ApiQuery({ name: 'search', required: false, description: 'Buscar por título, conteúdo ou tags' })
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Número da página (padrão: 1)' })
@@ -94,6 +96,7 @@ export class BlogPostController {
   }
 
   @Get('public/:slug')
+  @Public()
   @ApiOperation({ summary: 'Obter post publicado por slug (endpoint público)' })
   @ApiResponse({ status: 200, description: 'Post publicado', type: Object })
   @ApiResponse({ status: 404, description: 'Post não encontrado ou não publicado' })

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { TerminusModule } from '@nestjs/terminus';
 import { AuthModule } from '../app/services/auth/auth.module';
 import { UseCasesModule } from '../app/use-cases/use-cases.module';
@@ -41,6 +42,14 @@ import { WelcomeController } from './welcome/welcome.controller';
     TestZoneController,
     FaqController,
   ],
-  providers: [JwtAuthGuard, RolesGuard],
+  providers: [
+    JwtAuthGuard,
+    RolesGuard,
+    // Secure-by-default: autentica e valida roles em TODAS as rotas, exceto as
+    // marcadas com @Public(). A ordem importa — JwtAuthGuard preenche
+    // request.user antes de o RolesGuard validar as roles.
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
+  ],
 })
 export class ApiModule { }
