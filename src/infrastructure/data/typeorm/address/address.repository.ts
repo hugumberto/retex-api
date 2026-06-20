@@ -37,7 +37,9 @@ export class AddressRepository
     await repo.createQueryBuilder()
       .update('user_address')
       .set({ isInServiceZone: value })
-      .where('LOWER(city) = :city', { city: sanitizedCity })
+      // city_normalized é guardada já sanitizada (sem acentos, minúsculas), tal
+      // como o argumento — assim cidades com acentos também casam.
+      .where('city_normalized = :city', { city: sanitizedCity })
       .execute();
   }
 }

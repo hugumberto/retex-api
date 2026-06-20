@@ -6,4 +6,6 @@ export interface IUserRepository extends IRepository<User> {
   findOneWithRelations(query: Partial<User>): Promise<User>;
   findWithRelations(query: Partial<User>, options?: { role?: Role }): Promise<User[]>;
   findInactiveUsersByCity(sanitizedCity: string): Promise<User[]>;
+  findByActivationToken(token: string): Promise<User | null>;
+  findByResetToken(token: string): Promise<User | null>;
 }

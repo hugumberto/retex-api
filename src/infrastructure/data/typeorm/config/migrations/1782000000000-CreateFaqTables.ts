@@ -14,9 +14,9 @@ export class CreateFaqTables1782000000000 implements MigrationInterface {
         "title"      character varying(255) NOT NULL,
         "description" text NOT NULL,
         "status"     "public"."faq_category_status_enum" NOT NULL DEFAULT 'ACTIVE',
-        "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-        "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
-        "deleted_at" TIMESTAMP,
+        "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+        "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+        "deleted_at" TIMESTAMP WITH TIME ZONE,
         CONSTRAINT "PK_faq_category" PRIMARY KEY ("id")
       )
     `);
@@ -27,9 +27,9 @@ export class CreateFaqTables1782000000000 implements MigrationInterface {
         "category_id" uuid NOT NULL,
         "title"       character varying(255) NOT NULL,
         "description" text NOT NULL,
-        "created_at"  TIMESTAMP NOT NULL DEFAULT now(),
-        "updated_at"  TIMESTAMP NOT NULL DEFAULT now(),
-        "deleted_at"  TIMESTAMP,
+        "created_at"  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+        "updated_at"  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+        "deleted_at"  TIMESTAMP WITH TIME ZONE,
         CONSTRAINT "PK_faq_item" PRIMARY KEY ("id"),
         CONSTRAINT "FK_faq_item_category" FOREIGN KEY ("category_id")
           REFERENCES "faq_category"("id") ON DELETE CASCADE

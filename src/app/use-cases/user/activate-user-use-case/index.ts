@@ -30,9 +30,7 @@ export class ActivateUserUseCase
   ) {}
 
   async call(param: ActivateUserDto): Promise<Omit<User, 'password'>> {
-    const user = await this.userRepository.findOne({
-      activationToken: param.token,
-    } as Partial<User>);
+    const user = await this.userRepository.findByActivationToken(param.token);
     if (!user) {
       throw new NotFoundException('Token de ativação inválido');
     }

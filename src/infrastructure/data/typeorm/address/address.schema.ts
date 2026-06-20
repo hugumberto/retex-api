@@ -39,6 +39,13 @@ export const addressSchema = new EntitySchema<Address>({
       length: 255,
       name: 'city',
     },
+    cityNormalized: {
+      type: 'varchar',
+      nullable: false,
+      length: 255,
+      name: 'city_normalized',
+      default: '',
+    },
     cityDivision: {
       type: 'varchar',
       nullable: false,
@@ -102,4 +109,10 @@ export const addressSchema = new EntitySchema<Address>({
       onDelete: 'CASCADE',
     },
   },
+  indices: [
+    {
+      name: 'IDX_user_address_city_normalized',
+      columns: ['cityNormalized'],
+    },
+  ],
 });

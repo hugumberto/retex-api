@@ -56,6 +56,7 @@ export class CreateAddressUseCase implements IUseCase<CreateAddressDto, Address>
       number: param.number,
       complement: param.complement,
       city: param.city,
+      cityNormalized: sanitizedCity,
       cityDivision: param.cityDivision ?? '',
       country: param.country ?? '',
       countryDivision: param.countryDivision ?? '',

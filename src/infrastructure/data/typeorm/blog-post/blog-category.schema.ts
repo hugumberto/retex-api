@@ -24,7 +24,6 @@ export const blogCategorySchema = new EntitySchema<BlogCategory>({
       nullable: false,
       length: 255,
       name: 'slug',
-      unique: true,
     },
     status: {
       type: 'enum',
@@ -44,9 +43,12 @@ export const blogCategorySchema = new EntitySchema<BlogCategory>({
   },
   indices: [
     {
+      // Unicidade só entre categorias vivas: permite recriar um slug depois de
+      // um soft-delete (senão a categoria apagada bloqueava o slug para sempre).
       name: 'IDX_BLOG_CATEGORY_SLUG',
       unique: true,
       columns: ['slug'],
+      where: 'deleted_at IS NULL',
     },
   ],
 });

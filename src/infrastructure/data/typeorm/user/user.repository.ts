@@ -54,7 +54,27 @@ export class UserRepository
       .createQueryBuilder('u')
       .innerJoin('user_address', 'a', 'a.user_id = u.id AND a.is_default = true')
       .where('u.status = :status', { status: UserStatus.INACTIVE })
-      .andWhere('LOWER(a.city) = :city', { city: sanitizedCity })
+      .andWhere('a.city_normalized = :city', { city: sanitizedCity })
       .getMany();
+  }
+
+  // Os tokens têm `select: false` (não vazam em leituras normais); aqui
+  // re-incluímos os campos necessários para validar a expiração.
+  async findByActivationToken(token: string): Promise<User | null> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('u')
+      .addSelect(['u.activationToken', 'u.activationTokenExpiresAt'])
+      .where('u.activationToken = :token', { token })
+      .getOne();
+  }
+
+  async findByResetToken(token: string): Promise<User | null> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('u')
+      .addSelect(['u.resetTokenExpiresAt'])
+      .where('u.resetToken = :token', { token })
+      .getOne();
   }
 }

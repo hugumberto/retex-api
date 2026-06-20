@@ -1,6 +1,7 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IRefreshTokenRepository } from '../../../../domain/user/refresh-token.repository';
+import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { RefreshTokenResult } from '../../../services/interfaces/auth.interface';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { GenerateJwtUseCase } from '../generate-jwt-use-case';
@@ -32,6 +33,17 @@ export class RefreshTokenUseCase implements IUseCase<RefreshTokenDto, RefreshTok
     // Verificar se não foi revogado
     if (refreshToken.isRevoked) {
       throw new UnauthorizedException('Refresh token revogado');
+    }
+
+    // Re-validar o estado do utilizador: contas desativadas/por ativar não
+    // podem renovar a sessão (senão um utilizador desativado mantinha acesso
+    // durante toda a validade do refresh token).
+    if (refreshToken.user?.status !== UserStatus.ACTIVE) {
+      await this.refreshTokenRepository.update(
+        { id: refreshToken.id },
+        { isRevoked: true }
+      );
+      throw new UnauthorizedException('Conta inativa');
     }
 
     // Revogar o token atual

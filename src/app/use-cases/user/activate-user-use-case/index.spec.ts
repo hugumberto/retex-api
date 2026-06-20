@@ -50,32 +50,32 @@ describe('ActivateUserUseCase', () => {
   const inZone = (v: boolean) => [{ isInServiceZone: v } as Address];
 
   it('throws NotFound for an unknown token', async () => {
-    userRepositoryMock.findOne.mockResolvedValue(undefined);
+    userRepositoryMock.findByActivationToken.mockResolvedValue(undefined);
     await expect(useCase.call(param)).rejects.toThrow(NotFoundException);
   });
 
   it('throws Conflict when the account is already active', async () => {
-    userRepositoryMock.findOne.mockResolvedValue(
+    userRepositoryMock.findByActivationToken.mockResolvedValue(
       pendingUser({ status: UserStatus.ACTIVE }),
     );
     await expect(useCase.call(param)).rejects.toThrow(ConflictException);
   });
 
   it('throws BadRequest when the token expired', async () => {
-    userRepositoryMock.findOne.mockResolvedValue(
+    userRepositoryMock.findByActivationToken.mockResolvedValue(
       pendingUser({ activationTokenExpiresAt: new Date(Date.now() - 1000) }),
     );
     await expect(useCase.call(param)).rejects.toThrow(BadRequestException);
   });
 
   it('throws BadRequest when the address is out of the service zone', async () => {
-    userRepositoryMock.findOne.mockResolvedValue(pendingUser());
+    userRepositoryMock.findByActivationToken.mockResolvedValue(pendingUser());
     addressRepositoryMock.find.mockResolvedValue(inZone(false));
     await expect(useCase.call(param)).rejects.toThrow(BadRequestException);
   });
 
   it('activates the account, sets the password and clears the token', async () => {
-    userRepositoryMock.findOne.mockResolvedValue(pendingUser());
+    userRepositoryMock.findByActivationToken.mockResolvedValue(pendingUser());
     addressRepositoryMock.find.mockResolvedValue(inZone(true));
     cryptoServiceMock.hashPassword.mockResolvedValue('hashed');
     userRepositoryMock.update.mockResolvedValue([

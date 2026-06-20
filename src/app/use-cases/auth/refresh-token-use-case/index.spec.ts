@@ -4,6 +4,7 @@ import { mock } from 'jest-mock-extended';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { RefreshToken } from '../../../../domain/user/refresh-token.entity';
 import { IRefreshTokenRepository } from '../../../../domain/user/refresh-token.repository';
+import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { GenerateJwtUseCase } from '../generate-jwt-use-case';
 import { GenerateRefreshTokenUseCase } from '../generate-refresh-token-use-case';
 import { RefreshTokenUseCase } from '.';
@@ -34,7 +35,7 @@ describe('RefreshTokenUseCase', () => {
     ({
       id: 'rt-id',
       token: 'old-token',
-      user: { id: 'user-id' },
+      user: { id: 'user-id', status: UserStatus.ACTIVE },
       expiresAt: new Date(Date.now() + 60_000),
       isRevoked: false,
       ...over,
@@ -63,6 +64,21 @@ describe('RefreshTokenUseCase', () => {
     await expect(
       useCase.call({ refresh_token: 'old-token' }),
     ).rejects.toThrow(UnauthorizedException);
+  });
+
+  it('rejects (and revokes) when the account is not active', async () => {
+    const row = tokenRow({ user: { id: 'user-id', status: UserStatus.INACTIVE } as any });
+    refreshTokenRepositoryMock.findByToken.mockResolvedValue(row);
+    refreshTokenRepositoryMock.update.mockResolvedValue([row]);
+
+    await expect(
+      useCase.call({ refresh_token: 'old-token' }),
+    ).rejects.toThrow(UnauthorizedException);
+    expect(refreshTokenRepositoryMock.update).toHaveBeenCalledWith(
+      { id: 'rt-id' },
+      { isRevoked: true },
+    );
+    expect(generateJwt.call).not.toHaveBeenCalled();
   });
 
   it('rotates the token: revokes the old one and returns new tokens', async () => {

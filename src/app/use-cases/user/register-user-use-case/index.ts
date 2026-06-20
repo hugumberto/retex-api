@@ -91,6 +91,7 @@ export class RegisterUserUseCase implements IUseCase<RegisterUserDto, RegisterUs
         number: param.address.number ?? '',
         complement: param.address.complement,
         city: param.address.city ?? '',
+        cityNormalized: sanitizedCity,
         cityDivision: param.address.cityDivision ?? '',
         country: param.address.country ?? '',
         countryDivision: param.address.countryDivision ?? '',

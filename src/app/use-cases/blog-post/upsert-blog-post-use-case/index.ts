@@ -84,8 +84,12 @@ export class UpsertBlogPostUseCase implements IUseCase<UpsertBlogPostDto, BlogPo
     if (categoryIds === undefined) return undefined;
     if (categoryIds.length === 0) return [];
 
-    const categories = await this.blogCategoryRepository.findByIds(categoryIds);
-    if (categories.length !== categoryIds.length) {
+    // Remover duplicados: senão `['a','a']` faz `categories.length` (1) !==
+    // `categoryIds.length` (2) e rejeita IDs válidos com um falso NotFound.
+    const uniqueIds = [...new Set(categoryIds)];
+
+    const categories = await this.blogCategoryRepository.findByIds(uniqueIds);
+    if (categories.length !== uniqueIds.length) {
       throw new NotFoundException('Uma ou mais categorias não foram encontradas');
     }
     return categories;

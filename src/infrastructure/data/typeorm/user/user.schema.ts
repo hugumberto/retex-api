@@ -73,11 +73,13 @@ export const userSchema = new EntitySchema<User>({
       length: 255,
       name: 'activation_token',
       unique: true,
+      select: false,
     },
     activationTokenExpiresAt: {
       type: 'timestamp',
       nullable: true,
       name: 'activation_token_expires_at',
+      select: false,
     },
     resetToken: {
       type: 'varchar',
@@ -85,11 +87,13 @@ export const userSchema = new EntitySchema<User>({
       length: 255,
       name: 'reset_token',
       unique: true,
+      select: false,
     },
     resetTokenExpiresAt: {
       type: 'timestamp',
       nullable: true,
       name: 'reset_token_expires_at',
+      select: false,
     },
     ...BaseTimestampColumns,
   },

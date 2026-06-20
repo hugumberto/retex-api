@@ -28,12 +28,12 @@ describe('ConfirmResetPasswordUseCase', () => {
   const param = { token: 'rtok', password: 'Abcdef1!' };
 
   it('throws BadRequest for an unknown token', async () => {
-    userRepositoryMock.findOne.mockResolvedValue(undefined);
+    userRepositoryMock.findByResetToken.mockResolvedValue(undefined);
     await expect(useCase.call(param)).rejects.toThrow(BadRequestException);
   });
 
   it('throws BadRequest when the token expired', async () => {
-    userRepositoryMock.findOne.mockResolvedValue({
+    userRepositoryMock.findByResetToken.mockResolvedValue({
       id: 'user-id',
       resetToken: 'rtok',
       resetTokenExpiresAt: new Date(Date.now() - 1000),
@@ -42,7 +42,7 @@ describe('ConfirmResetPasswordUseCase', () => {
   });
 
   it('sets the new password and clears the reset token', async () => {
-    userRepositoryMock.findOne.mockResolvedValue({
+    userRepositoryMock.findByResetToken.mockResolvedValue({
       id: 'user-id',
       resetToken: 'rtok',
       resetTokenExpiresAt: new Date(Date.now() + 60_000),

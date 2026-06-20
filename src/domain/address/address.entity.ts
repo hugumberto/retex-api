@@ -8,6 +8,9 @@ export interface Address extends Entity {
   number: string;
   complement?: string;
   city: string;
+  // Cidade normalizada (sem acentos, minúsculas) — usada para casar com as
+  // zonas de atuação, que também são guardadas normalizadas.
+  cityNormalized: string;
   cityDivision: string;
   country: string;
   countryDivision: string;
