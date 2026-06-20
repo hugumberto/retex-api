@@ -3,6 +3,7 @@ import { DOMAIN_TOKENS } from '../../../domain/tokens';
 import { IUserRoleRepository } from '../../../domain/user/user-role.repository';
 import { Role } from '../../../domain/user/user-roles.entity';
 import { UserStatus } from '../../../domain/user/user-status.enum';
+import { UserType } from '../../../domain/user/user-type.enum';
 import { User } from '../../../domain/user/user.entity';
 import { IUserRepository } from '../../../domain/user/user.repository';
 import { ICryptoService } from '../interfaces/crypto.interface';
@@ -32,9 +33,9 @@ export class SeedService implements OnApplicationBootstrap {
       lastName: 'Retex',
       email: adminEmail,
       contactPhone: '000000000',
-      documentNumber: '000000000',
       password: hashedPassword,
       status: UserStatus.ACTIVE,
+      userType: UserType.PERSON,
     });
 
     await this.userRoleRepository.create({ user: user as User, role: Role.ADMIN });

@@ -84,6 +84,29 @@ export class PackageRepository
     };
   }
 
+  async findByUser(userId: string): Promise<Package[]> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('package')
+      .leftJoinAndSelect('package.user', 'user')
+      .leftJoinAndSelect('package.address', 'address')
+      .leftJoinAndSelect('package.route', 'route')
+      .where('user.id = :userId', { userId })
+      .orderBy('package.createdAt', 'DESC')
+      .getMany();
+  }
+
+  async findAll(): Promise<Package[]> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('package')
+      .leftJoinAndSelect('package.user', 'user')
+      .leftJoinAndSelect('package.address', 'address')
+      .leftJoinAndSelect('package.route', 'route')
+      .orderBy('package.createdAt', 'DESC')
+      .getMany();
+  }
+
   async findOneWithAllRelations(id: string): Promise<Package> {
     const repository = await this.getRepository();
     return repository

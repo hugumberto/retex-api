@@ -22,7 +22,6 @@ export const blogPostSchema = new EntitySchema<BlogPost>({
       nullable: false,
       length: 255,
       name: 'slug',
-      unique: true,
     },
     title: {
       type: 'varchar',
@@ -61,11 +60,26 @@ export const blogPostSchema = new EntitySchema<BlogPost>({
     },
     ...BaseTimestampColumns,
   },
+  relations: {
+    categories: {
+      type: 'many-to-many',
+      target: 'blog_category',
+      inverseSide: 'posts',
+      joinTable: {
+        name: 'blog_post_categories',
+        joinColumn: { name: 'post_id', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
+      },
+    },
+  },
   indices: [
     {
+      // Unicidade só entre posts vivos: permite recriar um slug depois de um
+      // soft-delete (senão o post apagado bloqueava o slug para sempre → 500).
       name: 'IDX_BLOG_POST_SLUG',
       unique: true,
       columns: ['slug'],
+      where: 'deleted_at IS NULL',
     },
     {
       name: 'IDX_BLOG_POST_STATUS',

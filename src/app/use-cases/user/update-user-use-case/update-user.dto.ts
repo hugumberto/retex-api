@@ -1,5 +1,6 @@
 import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 import { UserStatus } from '../../../../domain/user/user-status.enum';
+import { UserType } from '../../../../domain/user/user-type.enum';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -19,10 +20,10 @@ export class UpdateUserDto {
   contactPhone?: string;
 
   @IsOptional()
-  @IsString({ message: 'Número do documento deve ser uma string' })
-  documentNumber?: string;
-
-  @IsOptional()
   @IsEnum(UserStatus, { message: 'Status deve ser ACTIVE ou INACTIVE' })
   status?: UserStatus;
+
+  @IsOptional()
+  @IsEnum(UserType, { message: 'userType deve ser PERSON ou COMPANY' })
+  userType?: UserType;
 } 

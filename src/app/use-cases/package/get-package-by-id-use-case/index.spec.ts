@@ -26,27 +26,60 @@ describe('GetPackageByIdUseCase', () => {
     getPackageByIdUseCase = module.get(GetPackageByIdUseCase);
   });
 
+  const pkgOwnedBy = (ownerId: string) =>
+    ({ id: 'pkg-id', user: { id: ownerId } } as unknown as Package);
+
   describe('call', () => {
-    it('should return a package with relations', async () => {
-      const pkg = mock<Package>();
+    it('returns the package for a privileged requester (ADMIN/OPS)', async () => {
+      const pkg = pkgOwnedBy('someone-else');
       packageRepositoryMock.findOneWithAllRelations.mockResolvedValue(pkg);
 
-      const response = await getPackageByIdUseCase.call('package-id');
+      const response = await getPackageByIdUseCase.call({
+        id: 'pkg-id',
+        requesterId: 'admin-id',
+        isPrivileged: true,
+      });
 
       expect(response).toEqual(pkg);
-      expect(
-        packageRepositoryMock.findOneWithAllRelations,
-      ).toHaveBeenCalledWith('package-id');
     });
 
-    it('should throw not found when package does not exist', async () => {
+    it('returns the package when the USER owns it', async () => {
+      const pkg = pkgOwnedBy('me-id');
+      packageRepositoryMock.findOneWithAllRelations.mockResolvedValue(pkg);
+
+      const response = await getPackageByIdUseCase.call({
+        id: 'pkg-id',
+        requesterId: 'me-id',
+        isPrivileged: false,
+      });
+
+      expect(response).toEqual(pkg);
+    });
+
+    it('hides another user\'s package from a non-privileged requester (404)', async () => {
       packageRepositoryMock.findOneWithAllRelations.mockResolvedValue(
-        undefined,
+        pkgOwnedBy('someone-else'),
       );
 
-      await expect(getPackageByIdUseCase.call('missing-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        getPackageByIdUseCase.call({
+          id: 'pkg-id',
+          requesterId: 'me-id',
+          isPrivileged: false,
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws not found when the package does not exist', async () => {
+      packageRepositoryMock.findOneWithAllRelations.mockResolvedValue(undefined);
+
+      await expect(
+        getPackageByIdUseCase.call({
+          id: 'missing-id',
+          requesterId: 'admin-id',
+          isPrivileged: true,
+        }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

@@ -4,8 +4,11 @@ import { BindItemsStorageUnitsDto } from '../../app/use-cases/item/bind-items-st
 import { CreateItemUseCase } from '../../app/use-cases/item/create-item-use-case';
 import { CreateItemDto } from '../../app/use-cases/item/create-item-use-case/create-item.dto';
 import { DeleteItemUseCase } from '../../app/use-cases/item/delete-item-use-case';
+import { Role } from '../../domain/user/user-roles.entity';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('items')
+@Roles(Role.ADMIN, Role.OPS)
 export class ItemController {
   constructor(
     private readonly createItemUseCase: CreateItemUseCase,

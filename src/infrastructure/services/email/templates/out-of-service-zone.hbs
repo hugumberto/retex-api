@@ -1,0 +1,25 @@
+{{#> layout title="Registo Retex"}}
+
+  {{> eyebrow text="OBRIGADO PELO SEU REGISTO"}}
+
+  <!-- Body -->
+  <tr>
+    <td style="padding:20px 40px 32px;">
+      <p style="margin:0 0 12px;font-size:15px;color:#333333;">
+        Olá, <strong style="color:#02748E;">{{firstName}} {{lastName}}</strong>!
+      </p>
+      <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
+        Recebemos o seu registo. De momento, a sua zona{{#if city}} (<strong>{{city}}</strong>){{/if}}
+        ainda está <strong>fora da nossa zona de atuação</strong>, pelo que ainda não é possível ativar a conta.
+      </p>
+      <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
+        Não se preocupe — guardámos os seus dados e iremos <strong>notificá-lo por email</strong> assim que a Retex
+        estiver disponível na sua zona. Nessa altura poderá definir a sua palavra-passe e ativar a conta.
+      </p>
+      <p style="margin:0;font-size:15px;color:#333333;">
+        A sua equipa <strong>RETEX Portugal</strong>
+      </p>
+    </td>
+  </tr>
+
+{{/layout}}

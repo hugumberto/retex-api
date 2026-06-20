@@ -8,18 +8,16 @@ import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { ICryptoService } from '../../../services/interfaces/crypto.interface';
-import { ISanitizationService } from '../../../services/interfaces/sanitization.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
+import { UserType } from '../../../../domain/user/user-type.enum';
 
 describe('CreateUserUseCase', () => {
   let createUserUseCase: CreateUserUseCase;
   const userRepositoryMock = mock<IUserRepository>();
   const userRoleRepositoryMock = mock<IUserRoleRepository>();
-  const sanitizationServiceMock = mock<ISanitizationService>();
   const cryptoServiceMock = mock<ICryptoService>();
 
   beforeEach(async () => {
-    sanitizationServiceMock.sanitizeNumericString.mockImplementation((v: string) => v.replace(/\D/g, ''));
     cryptoServiceMock.hashPassword.mockResolvedValue('hashed_password');
 
     const module = await Test.createTestingModule({
@@ -27,7 +25,6 @@ describe('CreateUserUseCase', () => {
         CreateUserUseCase,
         { provide: DOMAIN_TOKENS.USER_REPOSITORY, useValue: userRepositoryMock },
         { provide: DOMAIN_TOKENS.USER_ROLE_REPOSITORY, useValue: userRoleRepositoryMock },
-        { provide: SERVICE_TOKENS.SANITIZATION_SERVICE, useValue: sanitizationServiceMock },
         { provide: SERVICE_TOKENS.CRYPTO_SERVICE, useValue: cryptoServiceMock },
       ],
     }).compile();
@@ -47,8 +44,8 @@ describe('CreateUserUseCase', () => {
         lastName: 'Doe',
         email: 'john@email.com',
         contactPhone: '99999999',
-        documentNumber: 'ABC-123',
         password: 'secret',
+        userType: UserType.PERSON,
       });
 
       expect(response).toEqual(
@@ -65,9 +62,9 @@ describe('CreateUserUseCase', () => {
           lastName: 'Doe',
           email: 'john@email.com',
           contactPhone: '99999999',
-          documentNumber: '123',
           password: 'hashed_password',
           status: UserStatus.ACTIVE,
+          userType: UserType.PERSON,
         })
       );
     });

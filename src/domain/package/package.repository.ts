@@ -18,4 +18,6 @@ export interface IPackageRepository extends IRepository<Package> {
   ): Promise<PaginatedResult<Package>>;
 
   findOneWithAllRelations(id: string): Promise<Package>;
+  findByUser(userId: string): Promise<Package[]>;
+  findAll(): Promise<Package[]>;
 }

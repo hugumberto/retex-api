@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { addressSchema } from './address/address.schema';
+import { blogCategorySchema } from './blog-post/blog-category.schema';
 import { blogPostSchema } from './blog-post/blog-post.schema';
 import { brandSchema } from './brand/brand.schema';
 import { TEST_DATABASE_CONFIG } from './config/typeorm-test.config';
@@ -8,6 +10,8 @@ import { itemSchema } from './item/item.schema';
 import { packageSchema } from './package/package.schema';
 import { routeSchema } from './route/route.schema';
 import { storageUnitSchema } from './storage-unit/storage-unit.schema';
+import { faqCategorySchema } from './faq/faq-category.schema';
+import { faqItemSchema } from './faq/faq-item.schema';
 import { testZoneSchema } from './test-zone/test-zone.schema';
 import { userRoleSchema } from './user-role/user-role.schema';
 import { refreshTokenSchema } from './user/refresh-token.schema';
@@ -20,6 +24,7 @@ import { userSchema } from './user/user.schema';
     ),
     TypeOrmModule.forFeature([
       userSchema,
+      addressSchema,
       testZoneSchema,
       brandSchema,
       itemSchema,
@@ -29,6 +34,9 @@ import { userSchema } from './user/user.schema';
       userRoleSchema,
       refreshTokenSchema,
       blogPostSchema,
+      blogCategorySchema,
+      faqCategorySchema,
+      faqItemSchema,
     ]),
   ],
   exports: [TypeOrmModule],

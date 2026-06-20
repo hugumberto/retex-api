@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@ne
 import { DeleteBlogPostUseCase } from '../../app/use-cases/blog-post/delete-blog-post-use-case';
 import { GetAllBlogPostsUseCase } from '../../app/use-cases/blog-post/get-all-blog-posts-use-case';
 import { GetAllBlogPostsDto } from '../../app/use-cases/blog-post/get-all-blog-posts-use-case/get-all-blog-posts.dto';
+import { GetPublicBlogPostBySlugUseCase } from '../../app/use-cases/blog-post/get-public-blog-post-by-slug-use-case';
 import { GetPublicBlogPostsUseCase } from '../../app/use-cases/blog-post/get-public-blog-posts-use-case';
 import { GetPublicBlogPostsDto } from '../../app/use-cases/blog-post/get-public-blog-posts-use-case/get-public-blog-posts.dto';
 import { PublishBlogPostUseCase } from '../../app/use-cases/blog-post/publish-blog-post-use-case';
@@ -13,6 +14,7 @@ import { BlogPostStatus } from '../../domain/blog-post/blog-post-status.enum';
 import { BlogPost } from '../../domain/blog-post/blog-post.entity';
 import { PaginatedResult } from '../../domain/interfaces/pagination.interface';
 import { Role } from '../../domain/user/user-roles.entity';
+import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -25,6 +27,7 @@ export class BlogPostController {
     private readonly publishBlogPostUseCase: PublishBlogPostUseCase,
     private readonly deleteBlogPostUseCase: DeleteBlogPostUseCase,
     private readonly getPublicBlogPostsUseCase: GetPublicBlogPostsUseCase,
+    private readonly getPublicBlogPostBySlugUseCase: GetPublicBlogPostBySlugUseCase,
     private readonly getAllBlogPostsUseCase: GetAllBlogPostsUseCase,
   ) { }
 
@@ -78,6 +81,7 @@ export class BlogPostController {
   }
 
   @Get('public')
+  @Public()
   @ApiOperation({ summary: 'Listar posts publicados (endpoint público)' })
   @ApiQuery({ name: 'search', required: false, description: 'Buscar por título, conteúdo ou tags' })
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Número da página (padrão: 1)' })
@@ -89,6 +93,15 @@ export class BlogPostController {
   })
   async getPublicBlogPosts(@Query() query: GetPublicBlogPostsDto): Promise<PaginatedResult<BlogPost>> {
     return this.getPublicBlogPostsUseCase.call(query);
+  }
+
+  @Get('public/:slug')
+  @Public()
+  @ApiOperation({ summary: 'Obter post publicado por slug (endpoint público)' })
+  @ApiResponse({ status: 200, description: 'Post publicado', type: Object })
+  @ApiResponse({ status: 404, description: 'Post não encontrado ou não publicado' })
+  async getPublicBlogPostBySlug(@Param('slug') slug: string): Promise<BlogPost> {
+    return this.getPublicBlogPostBySlugUseCase.call({ slug });
   }
 
   @Get()

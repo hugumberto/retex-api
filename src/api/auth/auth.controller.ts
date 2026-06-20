@@ -7,6 +7,7 @@ import { LogoutUseCase } from '../../app/use-cases/auth/logout-use-case';
 import { LogoutDto } from '../../app/use-cases/auth/logout-use-case/logout.dto';
 import { RefreshTokenUseCase } from '../../app/use-cases/auth/refresh-token-use-case';
 import { RefreshTokenDto } from '../../app/use-cases/auth/refresh-token-use-case/refresh-token.dto';
+import { Public } from './decorators/public.decorator';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @ApiTags('auth')
@@ -19,6 +20,7 @@ export class AuthController {
   ) { }
 
   @Post('login')
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Fazer login do usuário' })
   @ApiResponse({
@@ -33,6 +35,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Renovar tokens usando refresh token' })
   @ApiResponse({
@@ -46,6 +49,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Fazer logout do usuário' })
   @ApiResponse({
