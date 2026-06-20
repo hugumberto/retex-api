@@ -73,4 +73,32 @@ describe('UpsertBlogPostUseCase', () => {
       { id: 'c1' },
     ]);
   });
+
+  it('preserves the current status when editing (does not silently unpublish)', async () => {
+    blogPostRepositoryMock.findOne.mockResolvedValue({
+      id: 'p1',
+      status: BlogPostStatus.PUBLISHED,
+    } as BlogPost);
+    blogPostRepositoryMock.findBySlug.mockResolvedValue(undefined);
+    blogPostRepositoryMock.update.mockResolvedValue([{ id: 'p1' } as BlogPost]);
+    blogPostRepositoryMock.findByIdWithCategories.mockResolvedValue({ id: 'p1' } as BlogPost);
+
+    await useCase.call({ ...newPostParam, id: 'p1' });
+
+    expect(blogPostRepositoryMock.update).toHaveBeenCalledWith(
+      { id: 'p1' },
+      expect.objectContaining({ status: BlogPostStatus.PUBLISHED }),
+    );
+  });
+
+  it('dedupes repeated categoryIds before validating existence', async () => {
+    blogPostRepositoryMock.findBySlug.mockResolvedValue(undefined);
+    blogCategoryRepositoryMock.findByIds.mockResolvedValue([{ id: 'c1' } as any]);
+    blogPostRepositoryMock.create.mockResolvedValue({ id: 'p1' } as BlogPost);
+
+    await useCase.call({ ...newPostParam, categoryIds: ['c1', 'c1'] });
+
+    expect(blogCategoryRepositoryMock.findByIds).toHaveBeenCalledWith(['c1']);
+    expect(blogPostRepositoryMock.create).toHaveBeenCalled();
+  });
 });

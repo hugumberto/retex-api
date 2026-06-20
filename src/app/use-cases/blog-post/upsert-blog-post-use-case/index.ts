@@ -34,7 +34,8 @@ export class UpsertBlogPostUseCase implements IUseCase<UpsertBlogPostDto, BlogPo
         throw new ConflictException('Já existe um post com este slug');
       }
 
-      // Atualizar post existente
+      // Atualizar post existente — preservar o estado atual: editar (ex.: corrigir
+      // um typo) não deve despublicar silenciosamente um post PUBLISHED.
       const updatedPosts = await this.blogPostRepository.update(
         { id: param.id },
         {
@@ -42,7 +43,7 @@ export class UpsertBlogPostUseCase implements IUseCase<UpsertBlogPostDto, BlogPo
           slug: param.slug,
           title: param.title,
           hero: param.hero,
-          status: BlogPostStatus.DRAFT,
+          status: existingPost.status,
           highlight: param.highlight,
           tags: param.tags,
         }
