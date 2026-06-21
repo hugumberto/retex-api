@@ -65,7 +65,7 @@ export class AppModule {
       ApiModule,
     ];
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV !== 'test') {
       imports.push(SeedModule);
     }
 

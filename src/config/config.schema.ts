@@ -16,6 +16,8 @@ export const envSchema = z.object({
   PORTAL_URL: z.string(),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET deve ter pelo menos 32 caracteres'),
   JWT_EXPIRES_IN: z.string().default('1d'),
+  ADMIN_EMAIL: z.string().email().optional(),
+  ADMIN_PASSWORD: z.string().optional(),
 });
 
 export function getConfigValidation(env: Record<string, string>) {

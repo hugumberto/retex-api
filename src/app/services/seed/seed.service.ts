@@ -21,17 +21,25 @@ export class SeedService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap() {
-    if (process.env.NODE_ENV !== 'development') return;
+    const isDev = process.env.NODE_ENV === 'development';
+    if (process.env.NODE_ENV === 'test') return;
 
-    const adminEmail = 'admin@retex.pt';
-    const existing = await this.userRepository.findOne({ email: adminEmail });
+    // Credenciais vêm do ambiente; em dev há fallback para facilitar o arranque local.
+    const email = process.env.ADMIN_EMAIL ?? (isDev ? 'admin@retex.pt' : undefined);
+    const password =
+      process.env.ADMIN_PASSWORD ?? (isDev ? '123456' : undefined);
+
+    // Em produção sem credenciais configuradas → não faz nada.
+    if (!email || !password) return;
+
+    const existing = await this.userRepository.findOne({ email });
     if (existing) return;
 
-    const hashedPassword = await this.cryptoService.hashPassword('123456');
+    const hashedPassword = await this.cryptoService.hashPassword(password);
     const user = await this.userRepository.create({
       firstName: 'Admin',
       lastName: 'Retex',
-      email: adminEmail,
+      email,
       contactPhone: '000000000',
       password: hashedPassword,
       status: UserStatus.ACTIVE,
