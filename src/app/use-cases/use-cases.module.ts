@@ -7,6 +7,7 @@ import { AUTH_USE_CASES } from './auth';
 import { BLOG_CATEGORY_USE_CASES } from './blog-category';
 import { BLOG_POST_USE_CASES } from './blog-post';
 import { BRAND_USE_CASES } from './brand';
+import { CONTACT_USE_CASES } from './contact';
 import { FAQ_USE_CASES } from './faq';
 import { TEST_ZONE_USE_CASES } from './test-zone';
 import { ITEM_USE_CASES } from './item/item.use-cases';
@@ -32,6 +33,7 @@ export class UseCasesModule {
       ...BLOG_CATEGORY_USE_CASES,
       ...TEST_ZONE_USE_CASES,
       ...FAQ_USE_CASES,
+      ...CONTACT_USE_CASES,
     ];
 
     return {

@@ -19,6 +19,7 @@ export const envSchema = z.object({
   ADMIN_EMAIL: z.string().email().optional(),
   ADMIN_PASSWORD: z.string().optional(),
   ASSETS_BASE_URL: z.string().url().optional(),
+  CONTACT_EMAIL: z.string().email().optional(),
 });
 
 export function getConfigValidation(env: Record<string, string>) {
