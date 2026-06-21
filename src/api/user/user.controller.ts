@@ -39,6 +39,8 @@ import { RegisterUserUseCase } from '../../app/use-cases/user/register-user-use-
 import { RegisterUserDto } from '../../app/use-cases/user/register-user-use-case/register-user.dto';
 import { ResetUserPasswordUseCase } from '../../app/use-cases/user/reset-user-password-use-case';
 import { ResetUserPasswordDto } from '../../app/use-cases/user/reset-user-password-use-case/reset-user-password.dto';
+import { SendActivationEmailUseCase } from '../../app/use-cases/user/send-activation-email-use-case';
+import { SendActivationEmailDto } from '../../app/use-cases/user/send-activation-email-use-case/send-activation-email.dto';
 import { UpdateUserUseCase } from '../../app/use-cases/user/update-user-use-case';
 import { UpdateUserDto } from '../../app/use-cases/user/update-user-use-case/update-user.dto';
 import { Address } from '../../domain/address/address.entity';
@@ -58,6 +60,7 @@ export class UserController {
     private readonly getAllUsersUseCase: GetAllUsersUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly resetUserPasswordUseCase: ResetUserPasswordUseCase,
+    private readonly sendActivationEmailUseCase: SendActivationEmailUseCase,
     private readonly addRoleToUserUseCase: AddRoleToUserUseCase,
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly activateUserUseCase: ActivateUserUseCase,
@@ -121,6 +124,22 @@ export class UserController {
     @Body() dto: ConfirmResetPasswordDto,
   ): Promise<Omit<User, 'password'>> {
     return this.confirmResetPasswordUseCase.call(dto);
+  }
+
+  @Post('send-activation')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Enviar email de ativação para o utilizador (re)definir a senha (admin)',
+  })
+  @ApiResponse({ status: 201, description: 'Email de ativação enviado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
+  @ApiResponse({ status: 404, description: 'Utilizador não encontrado' })
+  async sendActivationEmail(
+    @Body() dto: SendActivationEmailDto,
+  ): Promise<{ ok: true }> {
+    return this.sendActivationEmailUseCase.call(dto);
   }
 
   @Post()
