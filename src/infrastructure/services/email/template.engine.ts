@@ -12,7 +12,13 @@ export class TemplateEngine {
     const filePath = path.join(this.templatesDir, `${template}.hbs`);
     const source = fs.readFileSync(filePath, 'utf-8');
     const compiled = handlebars.compile(source);
-    return compiled(context);
+    return compiled({ assetsBaseUrl: this.assetsBaseUrl(), ...context });
+  }
+
+  // Base URL dos assets dos emails (logo, etc.); configurável via env.
+  private assetsBaseUrl(): string {
+    const base = process.env.ASSETS_BASE_URL ?? 'https://www.retex.pt';
+    return base.replace(/\/+$/, '');
   }
 
   // Regista os partials partilhados (layout/header/footer/cta) uma única vez,
