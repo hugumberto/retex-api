@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUserRoleRepository } from '../../../../domain/user/user-role.repository';
-import { UserRole } from '../../../../domain/user/user-roles.entity';
+import { Role, UserRole } from '../../../../domain/user/user-roles.entity';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
@@ -28,9 +28,15 @@ export class AddRoleToUserUseCase implements IUseCase<AddRoleToUserParamDto, Omi
     const currentRoles = user.roles?.map((ur) => ur.role) ?? [];
     const incomingRoles = data.roles ?? [];
 
+    // Regra: ADMIN é exclusiva — se for atribuída, todas as outras roles são
+    // removidas (o utilizador fica apenas com ADMIN).
+    const effectiveRoles = incomingRoles.includes(Role.ADMIN)
+      ? [Role.ADMIN]
+      : incomingRoles;
+
     // Calcular diferenças
-    const rolesToAdd = incomingRoles.filter((role) => !currentRoles.includes(role));
-    const rolesToRemove = currentRoles.filter((role) => !incomingRoles.includes(role));
+    const rolesToAdd = effectiveRoles.filter((role) => !currentRoles.includes(role));
+    const rolesToRemove = currentRoles.filter((role) => !effectiveRoles.includes(role));
 
     // Adicionar novas roles
     for (const role of rolesToAdd) {
