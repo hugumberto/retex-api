@@ -44,15 +44,17 @@ export class ActivateUserUseCase
     }
 
     // Defesa: garantir que o utilizador continua elegível (zona pode ter mudado).
-    // Só se aplica a quem tem endereço (ex.: particulares). Staff/admin sem
-    // endereço não passam por esta verificação.
-    const addresses = await this.addressRepository.find({
-      userId: user.id,
-      isDefault: true,
-    } as Partial<Address>);
-    const defaultAddress = addresses[0];
-    if (defaultAddress && !defaultAddress.isInServiceZone) {
-      throw new BadRequestException('Endereço fora da zona de atuação');
+    // Ativações iniciadas pelo admin no portal (activationBypassZone) ignoram
+    // esta regra; o fluxo de registo normal continua a exigir endereço em zona.
+    if (!user.activationBypassZone) {
+      const addresses = await this.addressRepository.find({
+        userId: user.id,
+        isDefault: true,
+      } as Partial<Address>);
+      const defaultAddress = addresses[0];
+      if (!defaultAddress?.isInServiceZone) {
+        throw new BadRequestException('Endereço fora da zona de atuação');
+      }
     }
 
     const hashedPassword = await this.cryptoService.hashPassword(param.password);
@@ -64,6 +66,7 @@ export class ActivateUserUseCase
         status: UserStatus.ACTIVE,
         activationToken: null,
         activationTokenExpiresAt: null,
+        activationBypassZone: false,
       } as Partial<User>,
     );
 

@@ -41,6 +41,8 @@ export class SendActivationEmailUseCase
       {
         activationToken: token,
         activationTokenExpiresAt: expiresAt,
+        // Ativações iniciadas pelo admin no portal ignoram a regra de zona.
+        activationBypassZone: true,
         status: UserStatus.INACTIVE,
       } as Partial<User>,
     );

@@ -81,6 +81,11 @@ export const userSchema = new EntitySchema<User>({
       name: 'activation_token_expires_at',
       select: false,
     },
+    activationBypassZone: {
+      type: 'boolean',
+      default: false,
+      name: 'activation_bypass_zone',
+    },
     resetToken: {
       type: 'varchar',
       nullable: true,
