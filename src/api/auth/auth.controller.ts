@@ -28,7 +28,7 @@ export class AuthController {
     description: 'Login realizado com sucesso',
     type: Object
   })
-  @ApiResponse({ status: 401, description: 'Credenciais inválidas' })
+  @ApiResponse({ status: 401, description: 'Email ou senha inválidos' })
   async login(@Body() loginDto: LoginDto): Promise<LoginResult> {
     const result = await this.loginUseCase.call(loginDto);
     return result;
