@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
 import { SERVICE_TOKENS } from '../../../../app/services/tokens';
+import { BlogCategory } from '../../../../domain/blog-post/blog-category.entity';
 import { BlogPostHighlight } from '../../../../domain/blog-post/blog-post-highlight.enum';
 import { BlogPostStatus } from '../../../../domain/blog-post/blog-post-status.enum';
 import { BlogPost } from '../../../../domain/blog-post/blog-post.entity';
@@ -28,7 +29,35 @@ export class BlogPostRepository
     const repository = await this.getRepository();
     return repository.findOne({
       where: { slug } as FindOptionsWhere<BlogPost>,
+      relations: ['categories'],
     });
+  }
+
+  async findPublishedBySlug(slug: string): Promise<BlogPost> {
+    const repository = await this.getRepository();
+    return repository.findOne({
+      where: { slug, status: BlogPostStatus.PUBLISHED } as FindOptionsWhere<BlogPost>,
+      relations: ['categories'],
+    });
+  }
+
+  async findByIdWithCategories(id: string): Promise<BlogPost> {
+    const repository = await this.getRepository();
+    return repository.findOne({
+      where: { id } as FindOptionsWhere<BlogPost>,
+      relations: ['categories'],
+    });
+  }
+
+  async replaceCategories(postId: string, categories: BlogCategory[]): Promise<void> {
+    const repository = await this.getRepository();
+    const post = await repository.findOne({
+      where: { id: postId } as FindOptionsWhere<BlogPost>,
+      relations: ['categories'],
+    });
+    if (!post) return;
+    post.categories = categories;
+    await repository.save(post);
   }
 
   async findByStatus(status: BlogPostStatus): Promise<BlogPost[]> {
@@ -72,6 +101,7 @@ export class BlogPostRepository
   ): Promise<PaginatedResult<BlogPost>> {
     const repository = await this.getRepository();
     const queryBuilder = repository.createQueryBuilder('blog_post');
+    queryBuilder.leftJoinAndSelect('blog_post.categories', 'categories');
 
     // Filtrar apenas posts publicados
     queryBuilder.where('blog_post.status = :status', { status: BlogPostStatus.PUBLISHED });
@@ -114,6 +144,7 @@ export class BlogPostRepository
   ): Promise<PaginatedResult<BlogPost>> {
     const repository = await this.getRepository();
     const queryBuilder = repository.createQueryBuilder('blog_post');
+    queryBuilder.leftJoinAndSelect('blog_post.categories', 'categories');
 
     // Aplicar filtros
     if (filters.status) {

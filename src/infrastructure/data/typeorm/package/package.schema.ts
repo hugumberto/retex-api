@@ -1,7 +1,9 @@
 import { EntitySchema } from 'typeorm';
-import { Package, PackageStatus } from '../../../../domain/package/package.entity';
+import {
+  Package,
+  PackageStatus,
+} from '../../../../domain/package/package.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
-import { addressEmbedded } from './address.embedded';
 
 export const packageSchema = new EntitySchema<Package>({
   name: 'package',
@@ -22,25 +24,29 @@ export const packageSchema = new EntitySchema<Package>({
       scale: 2,
       nullable: true,
     },
+    estimatedVolumes: {
+      type: 'integer',
+      nullable: true,
+      name: 'estimated_volumes',
+    },
     collectDay: {
       type: 'varchar',
-      nullable: false,
+      nullable: true,
       length: 20,
       name: 'collect_day',
     },
     collectTime: {
       type: 'varchar',
-      nullable: false,
+      nullable: true,
       length: 20,
       name: 'collect_time',
     },
-    ...BaseTimestampColumns,
-  },
-  embeddeds: {
-    address: {
-      schema: addressEmbedded,
-      prefix: 'address_',
+    addressId: {
+      type: 'uuid',
+      nullable: true,
+      name: 'address_id',
     },
+    ...BaseTimestampColumns,
   },
   relations: {
     user: {
@@ -50,6 +56,14 @@ export const packageSchema = new EntitySchema<Package>({
         name: 'user_id',
       },
       inverseSide: 'packages',
+    },
+    address: {
+      type: 'many-to-one',
+      target: 'user_address',
+      joinColumn: {
+        name: 'address_id',
+      },
+      nullable: true,
     },
     route: {
       type: 'many-to-one',
@@ -69,4 +83,4 @@ export const packageSchema = new EntitySchema<Package>({
       inverseSide: 'package',
     },
   },
-}); 
+});

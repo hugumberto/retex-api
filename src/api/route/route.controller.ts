@@ -7,8 +7,11 @@ import { GetAllRoutesDto } from "../../app/use-cases/route/get-all-routes-use-ca
 import { GetRouteByIdUseCase } from "../../app/use-cases/route/get-route-by-id-use-case";
 import { UpdateRouteUseCase } from "../../app/use-cases/route/update-route-use-case";
 import { UpdateRouteDto } from "../../app/use-cases/route/update-route-use-case/update-route.dto";
+import { Role } from "../../domain/user/user-roles.entity";
+import { Roles } from "../auth/decorators/roles.decorator";
 
 @Controller('route')
+@Roles(Role.ADMIN, Role.OPS, Role.DRIVER)
 export class RouteController {
   constructor(
     private readonly createRouteUseCase: CreateRouteUseCase,

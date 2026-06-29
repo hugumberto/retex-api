@@ -1,70 +1,17 @@
-import { Type } from 'class-transformer';
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-
-export class AddressDto {
-  @IsString()
-  @IsNotEmpty()
-  street: string;
-
-  @IsString()
-  @IsNotEmpty()
-  number: string;
-
-  @IsString()
-  @IsOptional()
-  complement?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  city: string;
-
-  @IsString()
-  @IsNotEmpty()
-  cityDivision: string;
-
-  @IsString()
-  @IsNotEmpty()
-  country: string;
-
-  @IsString()
-  @IsNotEmpty()
-  countryDivision: string;
-
-  @IsString()
-  @IsNotEmpty()
-  zipCode: string;
-
-  @IsString()
-  @IsNotEmpty()
-  lat: string;
-
-  @IsString()
-  @IsNotEmpty()
-  long: string;
-}
+import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 
 export class CreatePackageDto {
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
-  firstName: string;
+  userId: string;
 
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
-  lastName: string;
+  addressId: string;
 
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  contactPhone: string;
+  @IsInt({ message: 'Estimativa de volumes deve ser um número inteiro' })
+  @Min(1, { message: 'Estimativa de volumes deve ser pelo menos 1' })
+  estimatedVolumes: number;
 
   @IsString()
   @IsOptional()
@@ -73,12 +20,4 @@ export class CreatePackageDto {
   @IsString()
   @IsOptional()
   timeOfDay?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  nif: string;
-
-  @ValidateNested()
-  @Type(() => AddressDto)
-  address: AddressDto;
-} 
+}

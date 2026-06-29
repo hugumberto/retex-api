@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
+import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { ICryptoService } from '../../../services/interfaces/crypto.interface';
@@ -29,6 +30,11 @@ export class ValidateUserUseCase implements IUseCase<ValidateUserDto, User | nul
     );
 
     if (!isPasswordValid) {
+      return null;
+    }
+
+    // Contas inativas (por ativar ou desativadas) não podem entrar.
+    if (user.status !== UserStatus.ACTIVE) {
       return null;
     }
 

@@ -13,6 +13,13 @@ export const envSchema = z.object({
   SMTP_USER: z.string(),
   SMTP_PASS: z.string(),
   SMTP_FROM: z.string(),
+  PORTAL_URL: z.string(),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET deve ter pelo menos 32 caracteres'),
+  JWT_EXPIRES_IN: z.string().default('1d'),
+  ADMIN_EMAIL: z.string().email().optional(),
+  ADMIN_PASSWORD: z.string().optional(),
+  ASSETS_BASE_URL: z.string().url().optional(),
+  CONTACT_EMAIL: z.string().email().optional(),
 });
 
 export function getConfigValidation(env: Record<string, string>) {

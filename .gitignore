@@ -44,3 +44,7 @@ lerna-debug.log*
 .pnp.*
 
 .DS_Store
+
+# Others
+
+/scripts/email-preview/*

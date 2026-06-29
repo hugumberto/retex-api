@@ -1,6 +1,10 @@
 import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
+import { IAddressRepository } from './address/address.repository';
+import { IBlogCategoryRepository } from './blog-post/blog-category.repository';
 import { IBlogPostRepository } from './blog-post/blog-post.repository';
 import { IBrandRepository } from './brand/brand.repository';
+import { IFaqCategoryRepository } from './faq/faq-category.repository';
+import { IFaqItemRepository } from './faq/faq-item.repository';
 import { IUnitOfWork } from './interfaces/unit-of-work.interface';
 import { IItemRepository } from './item/item.repository';
 import { IPackageRepository } from './package/package.repository';
@@ -14,6 +18,7 @@ import { IUserRepository } from './user/user.repository';
 
 export interface DomainModuleOptions {
   userRepository: Type<IUserRepository>;
+  addressRepository: Type<IAddressRepository>;
   testZoneRepository: Type<ITestZoneRepository>;
   brandRepository: Type<IBrandRepository>;
   itemRepository: Type<IItemRepository>;
@@ -23,6 +28,9 @@ export interface DomainModuleOptions {
   userRoleRepository: Type<IUserRoleRepository>;
   refreshTokenRepository: Type<IRefreshTokenRepository>;
   blogPostRepository: Type<IBlogPostRepository>;
+  blogCategoryRepository: Type<IBlogCategoryRepository>;
+  faqCategoryRepository: Type<IFaqCategoryRepository>;
+  faqItemRepository: Type<IFaqItemRepository>;
   unitOfWork: Type<IUnitOfWork>;
   imports?: Array<
     Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
@@ -41,6 +49,10 @@ export class DomainModule {
           useClass: options.userRepository,
         },
         {
+          provide: DOMAIN_TOKENS.ADDRESS_REPOSITORY,
+          useClass: options.addressRepository,
+        },
+        {
           provide: DOMAIN_TOKENS.TEST_ZONE_REPOSITORY,
           useClass: options.testZoneRepository,
         },
@@ -75,6 +87,18 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.BLOG_POST_REPOSITORY,
           useClass: options.blogPostRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.BLOG_CATEGORY_REPOSITORY,
+          useClass: options.blogCategoryRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.FAQ_CATEGORY_REPOSITORY,
+          useClass: options.faqCategoryRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.FAQ_ITEM_REPOSITORY,
+          useClass: options.faqItemRepository,
         },
         {
           provide: DOMAIN_TOKENS.UNIT_OF_WORK,
@@ -87,6 +111,10 @@ export class DomainModule {
           useClass: options.userRepository,
         },
         {
+          provide: DOMAIN_TOKENS.ADDRESS_REPOSITORY,
+          useClass: options.addressRepository,
+        },
+        {
           provide: DOMAIN_TOKENS.TEST_ZONE_REPOSITORY,
           useClass: options.testZoneRepository,
         },
@@ -121,6 +149,18 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.BLOG_POST_REPOSITORY,
           useClass: options.blogPostRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.BLOG_CATEGORY_REPOSITORY,
+          useClass: options.blogCategoryRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.FAQ_CATEGORY_REPOSITORY,
+          useClass: options.faqCategoryRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.FAQ_ITEM_REPOSITORY,
+          useClass: options.faqItemRepository,
         },
         {
           provide: DOMAIN_TOKENS.UNIT_OF_WORK,

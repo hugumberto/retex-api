@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { BlogPostHighlight } from '../../../../domain/blog-post/blog-post-highlight.enum';
 
 export class UpsertBlogPostDto {
@@ -29,7 +29,14 @@ export class UpsertBlogPostDto {
 
   @IsOptional()
   @IsArray({ message: 'Tags deve ser um array' })
+  @ArrayMaxSize(30, { message: 'Máximo de 30 tags' })
   @IsString({ each: true, message: 'Cada tag deve ser uma string' })
   @Type(() => String)
   tags?: string[] = [];
+
+  @IsOptional()
+  @IsArray({ message: 'Categorias deve ser um array' })
+  @ArrayMaxSize(20, { message: 'Máximo de 20 categorias' })
+  @IsUUID('4', { each: true, message: 'Cada categoria deve ser um UUID válido' })
+  categoryIds?: string[];
 }

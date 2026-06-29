@@ -1,18 +1,20 @@
+import { Address } from '../address/address.entity';
 import { Entity } from '../interfaces/entity.interface';
 import { Item } from '../item/item.entity';
 import { Route } from '../route/route.entity';
 import { User } from '../user/user.entity';
-import { Address } from './address.entity';
 
 export interface Package extends Entity {
-  status: PackageStatus
-  user: User
-  route?: Route
-  weight?: number
-  collectDay: string
-  collectTime: string
-  address: Address
-  items?: Item[]
+  status: PackageStatus;
+  user: User;
+  route?: Route;
+  weight?: number;
+  estimatedVolumes?: number;
+  collectDay?: string;
+  collectTime?: string;
+  address?: Address;
+  addressId?: string;
+  items?: Item[];
 }
 
 export enum PackageStatus {

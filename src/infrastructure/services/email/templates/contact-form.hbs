@@ -1,0 +1,26 @@
+{{#> layout title="Mensagem de Contacto"}}
+
+  {{> eyebrow text="NOVA MENSAGEM DE CONTACTO"}}
+
+  <!-- Body -->
+  <tr>
+    <td style="padding:20px 40px 32px;">
+      <p style="margin:0 0 12px;font-size:15px;color:#333333;">
+        <strong style="color:#02748E;">Nome:</strong> {{name}}
+      </p>
+      <p style="margin:0 0 12px;font-size:15px;color:#333333;">
+        <strong style="color:#02748E;">Email:</strong> {{email}}
+      </p>
+      <p style="margin:0 0 12px;font-size:15px;color:#333333;">
+        <strong style="color:#02748E;">Telemóvel:</strong> {{phone}}
+      </p>
+      <p style="margin:0 0 12px;font-size:15px;color:#333333;">
+        <strong style="color:#02748E;">Título:</strong> {{contactTitle}}
+      </p>
+      <p style="margin:0;font-size:15px;color:#333333;line-height:1.6;">
+        <strong style="color:#02748E;">Mensagem:</strong><br />{{message}}
+      </p>
+    </td>
+  </tr>
+
+{{/layout}}

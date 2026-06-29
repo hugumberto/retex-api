@@ -1,15 +1,52 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CreateAddressUseCase } from '../../app/use-cases/address/create-address-use-case';
+import { CreateAddressDto } from '../../app/use-cases/address/create-address-use-case/create-address.dto';
+import { DeleteAddressUseCase } from '../../app/use-cases/address/delete-address-use-case';
+import { GetUserAddressesUseCase } from '../../app/use-cases/address/get-user-addresses-use-case';
+import { SetDefaultAddressUseCase } from '../../app/use-cases/address/set-default-address-use-case';
 import { AddRoleToUserUseCase } from '../../app/use-cases/user/add-role-to-user-use-case';
 import { AddRoleToUserDto } from '../../app/use-cases/user/add-role-to-user-use-case/add-role-to-user.dto';
 import { CreateUserUseCase } from '../../app/use-cases/user/create-user-use-case';
 import { CreateUserDto } from '../../app/use-cases/user/create-user-use-case/create-user.dto';
 import { GetAllUsersUseCase } from '../../app/use-cases/user/get-all-users-use-case';
 import { GetUserByIdUseCase } from '../../app/use-cases/user/get-user-by-id-use-case';
+import { ActivateUserUseCase } from '../../app/use-cases/user/activate-user-use-case';
+import { ActivateUserDto } from '../../app/use-cases/user/activate-user-use-case/activate-user.dto';
+import { ConfirmResetPasswordUseCase } from '../../app/use-cases/user/confirm-reset-password-use-case';
+import { ConfirmResetPasswordDto } from '../../app/use-cases/user/confirm-reset-password-use-case/confirm-reset-password.dto';
+import { ForgotPasswordUseCase } from '../../app/use-cases/user/forgot-password-use-case';
+import { ForgotPasswordDto } from '../../app/use-cases/user/forgot-password-use-case/forgot-password.dto';
+import { RegisterUserUseCase } from '../../app/use-cases/user/register-user-use-case';
+import { RegisterUserDto } from '../../app/use-cases/user/register-user-use-case/register-user.dto';
+import { ResetUserPasswordUseCase } from '../../app/use-cases/user/reset-user-password-use-case';
+import { ResetUserPasswordDto } from '../../app/use-cases/user/reset-user-password-use-case/reset-user-password.dto';
+import { SendActivationEmailUseCase } from '../../app/use-cases/user/send-activation-email-use-case';
+import { SendActivationEmailDto } from '../../app/use-cases/user/send-activation-email-use-case/send-activation-email.dto';
 import { UpdateUserUseCase } from '../../app/use-cases/user/update-user-use-case';
 import { UpdateUserDto } from '../../app/use-cases/user/update-user-use-case/update-user.dto';
+import { Address } from '../../domain/address/address.entity';
 import { Role } from '../../domain/user/user-roles.entity';
 import { User } from '../../domain/user/user.entity';
+import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -22,18 +59,104 @@ export class UserController {
     private readonly getUserByIdUseCase: GetUserByIdUseCase,
     private readonly getAllUsersUseCase: GetAllUsersUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly resetUserPasswordUseCase: ResetUserPasswordUseCase,
+    private readonly sendActivationEmailUseCase: SendActivationEmailUseCase,
     private readonly addRoleToUserUseCase: AddRoleToUserUseCase,
-  ) { }
+    private readonly registerUserUseCase: RegisterUserUseCase,
+    private readonly activateUserUseCase: ActivateUserUseCase,
+    private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
+    private readonly confirmResetPasswordUseCase: ConfirmResetPasswordUseCase,
+    private readonly createAddressUseCase: CreateAddressUseCase,
+    private readonly getUserAddressesUseCase: GetUserAddressesUseCase,
+    private readonly setDefaultAddressUseCase: SetDefaultAddressUseCase,
+    private readonly deleteAddressUseCase: DeleteAddressUseCase,
+  ) {}
+
+  @Post('register')
+  @Public()
+  @ApiOperation({
+    summary: 'Registo público de utilizador (tipo sempre PERSON)',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Utilizador registado com sucesso',
+    type: Object,
+  })
+  @ApiResponse({ status: 409, description: 'Email já em uso' })
+  async registerUser(
+    @Body() dto: RegisterUserDto,
+  ): Promise<Omit<User, 'password'> & { inServiceZone: boolean }> {
+    return this.registerUserUseCase.call(dto);
+  }
+
+  @Post('activate')
+  @Public()
+  @ApiOperation({
+    summary: 'Ativar conta com token de ativação e definir senha',
+  })
+  @ApiResponse({ status: 201, description: 'Conta ativada com sucesso', type: Object })
+  @ApiResponse({ status: 400, description: 'Token expirado ou endereço fora da zona' })
+  @ApiResponse({ status: 404, description: 'Token de ativação inválido' })
+  @ApiResponse({ status: 409, description: 'Conta já ativada' })
+  async activateUser(
+    @Body() dto: ActivateUserDto,
+  ): Promise<Omit<User, 'password'>> {
+    return this.activateUserUseCase.call(dto);
+  }
+
+  @Post('forgot-password')
+  @Public()
+  @ApiOperation({ summary: 'Pedir email para repor a palavra-passe' })
+  @ApiResponse({
+    status: 201,
+    description: 'Se o email estiver registado, enviamos um link de reposição',
+  })
+  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ ok: true }> {
+    return this.forgotPasswordUseCase.call(dto);
+  }
+
+  @Post('reset-password')
+  @Public()
+  @ApiOperation({ summary: 'Definir nova palavra-passe com token de reposição' })
+  @ApiResponse({ status: 201, description: 'Palavra-passe atualizada', type: Object })
+  @ApiResponse({ status: 400, description: 'Token de reset inválido ou expirado' })
+  async confirmResetPassword(
+    @Body() dto: ConfirmResetPasswordDto,
+  ): Promise<Omit<User, 'password'>> {
+    return this.confirmResetPasswordUseCase.call(dto);
+  }
+
+  @Post('send-activation')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Enviar email de ativação para o utilizador (re)definir a senha (admin)',
+  })
+  @ApiResponse({ status: 201, description: 'Email de ativação enviado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
+  @ApiResponse({ status: 404, description: 'Utilizador não encontrado' })
+  async sendActivationEmail(
+    @Body() dto: SendActivationEmailDto,
+  ): Promise<{ ok: true }> {
+    return this.sendActivationEmailUseCase.call(dto);
+  }
 
   @Post()
-  @ApiOperation({ summary: 'Criar novo usuário' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Criar novo usuário (admin)' })
   @ApiResponse({
     status: 201,
     description: 'Usuário criado com sucesso',
-    type: Object
+    type: Object,
   })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
   @ApiResponse({ status: 409, description: 'Usuário já existe' })
-  async createUser(@Body() createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
+  async createUser(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<Omit<User, 'password'>> {
     const user = await this.createUserUseCase.call(createUserDto);
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
@@ -44,14 +167,21 @@ export class UserController {
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Listar todos os usuários' })
-  @ApiQuery({ name: 'role', required: false, enum: Role, description: 'Filtra usuários por role' })
+  @ApiQuery({
+    name: 'role',
+    required: false,
+    enum: Role,
+    description: 'Filtra usuários por role',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lista de usuários',
-    type: Array
+    type: Array,
   })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
-  async getAllUsers(@Query('role') role?: Role): Promise<Omit<User, 'password'>[]> {
+  async getAllUsers(
+    @Query('role') role?: Role,
+  ): Promise<Omit<User, 'password'>[]> {
     return this.getAllUsersUseCase.call({ role });
   }
 
@@ -63,7 +193,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Usuário encontrado',
-    type: Object
+    type: Object,
   })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
@@ -71,6 +201,24 @@ export class UserController {
     const user = await this.getUserByIdUseCase.call(id);
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  }
+
+  @Put('reset-password')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Resetar senha do usuário (admin)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Senha atualizada com sucesso',
+    type: Object,
+  })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
+  async resetUserPassword(
+    @Body() resetUserPasswordDto: ResetUserPasswordDto,
+  ): Promise<Omit<User, 'password'>> {
+    return this.resetUserPasswordUseCase.call(resetUserPasswordDto);
   }
 
   @Put(':id')
@@ -81,14 +229,14 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Usuário atualizado com sucesso',
-    type: Object
+    type: Object,
   })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   @ApiResponse({ status: 409, description: 'Email ou documento já em uso' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   async updateUser(
     @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<Omit<User, 'password'>> {
     return this.updateUserUseCase.call({ id, data: updateUserDto });
   }
@@ -97,18 +245,78 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Sincronizar roles do usuário (substitui as existentes pelas enviadas)' })
+  @ApiOperation({
+    summary:
+      'Sincronizar roles do usuário (substitui as existentes pelas enviadas)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Roles sincronizadas com sucesso',
-    type: Object
+    type: Object,
   })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   @ApiResponse({ status: 403, description: 'Acesso negado - apenas ADMINs' })
   async addRoleToUser(
     @Param('id') userId: string,
-    @Body() addRoleDto: AddRoleToUserDto
+    @Body() addRoleDto: AddRoleToUserDto,
   ): Promise<Omit<User, 'password'>> {
     return this.addRoleToUserUseCase.call({ userId, data: addRoleDto });
+  }
+
+  @Post(':id/address')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Adicionar endereço ao utilizador' })
+  @ApiResponse({ status: 201, description: 'Endereço criado', type: Object })
+  @ApiResponse({ status: 404, description: 'Utilizador não encontrado' })
+  async createAddress(
+    @Param('id') userId: string,
+    @Body() dto: CreateAddressDto,
+  ): Promise<Address> {
+    return this.createAddressUseCase.call({ ...dto, userId });
+  }
+
+  @Get(':id/address')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Listar endereços do utilizador' })
+  @ApiResponse({ status: 200, description: 'Lista de endereços', type: Array })
+  async getUserAddresses(@Param('id') userId: string): Promise<Address[]> {
+    return this.getUserAddressesUseCase.call(userId);
+  }
+
+  @Patch(':id/address/:addrId/default')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Definir endereço como padrão' })
+  @ApiResponse({
+    status: 200,
+    description: 'Endereço padrão atualizado',
+    type: Object,
+  })
+  @ApiResponse({ status: 404, description: 'Endereço não encontrado' })
+  async setDefaultAddress(
+    @Param('id') userId: string,
+    @Param('addrId') addressId: string,
+  ): Promise<Address> {
+    return this.setDefaultAddressUseCase.call({ userId, addressId });
+  }
+
+  @Delete(':id/address/:addrId')
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Remover endereço do utilizador' })
+  @ApiResponse({ status: 204, description: 'Endereço removido' })
+  @ApiResponse({ status: 404, description: 'Endereço não encontrado' })
+  async deleteAddress(
+    @Param('id') userId: string,
+    @Param('addrId') addressId: string,
+  ): Promise<void> {
+    return this.deleteAddressUseCase.call({ userId, addressId });
   }
 }

@@ -1,4 +1,5 @@
 import { Entity } from '../interfaces/entity.interface';
+import { BlogCategory } from './blog-category.entity';
 import { BlogPostHighlight } from './blog-post-highlight.enum';
 import { BlogPostStatus } from './blog-post-status.enum';
 
@@ -10,5 +11,6 @@ export interface BlogPost extends Entity {
   status: BlogPostStatus;
   highlight: BlogPostHighlight;
   tags: string[];
+  categories?: BlogCategory[];
   publishDate?: Date; // nullable - só preenchido quando status muda para PUBLISHED
 }

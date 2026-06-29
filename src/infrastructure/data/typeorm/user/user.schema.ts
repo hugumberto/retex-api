@@ -1,5 +1,7 @@
 import { EntitySchema } from 'typeorm';
+import { Gender } from '../../../../domain/user/gender.enum';
 import { UserStatus } from '../../../../domain/user/user-status.enum';
+import { UserType } from '../../../../domain/user/user-type.enum';
 import { User } from '../../../../domain/user/user.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
 
@@ -36,13 +38,6 @@ export const userSchema = new EntitySchema<User>({
       length: 20,
       name: 'contact_phone',
     },
-    documentNumber: {
-      type: 'varchar',
-      nullable: false,
-      length: 20,
-      unique: true,
-      name: 'document_number',
-    },
     password: {
       type: 'varchar',
       nullable: false,
@@ -54,6 +49,56 @@ export const userSchema = new EntitySchema<User>({
       enum: UserStatus,
       nullable: false,
       name: 'status',
+    },
+    userType: {
+      type: 'enum',
+      enum: UserType,
+      nullable: false,
+      name: 'user_type',
+    },
+    gender: {
+      type: 'enum',
+      enum: Gender,
+      nullable: true,
+      name: 'gender',
+    },
+    dateOfBirth: {
+      type: 'date',
+      nullable: true,
+      name: 'date_of_birth',
+    },
+    activationToken: {
+      type: 'varchar',
+      nullable: true,
+      length: 255,
+      name: 'activation_token',
+      unique: true,
+      select: false,
+    },
+    activationTokenExpiresAt: {
+      type: 'timestamp with time zone',
+      nullable: true,
+      name: 'activation_token_expires_at',
+      select: false,
+    },
+    activationBypassZone: {
+      type: 'boolean',
+      default: false,
+      name: 'activation_bypass_zone',
+    },
+    resetToken: {
+      type: 'varchar',
+      nullable: true,
+      length: 255,
+      name: 'reset_token',
+      unique: true,
+      select: false,
+    },
+    resetTokenExpiresAt: {
+      type: 'timestamp with time zone',
+      nullable: true,
+      name: 'reset_token_expires_at',
+      select: false,
     },
     ...BaseTimestampColumns,
   },
@@ -82,13 +127,16 @@ export const userSchema = new EntitySchema<User>({
       },
       inverseSide: 'user',
     },
+    addresses: {
+      type: 'one-to-many',
+      target: 'user_address',
+      joinColumn: {
+        name: 'user_id',
+      },
+      inverseSide: 'user',
+    },
   },
   indices: [
-    {
-      name: 'IDX_USER_DOCUMENT_NUMBER',
-      unique: true,
-      columns: ['documentNumber'],
-    },
     {
       name: 'IDX_USER_EMAIL',
       unique: true,
