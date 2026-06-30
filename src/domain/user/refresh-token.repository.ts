@@ -6,4 +6,7 @@ export interface IRefreshTokenRepository extends IRepository<RefreshToken> {
   findValidTokensByUserId(userId: string): Promise<RefreshToken[]>;
   revokeAllUserTokens(userId: string): Promise<void>;
   deleteExpiredTokens(): Promise<void>;
-} 
+
+  // Utilizadores com sessão válida (token não revogado e não expirado).
+  countActiveUsers(): Promise<number>;
+}

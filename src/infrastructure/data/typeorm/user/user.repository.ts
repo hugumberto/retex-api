@@ -77,4 +77,16 @@ export class UserRepository
       .where('u.resetToken = :token', { token })
       .getOne();
   }
+
+  async countAll(): Promise<number> {
+    const repository = await this.getRepository();
+    return repository.count();
+  }
+
+  async countByStatus(status: UserStatus): Promise<number> {
+    const repository = await this.getRepository();
+    return repository.count({
+      where: { status } as FindOptionsWhere<User>,
+    });
+  }
 }

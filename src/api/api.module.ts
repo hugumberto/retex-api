@@ -9,6 +9,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
 import { BlogCategoryController } from './blog-category/blog-category.controller';
 import { BlogPostController } from './blog-post/blog-post.controller';
 import { ContactController } from './contact/contact.controller';
+import { DashboardController } from './dashboard/dashboard.controller';
 import { FaqController } from './faq/faq.controller';
 import { TestZoneController } from './test-zone/test-zone.controller';
 import { BrandController } from './brand/brand.controller';
@@ -43,6 +44,7 @@ import { WelcomeController } from './welcome/welcome.controller';
     TestZoneController,
     FaqController,
     ContactController,
+    DashboardController,
   ],
   providers: [
     JwtAuthGuard,
