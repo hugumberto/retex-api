@@ -11,6 +11,28 @@ export interface PackageFilters {
   collectTime?: string;
 }
 
+export interface PackageStatusCount {
+  status: PackageStatus;
+  count: number;
+}
+
+export interface PackageTotals {
+  totalPackages: number;
+  totalWeight: number;
+  totalVolumes: number;
+}
+
+export interface PackageTrendPoint {
+  period: string;
+  weightKg: number;
+  count: number;
+}
+
+export interface CityCount {
+  city: string;
+  count: number;
+}
+
 export interface IPackageRepository extends IRepository<Package> {
   findByFiltersWithPagination(
     filters: PackageFilters,
@@ -20,4 +42,10 @@ export interface IPackageRepository extends IRepository<Package> {
   findOneWithAllRelations(id: string): Promise<Package>;
   findByUser(userId: string): Promise<Package[]>;
   findAll(): Promise<Package[]>;
+
+  // Agregações para o dashboard (somente leitura).
+  countByStatus(): Promise<PackageStatusCount[]>;
+  getTotals(): Promise<PackageTotals>;
+  getWeightTrend(months: number): Promise<PackageTrendPoint[]>;
+  countOutOfZoneByCity(limit: number): Promise<CityCount[]>;
 }

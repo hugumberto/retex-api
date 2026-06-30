@@ -55,4 +55,17 @@ export class RefreshTokenRepository
       expiresAt: LessThan(new Date()),
     });
   }
-} 
+
+  async countActiveUsers(): Promise<number> {
+    const repository = await this.getRepository();
+    const row = await repository
+      .createQueryBuilder('rt')
+      .leftJoin('rt.user', 'u')
+      .select('COUNT(DISTINCT u.id)', 'count')
+      .where('rt.isRevoked = false')
+      .andWhere('rt.expiresAt > now()')
+      .getRawOne<{ count: string }>();
+
+    return Number(row?.count ?? 0);
+  }
+}
