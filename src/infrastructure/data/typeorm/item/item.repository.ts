@@ -42,13 +42,23 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
 
   async aggregateBy(dimension: ItemDimension): Promise<ItemDimensionCount[]> {
     const repository = await this.getRepository();
-    // `dimension` é restrito pelo tipo ItemDimension — seguro para interpolar.
+    // Whitelist runtime: nunca interpolar `dimension` no SQL sem validar, pois o
+    // tipo é apagado em runtime (defesa contra valores inválidos / injeção).
+    const columns: Record<ItemDimension, string> = {
+      quality: 'quality',
+      season: 'season',
+      type: 'type',
+    };
+    const column = columns[dimension];
+    if (!column) {
+      throw new Error(`Dimensão de item inválida: ${dimension}`);
+    }
     const rows = await repository
       .createQueryBuilder('item')
-      .select(`item.${dimension}`, 'key')
+      .select(`item.${column}`, 'key')
       .addSelect('COUNT(*)', 'count')
       .addSelect('COALESCE(SUM(item.quantity), 0)', 'quantity')
-      .groupBy(`item.${dimension}`)
+      .groupBy(`item.${column}`)
       .getRawMany<{ key: string; count: string; quantity: string }>();
 
     return rows.map((row) => ({
