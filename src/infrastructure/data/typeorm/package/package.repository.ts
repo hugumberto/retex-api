@@ -7,10 +7,14 @@ import {
   PaginatedResult,
   PaginationParams,
 } from '../../../../domain/interfaces/pagination.interface';
-import { Package } from '../../../../domain/package/package.entity';
+import { Package, PackageStatus } from '../../../../domain/package/package.entity';
 import {
+  CityCount,
   IPackageRepository,
   PackageFilters,
+  PackageStatusCount,
+  PackageTotals,
+  PackageTrendPoint,
 } from '../../../../domain/package/package.repository';
 import { BaseRepository } from '../abstraction/base.repository';
 import { packageSchema } from './package.schema';
@@ -105,6 +109,83 @@ export class PackageRepository
       .leftJoinAndSelect('package.route', 'route')
       .orderBy('package.createdAt', 'DESC')
       .getMany();
+  }
+
+  async countByStatus(): Promise<PackageStatusCount[]> {
+    const repository = await this.getRepository();
+    const rows = await repository
+      .createQueryBuilder('package')
+      .select('package.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('package.status')
+      .getRawMany<{ status: PackageStatus; count: string }>();
+
+    return rows.map((row) => ({
+      status: row.status,
+      count: Number(row.count),
+    }));
+  }
+
+  async getTotals(): Promise<PackageTotals> {
+    const repository = await this.getRepository();
+    const row = await repository
+      .createQueryBuilder('package')
+      .select('COUNT(*)', 'totalPackages')
+      .addSelect('COALESCE(SUM(package.weight), 0)', 'totalWeight')
+      .addSelect('COALESCE(SUM(package.estimatedVolumes), 0)', 'totalVolumes')
+      .getRawOne<{
+        totalPackages: string;
+        totalWeight: string;
+        totalVolumes: string;
+      }>();
+
+    return {
+      totalPackages: Number(row?.totalPackages ?? 0),
+      totalWeight: Number(row?.totalWeight ?? 0),
+      totalVolumes: Number(row?.totalVolumes ?? 0),
+    };
+  }
+
+  async getWeightTrend(months: number): Promise<PackageTrendPoint[]> {
+    const repository = await this.getRepository();
+    const rows = await repository
+      .createQueryBuilder('package')
+      .select("to_char(date_trunc('month', package.createdAt), 'YYYY-MM')", 'period')
+      .addSelect('COALESCE(SUM(package.weight), 0)', 'weight')
+      .addSelect('COUNT(*)', 'count')
+      .where("package.createdAt >= now() - (:months * interval '1 month')", {
+        months: Math.max(0, months - 1),
+      })
+      .groupBy("date_trunc('month', package.createdAt)")
+      .orderBy("date_trunc('month', package.createdAt)", 'ASC')
+      .getRawMany<{ period: string; weight: string; count: string }>();
+
+    return rows.map((row) => ({
+      period: row.period,
+      weightKg: Number(row.weight),
+      count: Number(row.count),
+    }));
+  }
+
+  async countOutOfZoneByCity(limit: number): Promise<CityCount[]> {
+    const repository = await this.getRepository();
+    const rows = await repository
+      .createQueryBuilder('package')
+      .innerJoin('package.address', 'address')
+      .select('address.city', 'city')
+      .addSelect('COUNT(*)', 'count')
+      .where('package.status = :status', {
+        status: PackageStatus.OUT_OF_ZONE,
+      })
+      .groupBy('address.city')
+      .orderBy('COUNT(*)', 'DESC')
+      .limit(limit)
+      .getRawMany<{ city: string; count: string }>();
+
+    return rows.map((row) => ({
+      city: row.city,
+      count: Number(row.count),
+    }));
   }
 
   async findOneWithAllRelations(id: string): Promise<Package> {
