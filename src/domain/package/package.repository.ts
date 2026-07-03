@@ -7,8 +7,8 @@ import { Package, PackageStatus } from './package.entity';
 
 export interface PackageFilters {
   status?: PackageStatus;
-  collectDay?: string;
-  collectTime?: string;
+  // Quando true, retorna apenas encomendas ainda não vinculadas a uma rota.
+  unrouted?: boolean;
 }
 
 export interface PackageStatusCount {

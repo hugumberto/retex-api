@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IBrandRepository } from '../../../../domain/brand/brand.repository';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -18,8 +17,6 @@ export class UpdateStorageUnitUseCase implements IUseCase<UpdateStorageUnitParam
   constructor(
     @Inject(DOMAIN_TOKENS.STORAGE_UNIT_REPOSITORY)
     private readonly storageUnitRepository: IStorageUnitRepository,
-    @Inject(DOMAIN_TOKENS.BRAND_REPOSITORY)
-    private readonly brandRepository: IBrandRepository,
   ) { }
 
   async call(param: UpdateStorageUnitParams): Promise<StorageUnit> {
@@ -33,20 +30,25 @@ export class UpdateStorageUnitUseCase implements IUseCase<UpdateStorageUnitParam
 
     const updateData: Partial<StorageUnit> = {};
 
-    // Se houver mudança de marca, buscar a marca pelo ID
-    if (data.brandId) {
-      const brand = await this.brandRepository.findOne({ id: data.brandId });
-
-      if (!brand) {
-        throw new Error('Marca não encontrada');
-      }
-
-      updateData.brand = brand;
-    }
-
-    // Atualizar outros campos se fornecidos
+    // Atualizar campos se fornecidos
     if (data.quality !== undefined) {
       updateData.quality = data.quality;
+    }
+
+    if (data.sex !== undefined) {
+      updateData.sex = data.sex;
+    }
+
+    if (data.ageGroup !== undefined) {
+      updateData.ageGroup = data.ageGroup;
+    }
+
+    if (data.type !== undefined) {
+      updateData.type = data.type;
+    }
+
+    if (data.season !== undefined) {
+      updateData.season = data.season;
     }
 
     if (data.weight !== undefined) {

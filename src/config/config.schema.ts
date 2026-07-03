@@ -20,6 +20,10 @@ export const envSchema = z.object({
   ADMIN_PASSWORD: z.string().optional(),
   ASSETS_BASE_URL: z.string().url().optional(),
   CONTACT_EMAIL: z.string().email().optional(),
+  // Geocodificação de endereços (TomTom). Opcional: sem a key o geocoding
+  // apenas não preenche coordenadas (degrada sem erro).
+  TOMTOM_API_KEY: z.string().optional(),
+  TOMTOM_GEOCODE_URL: z.string().url().optional(),
 });
 
 export function getConfigValidation(env: Record<string, string>) {
@@ -33,15 +37,17 @@ export function getConfigValidation(env: Record<string, string>) {
 }
 
 function validateEnvFiles() {
-  const getEnvKeys = (path: string) => {
-    const dotEnv = fs.readFileSync(join(__dirname, path), 'utf-8');
+  // Resolve a partir da raiz do projeto (cwd) — funciona tanto rodando via
+  // ts-node quanto compilado em dist/ (onde __dirname aponta para dist/src/config).
+  const getEnvKeys = (fileName: string) => {
+    const dotEnv = fs.readFileSync(join(process.cwd(), fileName), 'utf-8');
     const regex = /^(?!#)([A-Za-z_][A-Za-z0-9_]*)=/gm;
     const dotEnvVars = dotEnv.match(regex)!;
     const dotEnvKeys = dotEnvVars.map((match) => match.replace(/=.*$/, ''));
     return dotEnvKeys;
   };
-  const envKeys = getEnvKeys('../../.env');
-  const exampleEnvKeys = getEnvKeys('../../.env.example');
+  const envKeys = getEnvKeys('.env');
+  const exampleEnvKeys = getEnvKeys('.env.example');
   const missingKeys = envKeys.filter((key) => !exampleEnvKeys.includes(key));
   if (missingKeys.length > 0) {
     throw new Error(`Missing keys in .env.example file: ${missingKeys.join(', ')}`);

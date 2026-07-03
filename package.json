@@ -17,7 +17,8 @@
     "test:merge": "ts-node ./src/config/test/merge-coverage.ts --report ./coverage/e2e/coverage-final.json --report ./coverage/unit/coverage-final.json",
     "test:full:cov": "rimraf coverage && npm run test:cov && npm run test:e2e:cov && npm run test:merge",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d src/infrastructure/data/typeorm/config/datasource.ts",
-    "typeorm:migrate": "ts-node src/infrastructure/data/typeorm/config/generate-migration.ts"
+    "typeorm:migrate": "ts-node src/infrastructure/data/typeorm/config/generate-migration.ts",
+    "geocode:backfill": "ts-node -r tsconfig-paths/register scripts/backfill-geocoding.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.1",

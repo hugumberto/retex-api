@@ -1,5 +1,5 @@
 import { EntitySchema } from 'typeorm';
-import { Item, Quality, Season, Type } from '../../../../domain/item/item.entity';
+import { AgeGroup, Item, Quality, Season, Sex, Type } from '../../../../domain/item/item.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
 
 export const itemSchema = new EntitySchema<Item>({
@@ -23,6 +23,17 @@ export const itemSchema = new EntitySchema<Item>({
     season: {
       type: 'enum',
       enum: Season,
+      nullable: false,
+    },
+    sex: {
+      type: 'enum',
+      enum: Sex,
+      nullable: false,
+    },
+    ageGroup: {
+      name: 'age_group',
+      type: 'enum',
+      enum: AgeGroup,
       nullable: false,
     },
     quantity: {

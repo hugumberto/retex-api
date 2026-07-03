@@ -69,7 +69,6 @@ describe('RouteController', () => {
         driverId: 'driver-uuid-123',
         packageIds: ['package-1', 'package-2'],
         startDate: '2024-01-15T10:00:00Z',
-        shift: 'MORNING',
       };
 
       const expectedResult = {

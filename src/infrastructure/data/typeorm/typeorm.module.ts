@@ -8,6 +8,7 @@ import { TEST_DATABASE_CONFIG } from './config/typeorm-test.config';
 import { DATABASE_CONFIG } from './config/typeorm.config';
 import { itemSchema } from './item/item.schema';
 import { packageSchema } from './package/package.schema';
+import { qrCodeSchema } from './qr-code/qr-code.schema';
 import { routeSchema } from './route/route.schema';
 import { storageUnitSchema } from './storage-unit/storage-unit.schema';
 import { faqCategorySchema } from './faq/faq-category.schema';
@@ -31,6 +32,7 @@ import { userSchema } from './user/user.schema';
       packageSchema,
       routeSchema,
       storageUnitSchema,
+      qrCodeSchema,
       userRoleSchema,
       refreshTokenSchema,
       blogPostSchema,

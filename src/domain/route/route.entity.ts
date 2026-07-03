@@ -8,7 +8,6 @@ export interface Route extends Entity {
   packages: Package[]
   startDate: Date
   endDate?: Date
-  shift: string
 }
 
 export enum RouteStatus {

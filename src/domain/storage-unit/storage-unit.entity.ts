@@ -1,9 +1,11 @@
-import { Brand } from "../brand/brand.entity"
 import { Entity } from "../interfaces/entity.interface"
-import { Quality } from "../item/item.entity"
+import { AgeGroup, Quality, Season, Sex, Type } from "../item/item.entity"
 
 export interface StorageUnit extends Entity {
-  brand: Brand
   quality: Quality
+  sex: Sex
+  ageGroup: AgeGroup
+  type: Type
+  season: Season
   weight: number
 }

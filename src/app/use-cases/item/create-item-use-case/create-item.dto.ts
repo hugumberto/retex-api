@@ -5,7 +5,7 @@ import {
   IsString,
   Min
 } from 'class-validator';
-import { Quality, Season, Type } from '../../../../domain/item/item.entity';
+import { AgeGroup, Quality, Season, Sex, Type } from '../../../../domain/item/item.entity';
 
 export class CreateItemDto {
   @IsString()
@@ -23,6 +23,14 @@ export class CreateItemDto {
   @IsEnum(Season)
   @IsNotEmpty()
   season: Season;
+
+  @IsEnum(Sex)
+  @IsNotEmpty()
+  sex: Sex;
+
+  @IsEnum(AgeGroup)
+  @IsNotEmpty()
+  ageGroup: AgeGroup;
 
   @IsString()
   @IsNotEmpty()

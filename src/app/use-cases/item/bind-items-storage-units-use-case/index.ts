@@ -69,7 +69,7 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
       const compatibleStorageUnit = this.findCompatibleStorageUnit(item, storageUnitsAvailable);
 
       if (!compatibleStorageUnit) {
-        errors.push(`Nenhum Storage Unit compatível encontrado para item ${item.id} (brand: ${item.brand.name}, quality: ${item.quality})`);
+        errors.push(`Nenhum Storage Unit compatível encontrado para item ${item.id} (quality: ${item.quality}, sex: ${item.sex}, ageGroup: ${item.ageGroup}, type: ${item.type}, season: ${item.season})`);
         continue;
       }
 
@@ -115,10 +115,13 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
   }
 
   private findCompatibleStorageUnit(item: Item, storageUnits: StorageUnit[]): StorageUnit | null {
-    // Buscar storage units compatíveis (brand e quality)
+    // Buscar storage units compatíveis pelos atributos de triagem
     const compatible = storageUnits.filter(su =>
-      su.brand.id === item.brand.id &&
-      su.quality === item.quality
+      su.quality === item.quality &&
+      su.sex === item.sex &&
+      su.ageGroup === item.ageGroup &&
+      su.type === item.type &&
+      su.season === item.season
     );
 
     if (compatible.length === 0) {

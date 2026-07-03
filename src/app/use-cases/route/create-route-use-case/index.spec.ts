@@ -28,7 +28,7 @@ describe('CreateRouteUseCase', () => {
     useCase = module.get(CreateRouteUseCase);
   });
 
-  const param = { driverId: 'd1', packageIds: ['p1'], startDate: '2025-01-01', shift: 'MORNING' } as any;
+  const param = { driverId: 'd1', packageIds: ['p1'], startDate: '2025-01-01' } as any;
 
   it('throws when the driver does not exist', async () => {
     userRepo.findOneWithRelations.mockResolvedValue(undefined);
@@ -40,5 +40,20 @@ describe('CreateRouteUseCase', () => {
       id: 'd1', roles: [{ role: Role.USER }],
     } as User);
     await expect(useCase.call(param)).rejects.toThrow(BadRequestException);
+  });
+
+  it('moves assigned packages to WAITING_FOR_COLLECTION', async () => {
+    userRepo.findOneWithRelations.mockResolvedValue({
+      id: 'd1', roles: [{ role: Role.DRIVER }],
+    } as User);
+    packageRepo.findOne.mockResolvedValue({ id: 'p1', status: 'CREATED' } as any);
+    routeRepo.create.mockResolvedValue({ id: 'r1' } as any);
+
+    await useCase.call(param);
+
+    expect(packageRepo.update).toHaveBeenCalledWith(
+      { id: 'p1' },
+      { status: 'WAITING_FOR_COLLECTION' },
+    );
   });
 });

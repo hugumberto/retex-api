@@ -28,8 +28,8 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
   async call(param: UpdateRouteParamDto): Promise<Route> {
     const { id, data } = param;
 
-    // 1. Verificar se a route existe
-    const existingRoute = await this.routeRepository.findOne({ id });
+    // 1. Verificar se a route existe (com packages, para reverter os removidos)
+    const existingRoute = await this.routeRepository.findOneWithAllRelations(id);
     if (!existingRoute) {
       throw new NotFoundException('Route não encontrada');
     }
@@ -61,9 +61,15 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
           throw new NotFoundException(`Package com ID ${packageId} não encontrado`);
         }
 
-        // Verificar se package está no status CREATED
-        if (packageEntity.status !== PackageStatus.CREATED) {
-          throw new BadRequestException(`Package ${packageId} não está no status CREATED`);
+        // Aceita solicitações ainda não roteadas (CREATED) ou já atribuídas a
+        // esta rota (WAITING_FOR_COLLECTION), permitindo re-salvar a rota.
+        if (
+          packageEntity.status !== PackageStatus.CREATED &&
+          packageEntity.status !== PackageStatus.WAITING_FOR_COLLECTION
+        ) {
+          throw new BadRequestException(
+            `Package ${packageId} não está disponível para recolha`,
+          );
         }
 
         // Verificar se package já não está associado a outra route (exceto a atual)
@@ -89,12 +95,32 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
       updateData.endDate = new Date(data.endDate);
     }
 
-    if (data.shift) {
-      updateData.shift = data.shift;
-    }
-
     // 6. Atualizar a route
     const [updatedRoute] = await this.routeRepository.update({ id }, updateData);
+
+    // 7. Ajustar status das solicitações conforme a nova composição da rota.
+    if (data.packageIds) {
+      const newIds = new Set(data.packageIds);
+
+      // Atribuídas → aguardando recolha.
+      for (const packageId of data.packageIds) {
+        await this.packageRepository.update(
+          { id: packageId },
+          { status: PackageStatus.WAITING_FOR_COLLECTION },
+        );
+      }
+
+      // Removidas → voltam a CREATED (ficam elegíveis de novo).
+      for (const previous of existingRoute.packages ?? []) {
+        if (!newIds.has(previous.id)) {
+          await this.packageRepository.update(
+            { id: previous.id },
+            { status: PackageStatus.CREATED },
+          );
+        }
+      }
+    }
+
     return updatedRoute;
   }
-} 
+}

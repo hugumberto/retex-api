@@ -47,23 +47,17 @@ export class PackageRepository
       });
     }
 
-    if (filters.collectDay) {
-      queryBuilder.andWhere('package.collectDay = :collectDay', {
-        collectDay: filters.collectDay,
-      });
-    }
-
-    if (filters.collectTime) {
-      queryBuilder.andWhere('package.collectTime = :collectTime', {
-        collectTime: filters.collectTime,
-      });
-    }
-
-    // Incluir relacionamentos
+    // Incluir relacionamentos (address é necessário para plotar lat/long no mapa)
     queryBuilder
       .leftJoinAndSelect('package.user', 'user')
+      .leftJoinAndSelect('package.address', 'address')
       .leftJoinAndSelect('package.route', 'route')
       .leftJoinAndSelect('package.items', 'items');
+
+    // Apenas encomendas ainda não vinculadas a uma rota
+    if (filters.unrouted) {
+      queryBuilder.andWhere('route.id IS NULL');
+    }
 
     // Aplicar paginação
     const offset = (pagination.page - 1) * pagination.limit;
@@ -193,6 +187,7 @@ export class PackageRepository
     return repository
       .createQueryBuilder('package')
       .leftJoinAndSelect('package.user', 'user')
+      .leftJoinAndSelect('package.address', 'address')
       .leftJoinAndSelect('package.route', 'route')
       .leftJoinAndSelect('package.items', 'items')
       .leftJoinAndSelect('items.brand', 'brand')

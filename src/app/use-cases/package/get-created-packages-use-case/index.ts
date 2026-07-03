@@ -16,13 +16,12 @@ export class GetCreatedPackagesUseCase implements IUseCase<GetCreatedPackagesDto
   async call(param: GetCreatedPackagesDto): Promise<PaginatedResult<Package>> {
     const filters = {
       status: PackageStatus.CREATED,
-      collectDay: param.collectDay,
-      collectTime: param.collectTime,
+      unrouted: true,
     };
 
     const pagination = {
       page: param.page || 1,
-      limit: param.limit || 10,
+      limit: param.limit || 1000,
     };
 
     return this.packageRepository.findByFiltersWithPagination(filters, pagination);

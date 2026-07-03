@@ -17,6 +17,7 @@ import { FaqItemRepository } from './infrastructure/data/typeorm/faq/faq-item.re
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
 import { PackageRepository } from './infrastructure/data/typeorm/package/package.repository';
+import { QrCodeRepository } from './infrastructure/data/typeorm/qr-code/qr-code.repository';
 import { RouteRepository } from './infrastructure/data/typeorm/route/route.repository';
 import { StorageUnitRepository } from './infrastructure/data/typeorm/storage-unit/storage-unit.repository';
 import { TestZoneRepository } from './infrastructure/data/typeorm/test-zone/test-zone.repository';
@@ -26,6 +27,7 @@ import { RefreshTokenRepository } from './infrastructure/data/typeorm/user/refre
 import { UserRepository } from './infrastructure/data/typeorm/user/user.repository';
 import { EmailModule } from './infrastructure/services/email/email.module';
 import { EmailService } from './infrastructure/services/email/email.service';
+import { GeocodingService } from './infrastructure/services/geocoding/geocoding.service';
 import { LocalStorageModule } from './infrastructure/services/local-storage/local-storage.module';
 import { LocalStorageService } from './infrastructure/services/local-storage/local-storage.service';
 import { SanitizationService } from './infrastructure/services/sanitization/sanitization.service';
@@ -47,6 +49,7 @@ export class AppModule {
         packageRepository: PackageRepository,
         routeRepository: RouteRepository,
         storageUnitRepository: StorageUnitRepository,
+        qrCodeRepository: QrCodeRepository,
         userRoleRepository: UserRoleRepository,
         refreshTokenRepository: RefreshTokenRepository,
         blogPostRepository: BlogPostRepository,
@@ -60,6 +63,7 @@ export class AppModule {
         sanitizationService: SanitizationService,
         localStorageService: LocalStorageService,
         emailService: EmailService,
+        geocodingService: GeocodingService,
         imports: [LocalStorageModule, EmailModule],
       }),
       ApiModule,

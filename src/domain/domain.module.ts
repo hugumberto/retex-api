@@ -8,6 +8,7 @@ import { IFaqItemRepository } from './faq/faq-item.repository';
 import { IUnitOfWork } from './interfaces/unit-of-work.interface';
 import { IItemRepository } from './item/item.repository';
 import { IPackageRepository } from './package/package.repository';
+import { IQrCodeRepository } from './qr-code/qr-code.repository';
 import { IRouteRepository } from './route/route.repository';
 import { IStorageUnitRepository } from './storage-unit/storage-unit.repository';
 import { ITestZoneRepository } from './test-zone/test-zone.repository';
@@ -25,6 +26,7 @@ export interface DomainModuleOptions {
   packageRepository: Type<IPackageRepository>;
   routeRepository: Type<IRouteRepository>;
   storageUnitRepository: Type<IStorageUnitRepository>;
+  qrCodeRepository: Type<IQrCodeRepository>;
   userRoleRepository: Type<IUserRoleRepository>;
   refreshTokenRepository: Type<IRefreshTokenRepository>;
   blogPostRepository: Type<IBlogPostRepository>;
@@ -75,6 +77,10 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.STORAGE_UNIT_REPOSITORY,
           useClass: options.storageUnitRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY,
+          useClass: options.qrCodeRepository,
         },
         {
           provide: DOMAIN_TOKENS.USER_ROLE_REPOSITORY,
@@ -137,6 +143,10 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.STORAGE_UNIT_REPOSITORY,
           useClass: options.storageUnitRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY,
+          useClass: options.qrCodeRepository,
         },
         {
           provide: DOMAIN_TOKENS.USER_ROLE_REPOSITORY,

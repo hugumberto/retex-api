@@ -1,12 +1,24 @@
-import { IsEnum, IsNotEmpty, IsString } from "class-validator";
-import { Quality } from "../../../../domain/item/item.entity";
+import { IsEnum, IsNotEmpty } from "class-validator";
+import { AgeGroup, Quality, Season, Sex, Type } from "../../../../domain/item/item.entity";
 
 export class CreateStorageUnitDto {
-  @IsString()
-  @IsNotEmpty()
-  brandId: string;
-
   @IsNotEmpty()
   @IsEnum(Quality)
   quality: Quality;
-} 
+
+  @IsNotEmpty()
+  @IsEnum(Sex)
+  sex: Sex;
+
+  @IsNotEmpty()
+  @IsEnum(AgeGroup)
+  ageGroup: AgeGroup;
+
+  @IsNotEmpty()
+  @IsEnum(Type)
+  type: Type;
+
+  @IsNotEmpty()
+  @IsEnum(Season)
+  season: Season;
+}

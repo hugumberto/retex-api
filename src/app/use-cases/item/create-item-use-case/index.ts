@@ -42,6 +42,8 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
       quality: param.quality,
       type: param.type,
       season: param.season,
+      sex: param.sex,
+      ageGroup: param.ageGroup,
       brand: brand,
       quantity: param.quantity,
       storageUnit: null, // Inicialmente vazio

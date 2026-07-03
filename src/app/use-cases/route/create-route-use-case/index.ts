@@ -59,9 +59,18 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
       driver: driver,
       packages: packages,
       startDate: new Date(param.startDate),
-      shift: param.shift,
     };
 
-    return this.routeRepository.create(routeData);
+    const route = await this.routeRepository.create(routeData);
+
+    // 6. Solicitações atribuídas passam a aguardar recolha.
+    for (const packageEntity of packages) {
+      await this.packageRepository.update(
+        { id: packageEntity.id },
+        { status: PackageStatus.WAITING_FOR_COLLECTION },
+      );
+    }
+
+    return route;
   }
 } 
