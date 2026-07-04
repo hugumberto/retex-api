@@ -135,33 +135,11 @@
 
                 <!-- Código-Postal -->
                 <tr>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#7F7F7F;{{#if collectDay}}border-bottom:1px solid #f0f0f0;{{/if}}">
+                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;">
                     Código-Postal</td>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#013364;{{#if collectDay}}border-bottom:1px solid #f0f0f0;{{/if}}">
+                  <td style="padding:14px 20px;font-size:14px;color:#013364;">
                     {{address.zipCode}}</td>
                 </tr>
-
-                {{#if collectDay}}
-                <!-- Dia de recolha -->
-                <tr>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#7F7F7F;{{#if collectTime}}border-bottom:1px solid #f0f0f0;{{/if}}">
-                    Dia de recolha</td>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#013364;font-weight:500;{{#if collectTime}}border-bottom:1px solid #f0f0f0;{{/if}}">
-                    {{collectDay}}</td>
-                </tr>
-                {{/if}}
-
-                {{#if collectTime}}
-                <!-- Horário de recolha -->
-                <tr>
-                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;">Horário de recolha</td>
-                  <td style="padding:14px 20px;font-size:14px;color:#013364;font-weight:500;">{{collectTime}}</td>
-                </tr>
-                {{/if}}
 
               </table>
             </td>

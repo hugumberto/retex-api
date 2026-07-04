@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PackageStatus } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
 import { Route } from '../../../../domain/route/route.entity';
@@ -7,6 +7,7 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { SendCollectionConfirmationUseCase } from '../../package/send-collection-confirmation-use-case';
 import { UpdateRouteDto } from './update-route.dto';
 
 export interface UpdateRouteParamDto {
@@ -16,6 +17,8 @@ export interface UpdateRouteParamDto {
 
 @Injectable()
 export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> {
+  private readonly logger = new Logger(UpdateRouteUseCase.name);
+
   constructor(
     @Inject(DOMAIN_TOKENS.ROUTE_REPOSITORY)
     private readonly routeRepository: IRouteRepository,
@@ -23,6 +26,7 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     private readonly userRepository: IUserRepository,
     @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
     private readonly packageRepository: IPackageRepository,
+    private readonly sendCollectionConfirmationUseCase: SendCollectionConfirmationUseCase,
   ) { }
 
   async call(param: UpdateRouteParamDto): Promise<Route> {
@@ -56,25 +60,21 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     if (data.packageIds) {
       const packages = [];
       for (const packageId of data.packageIds) {
-        const packageEntity = await this.packageRepository.findOne({ id: packageId });
+        const packageEntity = await this.packageRepository.findOneWithAllRelations(packageId);
         if (!packageEntity) {
           throw new NotFoundException(`Package com ID ${packageId} não encontrado`);
         }
 
-        // Aceita solicitações ainda não roteadas (CREATED) ou já atribuídas a
-        // esta rota (WAITING_FOR_COLLECTION), permitindo re-salvar a rota.
-        if (
-          packageEntity.status !== PackageStatus.CREATED &&
-          packageEntity.status !== PackageStatus.WAITING_FOR_COLLECTION
-        ) {
+        // Apenas solicitações no status CREATED podem estar numa rota.
+        if (packageEntity.status !== PackageStatus.CREATED) {
           throw new BadRequestException(
-            `Package ${packageId} não está disponível para recolha`,
+            `Package ${packageId} não está no status CREATED`,
           );
         }
 
-        // Verificar se package já não está associado a outra route (exceto a atual)
+        // Uma solicitação existe em no máximo uma rota (exceto a atual).
         if (packageEntity.route && packageEntity.route.id !== id) {
-          throw new ConflictException(`Package ${packageId} já está associado a outra route`);
+          throw new ConflictException(`Package ${packageId} já está associado a outra rota`);
         }
 
         packages.push(packageEntity);
@@ -98,24 +98,37 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     // 6. Atualizar a route
     const [updatedRoute] = await this.routeRepository.update({ id }, updateData);
 
-    // 7. Ajustar status das solicitações conforme a nova composição da rota.
+    // 7. Ajustar a composição da rota.
     if (data.packageIds) {
       const newIds = new Set(data.packageIds);
+      const previousIds = new Set(
+        (existingRoute.packages ?? []).map((pkg) => pkg.id),
+      );
 
-      // Atribuídas → aguardando recolha.
+      // Recém-adicionadas → enviar confirmação (fire-and-forget).
       for (const packageId of data.packageIds) {
-        await this.packageRepository.update(
-          { id: packageId },
-          { status: PackageStatus.WAITING_FOR_COLLECTION },
-        );
+        if (!previousIds.has(packageId)) {
+          this.sendCollectionConfirmationUseCase
+            .call(packageId)
+            .catch((err) =>
+              this.logger.error(
+                `Falha ao enviar confirmação de coleta do package ${packageId}: ${err.message}`,
+              ),
+            );
+        }
       }
 
-      // Removidas → voltam a CREATED (ficam elegíveis de novo).
+      // Removidas → voltam a CREATED, sem rota, e limpam a confirmação.
       for (const previous of existingRoute.packages ?? []) {
         if (!newIds.has(previous.id)) {
           await this.packageRepository.update(
             { id: previous.id },
-            { status: PackageStatus.CREATED },
+            {
+              route: null,
+              status: PackageStatus.CREATED,
+              collectionConfirmationToken: null,
+              collectionConfirmedAt: null,
+            },
           );
         }
       }

@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Request } from 'express';
+import { ConfirmCollectionUseCase } from '../../app/use-cases/package/confirm-collection-use-case';
 import { CreatePackageUseCase } from '../../app/use-cases/package/create-package-use-case';
 import { GetAllPackagesUseCase } from '../../app/use-cases/package/get-all-packages-use-case';
 import { GetCreatedPackagesUseCase } from '../../app/use-cases/package/get-created-packages-use-case';
@@ -27,6 +28,7 @@ describe('PackageController', () => {
         { provide: GetPackageByIdUseCase, useValue: { call: jest.fn() } },
         { provide: UpdatePackageUseCase, useValue: { call: jest.fn() } },
         { provide: GetAllPackagesUseCase, useValue: { call: jest.fn() } },
+        { provide: ConfirmCollectionUseCase, useValue: { call: jest.fn() } },
       ],
     }).compile();
 

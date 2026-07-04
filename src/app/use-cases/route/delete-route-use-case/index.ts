@@ -27,7 +27,12 @@ export class DeleteRouteUseCase implements IUseCase<string, Route> {
       for (const packageEntity of existingRoute.packages) {
         await this.packageRepository.update(
           { id: packageEntity.id },
-          { route: null, status: PackageStatus.CREATED }
+          {
+            route: null,
+            status: PackageStatus.CREATED,
+            collectionConfirmationToken: null,
+            collectionConfirmedAt: null,
+          }
         );
       }
     }

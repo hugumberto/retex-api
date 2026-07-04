@@ -10,11 +10,11 @@ export interface Package extends Entity {
   route?: Route;
   weight?: number;
   estimatedVolumes?: number;
-  collectDay?: string;
-  collectTime?: string;
   address?: Address;
   addressId?: string;
   items?: Item[];
+  collectionConfirmationToken?: string | null;
+  collectionConfirmedAt?: Date | null;
 }
 
 export enum PackageStatus {

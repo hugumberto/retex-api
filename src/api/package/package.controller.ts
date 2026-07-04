@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtPayload } from '../../app/services/interfaces/auth.interface';
+import { ConfirmCollectionUseCase } from '../../app/use-cases/package/confirm-collection-use-case';
+import { ConfirmCollectionDto } from '../../app/use-cases/package/confirm-collection-use-case/confirm-collection.dto';
 import { CreatePackageUseCase } from '../../app/use-cases/package/create-package-use-case';
 import { CreatePackageDto } from '../../app/use-cases/package/create-package-use-case/create-package.dto';
 import { GetAllPackagesUseCase } from '../../app/use-cases/package/get-all-packages-use-case';
@@ -19,6 +21,7 @@ import { GetPackageByIdUseCase } from '../../app/use-cases/package/get-package-b
 import { UpdatePackageUseCase } from '../../app/use-cases/package/update-package-use-case';
 import { UpdatePackageDto } from '../../app/use-cases/package/update-package-use-case/update-package.dto';
 import { Role } from '../../domain/user/user-roles.entity';
+import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 
 function requesterFrom(req: Request): { id: string; isPrivileged: boolean } {
@@ -37,7 +40,14 @@ export class PackageController {
     private readonly getPackageByIdUseCase: GetPackageByIdUseCase,
     private readonly updatePackageUseCase: UpdatePackageUseCase,
     private readonly getAllPackagesUseCase: GetAllPackagesUseCase,
+    private readonly confirmCollectionUseCase: ConfirmCollectionUseCase,
   ) {}
+
+  @Post('confirm-collection')
+  @Public()
+  confirmCollection(@Body() body: ConfirmCollectionDto) {
+    return this.confirmCollectionUseCase.call(body);
+  }
 
   @Get()
   @Roles(Role.ADMIN, Role.OPS)

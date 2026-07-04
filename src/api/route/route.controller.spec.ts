@@ -4,6 +4,7 @@ import { DeleteRouteUseCase } from '../../app/use-cases/route/delete-route-use-c
 import { GetAllRoutesUseCase } from '../../app/use-cases/route/get-all-routes-use-case';
 import { GetRouteByIdUseCase } from '../../app/use-cases/route/get-route-by-id-use-case';
 import { UpdateRouteUseCase } from '../../app/use-cases/route/update-route-use-case';
+import { ProcessCollectionSchedulesUseCase } from '../../app/use-cases/collection/process-collection-schedules-use-case';
 import { RouteController } from './route.controller';
 
 describe('RouteController', () => {
@@ -44,6 +45,12 @@ describe('RouteController', () => {
         },
         {
           provide: UpdateRouteUseCase,
+          useValue: {
+            call: jest.fn(),
+          },
+        },
+        {
+          provide: ProcessCollectionSchedulesUseCase,
           useValue: {
             call: jest.fn(),
           },

@@ -64,8 +64,6 @@ export class CreatePackageUseCase
         status: packageStatus,
         user: user,
         address: address,
-        collectDay: param.dayOfWeek,
-        collectTime: param.timeOfDay,
         estimatedVolumes: param.estimatedVolumes,
       };
 
@@ -97,8 +95,6 @@ export class CreatePackageUseCase
         packageId: pkg.id,
         status: this.formatStatus(pkg.status),
         address,
-        collectDay: this.formatCollectDay(pkg.collectDay),
-        collectTime: pkg.collectTime,
         year: new Date().getFullYear(),
       },
     });
@@ -117,19 +113,5 @@ export class CreatePackageUseCase
       [PackageStatus.STOCKED]: 'Armazenado',
     };
     return labels[status] ?? status;
-  }
-
-  private formatCollectDay(day: string | undefined): string | undefined {
-    if (!day) return undefined;
-    const labels: Record<string, string> = {
-      MONDAY: 'Segunda-feira',
-      TUESDAY: 'Terça-feira',
-      WEDNESDAY: 'Quarta-feira',
-      THURSDAY: 'Quinta-feira',
-      FRIDAY: 'Sexta-feira',
-      SATURDAY: 'Sábado',
-      SUNDAY: 'Domingo',
-    };
-    return labels[day.toUpperCase()] ?? day;
   }
 }

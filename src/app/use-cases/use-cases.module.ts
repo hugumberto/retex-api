@@ -17,6 +17,7 @@ import { PACKAGE_USE_CASES } from './package';
 import { QR_CODE_USE_CASES } from './qr-code';
 import { ROUTE_USE_CASES } from './route';
 import { STORAGE_UNIT_USE_CASES } from './storage-unit';
+import { SYSTEM_PARAMETER_USE_CASES } from './system-parameter';
 import { USER_USE_CASES } from './user';
 import { WELCOME_USE_CASES } from './welcome';
 
@@ -32,6 +33,7 @@ export class UseCasesModule {
       ...STORAGE_UNIT_USE_CASES,
       ...QR_CODE_USE_CASES,
       ...COLLECTION_USE_CASES,
+      ...SYSTEM_PARAMETER_USE_CASES,
       ...BRAND_USE_CASES,
       ...ITEM_USE_CASES,
       ...BLOG_POST_USE_CASES,

@@ -195,4 +195,37 @@ export class PackageRepository
       .where('package.id = :id', { id })
       .getOne();
   }
+
+  async findByCollectionConfirmationToken(token: string): Promise<Package> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('package')
+      .addSelect('package.collectionConfirmationToken')
+      .leftJoinAndSelect('package.user', 'user')
+      .leftJoinAndSelect('package.route', 'route')
+      .where('package.collectionConfirmationToken = :token', { token })
+      .getOne();
+  }
+
+  async findExpiredUnconfirmed(days: number): Promise<Package[]> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('package')
+      .innerJoinAndSelect('package.route', 'route')
+      .where('package.status = :status', { status: PackageStatus.CREATED })
+      .andWhere('package.collectionConfirmedAt IS NULL')
+      .andWhere('(route.start_date::date - :days) < CURRENT_DATE', { days })
+      .getMany();
+  }
+
+  async findDueConfirmed(): Promise<Package[]> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('package')
+      .innerJoinAndSelect('package.route', 'route')
+      .where('package.status = :status', { status: PackageStatus.CREATED })
+      .andWhere('package.collectionConfirmedAt IS NOT NULL')
+      .andWhere('route.start_date::date <= CURRENT_DATE')
+      .getMany();
+  }
 }

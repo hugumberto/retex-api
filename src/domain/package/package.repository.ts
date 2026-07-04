@@ -43,6 +43,13 @@ export interface IPackageRepository extends IRepository<Package> {
   findByUser(userId: string): Promise<Package[]>;
   findAll(): Promise<Package[]>;
 
+  // Confirmação de coleta.
+  findByCollectionConfirmationToken(token: string): Promise<Package>;
+  // Cron: roteadas + CREATED + não confirmadas cujo prazo (startDate - days) passou.
+  findExpiredUnconfirmed(days: number): Promise<Package[]>;
+  // Cron: roteadas + CREATED + confirmadas cujo dia da coleta chegou.
+  findDueConfirmed(): Promise<Package[]>;
+
   // Agregações para o dashboard (somente leitura).
   countByStatus(): Promise<PackageStatusCount[]>;
   getTotals(): Promise<PackageTotals>;

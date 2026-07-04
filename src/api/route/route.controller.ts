@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { ProcessCollectionSchedulesUseCase } from "../../app/use-cases/collection/process-collection-schedules-use-case";
 import { CreateRouteUseCase } from "../../app/use-cases/route/create-route-use-case";
 import { CreateRouteDto } from "../../app/use-cases/route/create-route-use-case/create-route.dto";
 import { DeleteRouteUseCase } from "../../app/use-cases/route/delete-route-use-case";
@@ -19,11 +20,20 @@ export class RouteController {
     private readonly getAllRoutesUseCase: GetAllRoutesUseCase,
     private readonly getRouteByIdUseCase: GetRouteByIdUseCase,
     private readonly updateRouteUseCase: UpdateRouteUseCase,
+    private readonly processCollectionSchedulesUseCase: ProcessCollectionSchedulesUseCase,
   ) { }
 
   @Post()
   createRoute(@Body() body: CreateRouteDto) {
     return this.createRouteUseCase.call(body);
+  }
+
+  // Disparo manual (ADMIN) do processamento da agenda de coleta — mesmo que o
+  // cron diário faz: remove não-confirmados vencidos e move confirmados no dia.
+  @Post('process-schedules')
+  @Roles(Role.ADMIN)
+  processSchedules() {
+    return this.processCollectionSchedulesUseCase.call();
   }
 
   @Get()
