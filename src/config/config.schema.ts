@@ -24,6 +24,8 @@ export const envSchema = z.object({
   // apenas não preenche coordenadas (degrada sem erro).
   TOMTOM_API_KEY: z.string().optional(),
   TOMTOM_GEOCODE_URL: z.string().url().optional(),
+  // Link do questionário de satisfação (Google Forms). Opcional: sem ela usa o default do código.
+  SURVEY_FORM_URL: z.string().url().optional(),
 });
 
 export function getConfigValidation(env: Record<string, string>) {

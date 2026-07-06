@@ -8,6 +8,8 @@ import { IPackageRepository } from '../../../../domain/package/package.repositor
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
+import { IEmailService } from '../../../services/interfaces/email.interface';
+import { SERVICE_TOKENS } from '../../../services/tokens';
 import { BindItemsStorageUnitsUseCase } from '.';
 
 describe('BindItemsStorageUnitsUseCase', () => {
@@ -15,6 +17,7 @@ describe('BindItemsStorageUnitsUseCase', () => {
   const itemRepositoryMock = mock<IItemRepository>();
   const storageUnitRepositoryMock = mock<IStorageUnitRepository>();
   const packageRepositoryMock = mock<IPackageRepository>();
+  const emailServiceMock = mock<IEmailService>();
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -24,6 +27,7 @@ describe('BindItemsStorageUnitsUseCase', () => {
         { provide: DOMAIN_TOKENS.ITEM_REPOSITORY, useValue: itemRepositoryMock },
         { provide: DOMAIN_TOKENS.STORAGE_UNIT_REPOSITORY, useValue: storageUnitRepositoryMock },
         { provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY, useValue: packageRepositoryMock },
+        { provide: SERVICE_TOKENS.EMAIL_SERVICE, useValue: emailServiceMock },
       ],
     }).compile();
     useCase = module.get(BindItemsStorageUnitsUseCase);
@@ -62,9 +66,13 @@ describe('BindItemsStorageUnitsUseCase', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('binds compatible item/unit and moves the package to STOCKED', async () => {
+  it('binds compatible item/unit, moves package to STOCKED and sends the survey', async () => {
     itemRepositoryMock.findByIds.mockResolvedValue([item()]);
     storageUnitRepositoryMock.findByIds.mockResolvedValue([su()]);
+    packageRepositoryMock.findOneWithAllRelations.mockResolvedValue({
+      id: 'p1',
+      user: { email: 'cliente@example.com', firstName: 'Ana', lastName: 'Silva' },
+    } as any);
 
     const result = await useCase.call({ items: ['i1'], storageUnits: ['s1'] });
 
@@ -81,5 +89,14 @@ describe('BindItemsStorageUnitsUseCase', () => {
       packageId: 'p1',
       packageStatus: PackageStatus.STOCKED,
     });
+
+    // O envio do survey é fire-and-forget — aguardar a microtask antes de asserir.
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(emailServiceMock.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: 'cliente@example.com',
+        template: 'survey',
+      }),
+    );
   });
 });
