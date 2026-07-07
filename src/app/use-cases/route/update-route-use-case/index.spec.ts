@@ -1,7 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { Route } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -35,5 +36,41 @@ describe('UpdateRouteUseCase', () => {
     await expect(
       useCase.call({ id: 'r1', data: {} } as any),
     ).rejects.toThrow(NotFoundException);
+  });
+
+  it('blocks composition changes when the route is not DRAFTING', async () => {
+    routeRepo.findOneWithAllRelations.mockResolvedValue({
+      id: 'r1', status: 'CREATED', packages: [],
+    } as unknown as Route);
+
+    await expect(
+      useCase.call({ id: 'r1', data: { packageIds: ['p1'] } } as any),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('allows advancing the status of a confirmed route', async () => {
+    routeRepo.findOneWithAllRelations.mockResolvedValue({
+      id: 'r1', status: 'CREATED', packages: [],
+    } as unknown as Route);
+    routeRepo.update.mockResolvedValue([{ id: 'r1' } as Route]);
+
+    await useCase.call({ id: 'r1', data: { status: 'IN_TRANSIT' } } as any);
+
+    expect(routeRepo.update).toHaveBeenCalled();
+    expect(sendConfirmation.call).not.toHaveBeenCalled();
+  });
+
+  it('sends confirmation to all packages when moving DRAFTING -> CREATED', async () => {
+    routeRepo.findOneWithAllRelations.mockResolvedValue({
+      id: 'r1',
+      status: 'DRAFTING',
+      packages: [{ id: 'p1' }, { id: 'p2' }],
+    } as unknown as Route);
+    routeRepo.update.mockResolvedValue([{ id: 'r1' } as Route]);
+
+    await useCase.call({ id: 'r1', data: { status: 'CREATED' } } as any);
+
+    expect(sendConfirmation.call).toHaveBeenCalledWith('p1');
+    expect(sendConfirmation.call).toHaveBeenCalledWith('p2');
   });
 });

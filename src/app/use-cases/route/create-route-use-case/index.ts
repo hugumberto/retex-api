@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PackageStatus } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
 import { Route, RouteStatus } from '../../../../domain/route/route.entity';
@@ -7,13 +7,10 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
-import { SendCollectionConfirmationUseCase } from '../../package/send-collection-confirmation-use-case';
 import { CreateRouteDto } from './create-route.dto';
 
 @Injectable()
 export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
-  private readonly logger = new Logger(CreateRouteUseCase.name);
-
   constructor(
     @Inject(DOMAIN_TOKENS.ROUTE_REPOSITORY)
     private readonly routeRepository: IRouteRepository,
@@ -21,7 +18,6 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
     private readonly userRepository: IUserRepository,
     @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
     private readonly packageRepository: IPackageRepository,
-    private readonly sendCollectionConfirmationUseCase: SendCollectionConfirmationUseCase,
   ) { }
 
   async call(param: CreateRouteDto): Promise<Route> {
@@ -65,19 +61,8 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
       startDate: new Date(param.startDate),
     };
 
-    const route = await this.routeRepository.create(routeData);
-
-    // 6. Enviar email de confirmação do dia da coleta (fire-and-forget).
-    for (const packageEntity of packages) {
-      this.sendCollectionConfirmationUseCase
-        .call(packageEntity.id)
-        .catch((err) =>
-          this.logger.error(
-            `Falha ao enviar confirmação de coleta do package ${packageEntity.id}: ${err.message}`,
-          ),
-        );
-    }
-
-    return route;
+    // A rota nasce DRAFTING; o email de confirmação só é enviado quando a rota
+    // passa para CREATED (ver update-route-use-case).
+    return this.routeRepository.create(routeData);
   }
 }

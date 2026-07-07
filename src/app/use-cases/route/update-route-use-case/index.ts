@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PackageStatus } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
-import { Route } from '../../../../domain/route/route.entity';
+import { Route, RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
@@ -38,7 +38,16 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
       throw new NotFoundException('Route não encontrada');
     }
 
-    // 2. Preparar dados para atualização
+    // 2. Rota já confirmada trava a composição — só o status/endDate avançam.
+    if (existingRoute.status !== RouteStatus.DRAFTING) {
+      if (data.driverId || data.packageIds || data.startDate) {
+        throw new BadRequestException(
+          'A rota já foi confirmada e não permite alterar motorista, solicitações ou data',
+        );
+      }
+    }
+
+    // 3. Preparar dados para atualização
     const updateData: Partial<Route> = {};
 
     // 3. Validar e atualizar driver se fornecido
@@ -98,27 +107,9 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     // 6. Atualizar a route
     const [updatedRoute] = await this.routeRepository.update({ id }, updateData);
 
-    // 7. Ajustar a composição da rota.
+    // 7. Solicitações removidas da rota → voltam a CREATED (só em DRAFTING).
     if (data.packageIds) {
       const newIds = new Set(data.packageIds);
-      const previousIds = new Set(
-        (existingRoute.packages ?? []).map((pkg) => pkg.id),
-      );
-
-      // Recém-adicionadas → enviar confirmação (fire-and-forget).
-      for (const packageId of data.packageIds) {
-        if (!previousIds.has(packageId)) {
-          this.sendCollectionConfirmationUseCase
-            .call(packageId)
-            .catch((err) =>
-              this.logger.error(
-                `Falha ao enviar confirmação de coleta do package ${packageId}: ${err.message}`,
-              ),
-            );
-        }
-      }
-
-      // Removidas → voltam a CREATED, sem rota, e limpam a confirmação.
       for (const previous of existingRoute.packages ?? []) {
         if (!newIds.has(previous.id)) {
           await this.packageRepository.update(
@@ -131,6 +122,25 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
             },
           );
         }
+      }
+    }
+
+    // 8. Transição DRAFTING→CREATED: enviar a confirmação a todas as
+    // solicitações da rota (fire-and-forget).
+    if (
+      existingRoute.status !== RouteStatus.CREATED &&
+      data.status === RouteStatus.CREATED
+    ) {
+      const packageIds =
+        data.packageIds ?? (existingRoute.packages ?? []).map((pkg) => pkg.id);
+      for (const packageId of packageIds) {
+        this.sendCollectionConfirmationUseCase
+          .call(packageId)
+          .catch((err) =>
+            this.logger.error(
+              `Falha ao enviar confirmação de coleta do package ${packageId}: ${err.message}`,
+            ),
+          );
       }
     }
 

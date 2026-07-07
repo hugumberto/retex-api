@@ -7,14 +7,12 @@ import { Role } from '../../../../domain/user/user-roles.entity';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
-import { SendCollectionConfirmationUseCase } from '../../package/send-collection-confirmation-use-case';
 import { CreateRouteUseCase } from '.';
 
 describe('CreateRouteUseCase', () => {
   const routeRepo = mock<IRouteRepository>();
   const userRepo = mock<IUserRepository>();
   const packageRepo = mock<IPackageRepository>();
-  const sendConfirmation = mock<SendCollectionConfirmationUseCase>();
   let useCase: CreateRouteUseCase;
 
   beforeEach(async () => {
@@ -25,11 +23,9 @@ describe('CreateRouteUseCase', () => {
         { provide: DOMAIN_TOKENS.ROUTE_REPOSITORY, useValue: routeRepo },
         { provide: DOMAIN_TOKENS.USER_REPOSITORY, useValue: userRepo },
         { provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY, useValue: packageRepo },
-        { provide: SendCollectionConfirmationUseCase, useValue: sendConfirmation },
       ],
     }).compile();
     useCase = module.get(CreateRouteUseCase);
-    sendConfirmation.call.mockResolvedValue(undefined);
   });
 
   const param = { driverId: 'd1', packageIds: ['p1'], startDate: '2025-01-01' } as any;
@@ -57,7 +53,7 @@ describe('CreateRouteUseCase', () => {
     await expect(useCase.call(param)).rejects.toThrow(ConflictException);
   });
 
-  it('keeps packages CREATED and sends collection confirmation', async () => {
+  it('creates the route in DRAFTING without sending confirmation or moving packages', async () => {
     userRepo.findOneWithRelations.mockResolvedValue({
       id: 'd1', roles: [{ role: Role.DRIVER }],
     } as User);
@@ -68,8 +64,7 @@ describe('CreateRouteUseCase', () => {
 
     await useCase.call(param);
 
-    expect(sendConfirmation.call).toHaveBeenCalledWith('p1');
-    // não move para WAITING no create (isso passa a ser feito pelo cron).
+    // Email só na transição para CREATED; pacotes seguem CREATED sem update.
     expect(packageRepo.update).not.toHaveBeenCalled();
   });
 });
