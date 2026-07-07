@@ -73,6 +73,7 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
       .leftJoinAndSelect('driver.roles', 'driverRoles')
       .leftJoinAndSelect('route.packages', 'packages')
       .leftJoinAndSelect('packages.user', 'packageUser')
+      .leftJoinAndSelect('packages.address', 'packageAddress')
       .where('route.id = :id', { id })
       .getOne();
   }
