@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
 import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -47,6 +47,15 @@ export class GenerateCollectionQrCodesUseCase
       ) {
         friendlyCode = generateFriendlyCode(year);
         attempts++;
+      }
+      // Falha explícita em vez de violar o índice único de friendly_code.
+      if (
+        usedInBatch.has(friendlyCode) ||
+        (await this.qrCodeRepository.findOne({ friendlyCode }))
+      ) {
+        throw new ConflictException(
+          'Não foi possível gerar um código único para o QR code',
+        );
       }
       usedInBatch.add(friendlyCode);
 

@@ -32,14 +32,14 @@ describe('BindQrCodeUseCase', () => {
   const waiting = { id: 'p1', status: 'WAITING_FOR_COLLECTION' } as Package;
 
   it('throws when the package is not waiting for collection', async () => {
-    packageRepo.findOne.mockResolvedValue({ id: 'p1', status: 'CREATED' } as Package);
+    packageRepo.findOneWithAllRelations.mockResolvedValue({ id: 'p1', status: 'CREATED' } as Package);
     await expect(
       useCase.call({ packageId: 'p1', code: 'x' }),
     ).rejects.toThrow(BadRequestException);
   });
 
   it('throws NotFound when the code matches no qr code', async () => {
-    packageRepo.findOne.mockResolvedValue(waiting);
+    packageRepo.findOneWithAllRelations.mockResolvedValue(waiting);
     qrCodeRepo.findOne.mockResolvedValue(undefined);
     await expect(
       useCase.call({ packageId: 'p1', code: 'x' }),
@@ -47,15 +47,31 @@ describe('BindQrCodeUseCase', () => {
   });
 
   it('rejects an already-used qr code', async () => {
-    packageRepo.findOne.mockResolvedValue(waiting);
+    packageRepo.findOneWithAllRelations.mockResolvedValue(waiting);
     qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', usedAt: new Date() } as QrCode);
     await expect(
       useCase.call({ packageId: 'p1', code: 'tok' }),
     ).rejects.toThrow(ConflictException);
   });
 
+  it('rejects a qr code from a different route', async () => {
+    packageRepo.findOneWithAllRelations.mockResolvedValue({
+      id: 'p1',
+      status: 'WAITING_FOR_COLLECTION',
+      route: { id: 'r1' },
+    } as unknown as Package);
+    qrCodeRepo.findOne.mockResolvedValue({
+      id: 'q1',
+      usedAt: null,
+      routeId: 'r2',
+    } as QrCode);
+    await expect(
+      useCase.call({ packageId: 'p1', code: 'tok' }),
+    ).rejects.toThrow(BadRequestException);
+  });
+
   it('binds by token: sets packageId + usedAt', async () => {
-    packageRepo.findOne.mockResolvedValue(waiting);
+    packageRepo.findOneWithAllRelations.mockResolvedValue(waiting);
     qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', usedAt: null } as QrCode);
     qrCodeRepo.update.mockResolvedValue([{ id: 'q1' } as QrCode]);
 
@@ -68,7 +84,7 @@ describe('BindQrCodeUseCase', () => {
   });
 
   it('falls back to friendlyCode when token lookup misses', async () => {
-    packageRepo.findOne.mockResolvedValue(waiting);
+    packageRepo.findOneWithAllRelations.mockResolvedValue(waiting);
     qrCodeRepo.findOne
       .mockResolvedValueOnce(undefined) // por token
       .mockResolvedValueOnce({ id: 'q2', usedAt: null } as QrCode); // por friendlyCode

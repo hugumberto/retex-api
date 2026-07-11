@@ -30,7 +30,8 @@ export class BindQrCodeUseCase implements IUseCase<BindQrCodeParams, QrCode> {
   ) { }
 
   async call({ packageId, code }: BindQrCodeParams): Promise<QrCode> {
-    const packageEntity = await this.packageRepository.findOne({ id: packageId });
+    const packageEntity =
+      await this.packageRepository.findOneWithAllRelations(packageId);
     if (!packageEntity) {
       throw new NotFoundException('Solicitação não encontrada');
     }
@@ -48,6 +49,15 @@ export class BindQrCodeUseCase implements IUseCase<BindQrCodeParams, QrCode> {
     }
     if (qrCode.usedAt || qrCode.packageId) {
       throw new ConflictException('QR code já utilizado');
+    }
+    // O QR pertence à rota do pacote (os códigos são gerados por rota) — evita
+    // vincular um QR de outra rota.
+    if (
+      qrCode.routeId &&
+      packageEntity.route?.id &&
+      qrCode.routeId !== packageEntity.route.id
+    ) {
+      throw new BadRequestException('O QR code não pertence a esta rota');
     }
 
     const [updated] = await this.qrCodeRepository.update(

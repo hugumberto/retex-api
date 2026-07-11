@@ -145,9 +145,10 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     }
 
     // 8. Transição DRAFTING→CREATED: enviar a confirmação a todas as
-    // solicitações da rota (fire-and-forget).
+    // solicitações da rota (fire-and-forget). Restrito a DRAFTING para não
+    // reenviar emails caso o status regrida para CREATED.
     if (
-      existingRoute.status !== RouteStatus.CREATED &&
+      existingRoute.status === RouteStatus.DRAFTING &&
       data.status === RouteStatus.CREATED
     ) {
       const packageIds =

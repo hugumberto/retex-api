@@ -38,7 +38,7 @@ export class QrCodeRepository
     return repository
       .createQueryBuilder('qr_code')
       .where('qr_code.route_id = :routeId', { routeId })
-      .orderBy('qr_code.created_at', 'ASC')
+      .orderBy('qr_code.createdAt', 'ASC')
       .getMany();
   }
 
