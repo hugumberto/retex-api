@@ -60,7 +60,11 @@
                   {{lastName}}</a>!
               </p>
               <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
-                Informamos que o registo do processo <strong>nº{{packageId}}</strong>, foi efetuado com sucesso.
+                Informamos que o registo do processo <strong>nº{{friendlyCode}}</strong>, foi efetuado com sucesso.
+              </p>
+              <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
+                Em breve receberá um email com o <strong>dia</strong> e o
+                <strong>intervalo de horário</strong> em que a recolha será agendada.
               </p>
               <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
                 Encontre no final deste email, os detalhes da sua encomenda.
@@ -93,6 +97,15 @@
             <td style="padding:0 40px 40px;">
               <table width="100%" cellpadding="0" cellspacing="0" border="0"
                 style="border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;background-color:#F6F6F6;">
+
+                <!-- Código -->
+                <tr>
+                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;width:45%;border-bottom:1px solid #f0f0f0;">
+                    Código</td>
+                  <td
+                    style="padding:14px 20px;font-size:14px;color:#013364;font-weight:700;letter-spacing:0.5px;border-bottom:1px solid #f0f0f0;">
+                    {{friendlyCode}}</td>
+                </tr>
 
                 <!-- Nome -->
                 <tr>
@@ -135,33 +148,11 @@
 
                 <!-- Código-Postal -->
                 <tr>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#7F7F7F;{{#if collectDay}}border-bottom:1px solid #f0f0f0;{{/if}}">
+                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;">
                     Código-Postal</td>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#013364;{{#if collectDay}}border-bottom:1px solid #f0f0f0;{{/if}}">
+                  <td style="padding:14px 20px;font-size:14px;color:#013364;">
                     {{address.zipCode}}</td>
                 </tr>
-
-                {{#if collectDay}}
-                <!-- Dia de recolha -->
-                <tr>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#7F7F7F;{{#if collectTime}}border-bottom:1px solid #f0f0f0;{{/if}}">
-                    Dia de recolha</td>
-                  <td
-                    style="padding:14px 20px;font-size:14px;color:#013364;font-weight:500;{{#if collectTime}}border-bottom:1px solid #f0f0f0;{{/if}}">
-                    {{collectDay}}</td>
-                </tr>
-                {{/if}}
-
-                {{#if collectTime}}
-                <!-- Horário de recolha -->
-                <tr>
-                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;">Horário de recolha</td>
-                  <td style="padding:14px 20px;font-size:14px;color:#013364;font-weight:500;">{{collectTime}}</td>
-                </tr>
-                {{/if}}
 
               </table>
             </td>

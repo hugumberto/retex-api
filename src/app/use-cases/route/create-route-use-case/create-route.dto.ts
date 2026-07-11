@@ -1,4 +1,5 @@
-import { ArrayNotEmpty, IsArray, IsDateString, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsDateString, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { CollectionInterval } from '../../../../domain/route/route.entity';
 
 export class CreateRouteDto {
   @IsString()
@@ -13,7 +14,7 @@ export class CreateRouteDto {
   @IsDateString()
   startDate: string;
 
-  @IsString()
-  @IsNotEmpty()
-  shift: string;
-} 
+  @IsOptional()
+  @IsEnum(CollectionInterval)
+  collectionInterval?: CollectionInterval;
+}

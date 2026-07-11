@@ -47,23 +47,17 @@ export class PackageRepository
       });
     }
 
-    if (filters.collectDay) {
-      queryBuilder.andWhere('package.collectDay = :collectDay', {
-        collectDay: filters.collectDay,
-      });
-    }
-
-    if (filters.collectTime) {
-      queryBuilder.andWhere('package.collectTime = :collectTime', {
-        collectTime: filters.collectTime,
-      });
-    }
-
-    // Incluir relacionamentos
+    // Incluir relacionamentos (address é necessário para plotar lat/long no mapa)
     queryBuilder
       .leftJoinAndSelect('package.user', 'user')
+      .leftJoinAndSelect('package.address', 'address')
       .leftJoinAndSelect('package.route', 'route')
       .leftJoinAndSelect('package.items', 'items');
+
+    // Apenas encomendas ainda não vinculadas a uma rota
+    if (filters.unrouted) {
+      queryBuilder.andWhere('route.id IS NULL');
+    }
 
     // Aplicar paginação
     const offset = (pagination.page - 1) * pagination.limit;
@@ -193,11 +187,46 @@ export class PackageRepository
     return repository
       .createQueryBuilder('package')
       .leftJoinAndSelect('package.user', 'user')
+      .leftJoinAndSelect('package.address', 'address')
       .leftJoinAndSelect('package.route', 'route')
       .leftJoinAndSelect('package.items', 'items')
       .leftJoinAndSelect('items.brand', 'brand')
       .leftJoinAndSelect('items.storageUnit', 'storageUnit')
+      .leftJoinAndSelect('items.qrCode', 'itemQrCode')
       .where('package.id = :id', { id })
       .getOne();
+  }
+
+  async findByCollectionConfirmationToken(token: string): Promise<Package> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('package')
+      .addSelect('package.collectionConfirmationToken')
+      .leftJoinAndSelect('package.user', 'user')
+      .leftJoinAndSelect('package.route', 'route')
+      .where('package.collectionConfirmationToken = :token', { token })
+      .getOne();
+  }
+
+  async findExpiredUnconfirmed(days: number): Promise<Package[]> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('package')
+      .innerJoinAndSelect('package.route', 'route')
+      .where('package.status = :status', { status: PackageStatus.CREATED })
+      .andWhere('package.collectionConfirmedAt IS NULL')
+      .andWhere('(route.start_date::date - :days) < CURRENT_DATE', { days })
+      .getMany();
+  }
+
+  async findDueConfirmed(): Promise<Package[]> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('package')
+      .innerJoinAndSelect('package.route', 'route')
+      .where('package.status = :status', { status: PackageStatus.CONFIRMED })
+      .andWhere('package.collectionConfirmedAt IS NOT NULL')
+      .andWhere('route.start_date::date <= CURRENT_DATE')
+      .getMany();
   }
 }

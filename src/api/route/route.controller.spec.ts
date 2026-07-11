@@ -4,6 +4,8 @@ import { DeleteRouteUseCase } from '../../app/use-cases/route/delete-route-use-c
 import { GetAllRoutesUseCase } from '../../app/use-cases/route/get-all-routes-use-case';
 import { GetRouteByIdUseCase } from '../../app/use-cases/route/get-route-by-id-use-case';
 import { UpdateRouteUseCase } from '../../app/use-cases/route/update-route-use-case';
+import { ProcessCollectionSchedulesUseCase } from '../../app/use-cases/collection/process-collection-schedules-use-case';
+import { GetRouteQrCodesUseCase } from '../../app/use-cases/qr-code/get-route-qr-codes-use-case';
 import { RouteController } from './route.controller';
 
 describe('RouteController', () => {
@@ -48,6 +50,18 @@ describe('RouteController', () => {
             call: jest.fn(),
           },
         },
+        {
+          provide: ProcessCollectionSchedulesUseCase,
+          useValue: {
+            call: jest.fn(),
+          },
+        },
+        {
+          provide: GetRouteQrCodesUseCase,
+          useValue: {
+            call: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -69,7 +83,6 @@ describe('RouteController', () => {
         driverId: 'driver-uuid-123',
         packageIds: ['package-1', 'package-2'],
         startDate: '2024-01-15T10:00:00Z',
-        shift: 'MORNING',
       };
 
       const expectedResult = {

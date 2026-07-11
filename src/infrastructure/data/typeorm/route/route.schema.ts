@@ -10,6 +10,19 @@ export const routeSchema = new EntitySchema<Route>({
       type: 'uuid',
       generated: 'uuid',
     },
+    friendlyCode: {
+      type: 'varchar',
+      length: 32,
+      nullable: true,
+      unique: true,
+      name: 'friendly_code',
+    },
+    collectionInterval: {
+      type: 'varchar',
+      length: 32,
+      nullable: true,
+      name: 'collection_interval',
+    },
     status: {
       type: 'enum',
       enum: RouteStatus,
@@ -24,10 +37,6 @@ export const routeSchema = new EntitySchema<Route>({
       type: 'timestamp with time zone',
       nullable: true,
       name: 'end_date',
-    },
-    shift: {
-      type: 'varchar',
-      nullable: false,
     },
     ...BaseTimestampColumns,
   },

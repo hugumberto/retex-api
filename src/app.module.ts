@@ -2,6 +2,7 @@ import { DynamicModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino/LoggerModule';
 import { ApiModule } from './api/api.module';
+import { SchedulerModule } from './app/services/scheduler/scheduler.module';
 import { SeedModule } from './app/services/seed/seed.module';
 import { ServicesModule } from './app/services/services.module';
 import { UseCasesModule } from './app/use-cases/use-cases.module';
@@ -17,8 +18,10 @@ import { FaqItemRepository } from './infrastructure/data/typeorm/faq/faq-item.re
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
 import { PackageRepository } from './infrastructure/data/typeorm/package/package.repository';
+import { QrCodeRepository } from './infrastructure/data/typeorm/qr-code/qr-code.repository';
 import { RouteRepository } from './infrastructure/data/typeorm/route/route.repository';
 import { StorageUnitRepository } from './infrastructure/data/typeorm/storage-unit/storage-unit.repository';
+import { SystemParameterRepository } from './infrastructure/data/typeorm/system-parameter/system-parameter.repository';
 import { TestZoneRepository } from './infrastructure/data/typeorm/test-zone/test-zone.repository';
 import { AppTypeORMModule } from './infrastructure/data/typeorm/typeorm.module';
 import { UserRoleRepository } from './infrastructure/data/typeorm/user-role/user-role.repository';
@@ -26,6 +29,7 @@ import { RefreshTokenRepository } from './infrastructure/data/typeorm/user/refre
 import { UserRepository } from './infrastructure/data/typeorm/user/user.repository';
 import { EmailModule } from './infrastructure/services/email/email.module';
 import { EmailService } from './infrastructure/services/email/email.service';
+import { GeocodingService } from './infrastructure/services/geocoding/geocoding.service';
 import { LocalStorageModule } from './infrastructure/services/local-storage/local-storage.module';
 import { LocalStorageService } from './infrastructure/services/local-storage/local-storage.service';
 import { SanitizationService } from './infrastructure/services/sanitization/sanitization.service';
@@ -47,6 +51,8 @@ export class AppModule {
         packageRepository: PackageRepository,
         routeRepository: RouteRepository,
         storageUnitRepository: StorageUnitRepository,
+        qrCodeRepository: QrCodeRepository,
+        systemParameterRepository: SystemParameterRepository,
         userRoleRepository: UserRoleRepository,
         refreshTokenRepository: RefreshTokenRepository,
         blogPostRepository: BlogPostRepository,
@@ -60,6 +66,7 @@ export class AppModule {
         sanitizationService: SanitizationService,
         localStorageService: LocalStorageService,
         emailService: EmailService,
+        geocodingService: GeocodingService,
         imports: [LocalStorageModule, EmailModule],
       }),
       ApiModule,
@@ -67,6 +74,7 @@ export class AppModule {
 
     if (process.env.NODE_ENV !== 'test') {
       imports.push(SeedModule);
+      imports.push(SchedulerModule);
     }
 
     if (process.env.NODE_ENV !== 'test') {

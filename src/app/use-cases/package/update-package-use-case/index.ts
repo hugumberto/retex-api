@@ -1,8 +1,9 @@
-import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Package, PackageStatus } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { FinishRouteIfAllCollectedUseCase } from '../../route/finish-route-if-all-collected-use-case';
 import { UpdatePackageDto } from './update-package.dto';
 
 export interface UpdatePackageParamDto {
@@ -16,9 +17,12 @@ export interface UpdatePackageParamDto {
 export class UpdatePackageUseCase
   implements IUseCase<UpdatePackageParamDto, Package>
 {
+  private readonly logger = new Logger(UpdatePackageUseCase.name);
+
   constructor(
     @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
     private readonly packageRepository: IPackageRepository,
+    private readonly finishRouteIfAllCollectedUseCase: FinishRouteIfAllCollectedUseCase,
   ) {}
 
   async call(param: UpdatePackageParamDto): Promise<Package> {
@@ -60,6 +64,22 @@ export class UpdatePackageUseCase
       { id },
       updateData,
     );
+
+    // Cancelamento pode fechar a rota (todos coletados/cancelados).
+    if (
+      data.status === PackageStatus.CANCELLED &&
+      existingPackage.route?.id
+    ) {
+      const routeId = existingPackage.route.id;
+      this.finishRouteIfAllCollectedUseCase
+        .call(routeId)
+        .catch((err) =>
+          this.logger.error(
+            `Falha ao tentar finalizar a rota ${routeId}: ${err.message}`,
+          ),
+        );
+    }
+
     return updatedPackage;
   }
 }

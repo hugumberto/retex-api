@@ -1,6 +1,5 @@
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
-import { IBrandRepository } from '../../../../domain/brand/brand.repository';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -8,7 +7,6 @@ import { UpdateStorageUnitUseCase } from '.';
 
 describe('UpdateStorageUnitUseCase', () => {
   const repo = mock<IStorageUnitRepository>();
-  const brandRepo = mock<IBrandRepository>();
   let useCase: UpdateStorageUnitUseCase;
 
   beforeEach(async () => {
@@ -17,7 +15,6 @@ describe('UpdateStorageUnitUseCase', () => {
       providers: [
         UpdateStorageUnitUseCase,
         { provide: DOMAIN_TOKENS.STORAGE_UNIT_REPOSITORY, useValue: repo },
-        { provide: DOMAIN_TOKENS.BRAND_REPOSITORY, useValue: brandRepo },
       ],
     }).compile();
     useCase = module.get(UpdateStorageUnitUseCase);

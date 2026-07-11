@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IBrandRepository } from '../../../../domain/brand/brand.repository';
-import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
+import { StorageUnit, StorageUnitStatus } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { generateFriendlyCode } from '../../qr-code/qr-code.util';
 import { CreateStorageUnitDto } from './create-storage-unit.dto';
 
 export { CreateStorageUnitDto };
@@ -13,25 +13,39 @@ export class CreateStorageUnitUseCase implements IUseCase<CreateStorageUnitDto, 
   constructor(
     @Inject(DOMAIN_TOKENS.STORAGE_UNIT_REPOSITORY)
     private readonly storageUnitRepository: IStorageUnitRepository,
-    @Inject(DOMAIN_TOKENS.BRAND_REPOSITORY)
-    private readonly brandRepository: IBrandRepository,
   ) { }
 
   async call(param: CreateStorageUnitDto): Promise<StorageUnit> {
-    // Buscar a marca pelo ID
-    const brand = await this.brandRepository.findOne({ id: param.brandId });
-
-    if (!brand) {
-      throw new Error('Marca não encontrada');
-    }
+    const friendlyCode = await this.generateUniqueFriendlyCode();
 
     // Criar o StorageUnit com peso inicial = 0
     const storageUnit = await this.storageUnitRepository.create({
-      brand,
+      friendlyCode,
       quality: param.quality,
+      sex: param.sex,
+      ageGroup: param.ageGroup,
+      type: param.type,
+      season: param.season,
+      status: StorageUnitStatus.ATIVO,
       weight: 0,
     });
 
     return storageUnit;
   }
-} 
+
+  /**
+   * Gera um código amigável (`ano-XXXXXX`) único contra os já existentes. O
+   * índice único na coluna é a rede de segurança final.
+   */
+  private async generateUniqueFriendlyCode(): Promise<string> {
+    const year = new Date().getFullYear();
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = generateFriendlyCode(year);
+      const existing = await this.storageUnitRepository.findOne({
+        friendlyCode: code,
+      } as Partial<StorageUnit>);
+      if (!existing) return code;
+    }
+    return `${generateFriendlyCode(year)}${Date.now().toString(36).slice(-2).toUpperCase()}`;
+  }
+}

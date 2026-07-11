@@ -6,6 +6,7 @@ import { Item } from '../../../../domain/item/item.entity';
 import { IItemRepository } from '../../../../domain/item/item.repository';
 import { PackageStatus } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { CreateItemUseCase } from '.';
 
@@ -14,6 +15,7 @@ describe('CreateItemUseCase', () => {
   const itemRepositoryMock = mock<IItemRepository>();
   const packageRepositoryMock = mock<IPackageRepository>();
   const brandRepositoryMock = mock<IBrandRepository>();
+  const qrCodeRepositoryMock = mock<IQrCodeRepository>();
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -23,6 +25,7 @@ describe('CreateItemUseCase', () => {
         { provide: DOMAIN_TOKENS.ITEM_REPOSITORY, useValue: itemRepositoryMock },
         { provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY, useValue: packageRepositoryMock },
         { provide: DOMAIN_TOKENS.BRAND_REPOSITORY, useValue: brandRepositoryMock },
+        { provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY, useValue: qrCodeRepositoryMock },
       ],
     }).compile();
     useCase = module.get(CreateItemUseCase);

@@ -1,9 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Request } from 'express';
+import { ConfirmCollectionUseCase } from '../../app/use-cases/package/confirm-collection-use-case';
 import { CreatePackageUseCase } from '../../app/use-cases/package/create-package-use-case';
 import { GetAllPackagesUseCase } from '../../app/use-cases/package/get-all-packages-use-case';
 import { GetCreatedPackagesUseCase } from '../../app/use-cases/package/get-created-packages-use-case';
 import { GetPackageByIdUseCase } from '../../app/use-cases/package/get-package-by-id-use-case';
+import { RejectCollectionUseCase } from '../../app/use-cases/package/reject-collection-use-case';
 import { UpdatePackageUseCase } from '../../app/use-cases/package/update-package-use-case';
 import { PackageStatus } from '../../domain/package/package.entity';
 import { Role } from '../../domain/user/user-roles.entity';
@@ -27,6 +29,8 @@ describe('PackageController', () => {
         { provide: GetPackageByIdUseCase, useValue: { call: jest.fn() } },
         { provide: UpdatePackageUseCase, useValue: { call: jest.fn() } },
         { provide: GetAllPackagesUseCase, useValue: { call: jest.fn() } },
+        { provide: ConfirmCollectionUseCase, useValue: { call: jest.fn() } },
+        { provide: RejectCollectionUseCase, useValue: { call: jest.fn() } },
       ],
     }).compile();
 

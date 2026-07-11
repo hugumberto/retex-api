@@ -19,15 +19,15 @@ describe('GetCreatedPackagesUseCase', () => {
     useCase = module.get(GetCreatedPackagesUseCase);
   });
 
-  it('paginates with defaults page=1 limit=10', async () => {
-    const result = { data: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } };
+  it('lists only CREATED and unrouted packages with default pagination', async () => {
+    const result = { data: [], meta: { total: 0, page: 1, limit: 1000, totalPages: 0 } };
     repo.findByFiltersWithPagination.mockResolvedValue(result);
 
-    await useCase.call({ collectDay: 'segunda' } as any);
+    await useCase.call({} as any);
 
     expect(repo.findByFiltersWithPagination).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ page: 1, limit: 10 }),
+      expect.objectContaining({ status: 'CREATED', unrouted: true }),
+      expect.objectContaining({ page: 1, limit: 1000 }),
     );
   });
 });

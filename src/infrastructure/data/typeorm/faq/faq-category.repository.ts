@@ -27,6 +27,8 @@ export class FaqCategoryRepository
       .createQueryBuilder('category')
       .leftJoinAndSelect('category.items', 'items')
       .orderBy('category.createdAt', 'DESC')
+      // Ordem fixa dos itens (ordem de criação) — editar o texto não reordena.
+      .addOrderBy('items.createdAt', 'ASC')
       .getMany();
   }
 
@@ -37,6 +39,8 @@ export class FaqCategoryRepository
       .leftJoinAndSelect('category.items', 'items')
       .where('category.status = :status', { status: FaqStatus.ACTIVE })
       .orderBy('category.createdAt', 'DESC')
+      // Ordem fixa dos itens (ordem de criação) — editar o texto não reordena.
+      .addOrderBy('items.createdAt', 'ASC')
       .getMany();
   }
 }

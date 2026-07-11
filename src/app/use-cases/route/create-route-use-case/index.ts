@@ -7,6 +7,7 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { generateFriendlyCode } from '../../qr-code/qr-code.util';
 import { CreateRouteDto } from './create-route.dto';
 
 @Injectable()
@@ -32,36 +33,55 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
       throw new BadRequestException('Usuário não possui role de driver');
     }
 
-    // 2. Buscar todos os packages pelos IDs
+    // 2. Buscar todos os packages pelos IDs (com relações para validar a rota)
     const packages = [];
     for (const packageId of param.packageIds) {
-      const packageEntity = await this.packageRepository.findOne({ id: packageId });
+      const packageEntity = await this.packageRepository.findOneWithAllRelations(packageId);
       if (!packageEntity) {
         throw new NotFoundException(`Package com ID ${packageId} não encontrado`);
       }
 
-      // 3. Verificar se package está no status CREATED
+      // 3. Apenas solicitações no status CREATED podem ser adicionadas
       if (packageEntity.status !== PackageStatus.CREATED) {
         throw new BadRequestException(`Package ${packageId} não está no status CREATED`);
       }
 
-      // 4. Verificar se package já não está associado a outra route
+      // 4. Uma solicitação existe em no máximo uma rota
       if (packageEntity.route) {
-        throw new ConflictException(`Package ${packageId} já está associado a uma route`);
+        throw new ConflictException(`Package ${packageId} já está associado a uma rota`);
       }
 
       packages.push(packageEntity);
     }
 
-    // 5. Criar a route no status DRAFTING
+    // 5. Criar a route no status DRAFTING (packages permanecem CREATED)
     const routeData: Partial<Route> = {
       status: RouteStatus.DRAFTING,
+      friendlyCode: await this.generateUniqueFriendlyCode(),
+      collectionInterval: param.collectionInterval,
       driver: driver,
       packages: packages,
       startDate: new Date(param.startDate),
-      shift: param.shift,
     };
 
+    // A rota nasce DRAFTING; o email de confirmação só é enviado quando a rota
+    // passa para CREATED (ver update-route-use-case).
     return this.routeRepository.create(routeData);
   }
-} 
+
+  /**
+   * Gera um código amigável (`ano-XXXXXX`) único contra as rotas existentes. O
+   * índice único na coluna é a rede de segurança final.
+   */
+  private async generateUniqueFriendlyCode(): Promise<string> {
+    const year = new Date().getFullYear();
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = generateFriendlyCode(year);
+      const existing = await this.routeRepository.findOne({
+        friendlyCode: code,
+      } as Partial<Route>);
+      if (!existing) return code;
+    }
+    return `${generateFriendlyCode(year)}${Date.now().toString(36).slice(-2).toUpperCase()}`;
+  }
+}

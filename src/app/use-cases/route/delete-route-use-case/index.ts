@@ -1,4 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { PackageStatus } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
 import { Route } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
@@ -21,12 +22,17 @@ export class DeleteRouteUseCase implements IUseCase<string, Route> {
       throw new NotFoundException('Route não encontrada');
     }
 
-    // 2. Liberar todos os packages associados à rota (desassociar)
+    // 2. Liberar os packages: desassociar da rota e voltar a CREATED (elegíveis).
     if (existingRoute.packages && existingRoute.packages.length > 0) {
       for (const packageEntity of existingRoute.packages) {
         await this.packageRepository.update(
           { id: packageEntity.id },
-          { route: null }
+          {
+            route: null,
+            status: PackageStatus.CREATED,
+            collectionConfirmationToken: null,
+            collectionConfirmedAt: null,
+          }
         );
       }
     }

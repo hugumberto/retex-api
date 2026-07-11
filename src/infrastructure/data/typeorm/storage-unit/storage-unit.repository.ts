@@ -23,7 +23,6 @@ export class StorageUnitRepository extends BaseRepository<StorageUnit> implement
     const repository = await this.getRepository();
     return repository.findOne({
       where: this.buildWhereClause(query) as any,
-      relations: ['brand'],
     });
   }
 
@@ -31,7 +30,6 @@ export class StorageUnitRepository extends BaseRepository<StorageUnit> implement
     const repository = await this.getRepository();
     return repository.find({
       where: this.buildWhereClause(query) as any,
-      relations: ['brand'],
     });
   }
 
@@ -39,7 +37,6 @@ export class StorageUnitRepository extends BaseRepository<StorageUnit> implement
     const repository = await this.getRepository();
     return repository.find({
       where: { id: In(ids) },
-      relations: ['brand'],
     });
   }
 

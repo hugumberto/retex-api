@@ -13,6 +13,7 @@ import { IEmailService } from '../../../services/interfaces/email.interface';
 import { ISanitizationService } from '../../../services/interfaces/sanitization.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { generateFriendlyCode } from '../../qr-code/qr-code.util';
 import { CreatePackageDto } from './create-package.dto';
 
 @Injectable()
@@ -51,6 +52,8 @@ export class CreatePackageUseCase
       throw new NotFoundException('Endereço não encontrado');
     }
 
+    const friendlyCode = await this.generateUniqueFriendlyCode();
+
     const pkg = await this.unitOfWork.runInTransaction(async () => {
       const sanitizedCity = this.sanitizationService.sanitizeString(
         address.city,
@@ -62,10 +65,9 @@ export class CreatePackageUseCase
 
       const packageDto: Partial<Package> = {
         status: packageStatus,
+        friendlyCode,
         user: user,
         address: address,
-        collectDay: param.dayOfWeek,
-        collectTime: param.timeOfDay,
         estimatedVolumes: param.estimatedVolumes,
       };
 
@@ -95,18 +97,35 @@ export class CreatePackageUseCase
         lastName: user.lastName,
         fullName: `${user.firstName} ${user.lastName}`,
         packageId: pkg.id,
+        friendlyCode: pkg.friendlyCode,
         status: this.formatStatus(pkg.status),
         address,
-        collectDay: this.formatCollectDay(pkg.collectDay),
-        collectTime: pkg.collectTime,
         year: new Date().getFullYear(),
       },
     });
   }
 
+  /**
+   * Gera um código amigável (`ano-XXXXXX`) garantindo unicidade contra os já
+   * existentes. O índice único na coluna é a rede de segurança final.
+   */
+  private async generateUniqueFriendlyCode(): Promise<string> {
+    const year = new Date().getFullYear();
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = generateFriendlyCode(year);
+      const existing = await this.packageRepository.findOne({
+        friendlyCode: code,
+      } as Partial<Package>);
+      if (!existing) return code;
+    }
+    // Fallback improvável: sufixo extra para reduzir a chance de colisão.
+    return `${generateFriendlyCode(year)}${Date.now().toString(36).slice(-2).toUpperCase()}`;
+  }
+
   private formatStatus(status: PackageStatus): string {
     const labels: Record<PackageStatus, string> = {
       [PackageStatus.CREATED]: 'Criado',
+      [PackageStatus.CONFIRMED]: 'Confirmado',
       [PackageStatus.OUT_OF_ZONE]: 'Fora de zona',
       [PackageStatus.WAITING_FOR_COLLECTION]: 'A aguardar recolha',
       [PackageStatus.COLLECTED]: 'Recolhido',
@@ -117,19 +136,5 @@ export class CreatePackageUseCase
       [PackageStatus.STOCKED]: 'Armazenado',
     };
     return labels[status] ?? status;
-  }
-
-  private formatCollectDay(day: string | undefined): string | undefined {
-    if (!day) return undefined;
-    const labels: Record<string, string> = {
-      MONDAY: 'Segunda-feira',
-      TUESDAY: 'Terça-feira',
-      WEDNESDAY: 'Quarta-feira',
-      THURSDAY: 'Quinta-feira',
-      FRIDAY: 'Sexta-feira',
-      SATURDAY: 'Sábado',
-      SUNDAY: 'Domingo',
-    };
-    return labels[day.toUpperCase()] ?? day;
   }
 }

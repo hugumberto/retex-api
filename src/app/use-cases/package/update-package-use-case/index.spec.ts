@@ -7,11 +7,13 @@ import {
   PackageStatus,
 } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { FinishRouteIfAllCollectedUseCase } from '../../route/finish-route-if-all-collected-use-case';
 import { UpdatePackageUseCase } from '.';
 
 describe('UpdatePackageUseCase', () => {
   let updatePackageUseCase: UpdatePackageUseCase;
   const packageRepositoryMock = mock<IPackageRepository>();
+  const finishRouteMock = mock<FinishRouteIfAllCollectedUseCase>();
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -23,10 +25,15 @@ describe('UpdatePackageUseCase', () => {
           provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY,
           useValue: packageRepositoryMock,
         },
+        {
+          provide: FinishRouteIfAllCollectedUseCase,
+          useValue: finishRouteMock,
+        },
       ],
     }).compile();
 
     updatePackageUseCase = module.get(UpdatePackageUseCase);
+    finishRouteMock.call.mockResolvedValue(undefined);
   });
 
   const pkgOwnedBy = (ownerId: string) =>

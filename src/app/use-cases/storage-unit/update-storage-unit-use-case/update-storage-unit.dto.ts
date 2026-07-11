@@ -1,18 +1,39 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
-import { Quality } from "../../../../domain/item/item.entity";
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
+import { AgeGroup, Quality, Season, Sex, Type } from "../../../../domain/item/item.entity";
+import { StorageUnitStatus } from "../../../../domain/storage-unit/storage-unit.entity";
 
 export class UpdateStorageUnitDto {
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  brandId?: string;
-
   @IsOptional()
   @IsNotEmpty()
   @IsEnum(Quality)
   quality?: Quality;
 
   @IsOptional()
+  @IsNotEmpty()
+  @IsEnum(Sex)
+  sex?: Sex;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsEnum(AgeGroup)
+  ageGroup?: AgeGroup;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsEnum(Type)
+  type?: Type;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsEnum(Season)
+  season?: Season;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsEnum(StorageUnitStatus)
+  status?: StorageUnitStatus;
+
+  @IsOptional()
   @IsNumber()
   weight?: number;
-} 
+}

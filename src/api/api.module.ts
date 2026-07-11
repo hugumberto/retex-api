@@ -8,6 +8,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { BlogCategoryController } from './blog-category/blog-category.controller';
 import { BlogPostController } from './blog-post/blog-post.controller';
+import { CollectionController } from './collection/collection.controller';
 import { ContactController } from './contact/contact.controller';
 import { DashboardController } from './dashboard/dashboard.controller';
 import { FaqController } from './faq/faq.controller';
@@ -19,6 +20,8 @@ import { ItemController } from './item/item.controller';
 import { PackageController } from './package/package.controller';
 import { RouteController } from './route/route.controller';
 import { StorageUnitController } from './storage-unit/storage-unit.controller';
+import { SystemParameterController } from './system-parameter/system-parameter.controller';
+import { TriageController } from './triage/triage.controller';
 import { UserController } from './user/user.controller';
 import { WelcomeController } from './welcome/welcome.controller';
 
@@ -37,6 +40,9 @@ import { WelcomeController } from './welcome/welcome.controller';
     PackageController,
     RouteController,
     StorageUnitController,
+    CollectionController,
+    SystemParameterController,
+    TriageController,
     BrandController,
     ItemController,
     BlogPostController,

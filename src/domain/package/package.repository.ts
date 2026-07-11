@@ -7,8 +7,8 @@ import { Package, PackageStatus } from './package.entity';
 
 export interface PackageFilters {
   status?: PackageStatus;
-  collectDay?: string;
-  collectTime?: string;
+  // Quando true, retorna apenas encomendas ainda não vinculadas a uma rota.
+  unrouted?: boolean;
 }
 
 export interface PackageStatusCount {
@@ -42,6 +42,13 @@ export interface IPackageRepository extends IRepository<Package> {
   findOneWithAllRelations(id: string): Promise<Package>;
   findByUser(userId: string): Promise<Package[]>;
   findAll(): Promise<Package[]>;
+
+  // Confirmação de coleta.
+  findByCollectionConfirmationToken(token: string): Promise<Package>;
+  // Cron: roteadas + CREATED + não confirmadas cujo prazo (startDate - days) passou.
+  findExpiredUnconfirmed(days: number): Promise<Package[]>;
+  // Cron: roteadas + CREATED + confirmadas cujo dia da coleta chegou.
+  findDueConfirmed(): Promise<Package[]>;
 
   // Agregações para o dashboard (somente leitura).
   countByStatus(): Promise<PackageStatusCount[]>;
