@@ -1,10 +1,14 @@
 import { ArrayMinSize, IsArray, IsDateString, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
-import { RouteStatus } from '../../../../domain/route/route.entity';
+import { CollectionInterval, RouteStatus } from '../../../../domain/route/route.entity';
 
 export class UpdateRouteDto {
   @IsOptional()
   @IsEnum(RouteStatus)
   status?: RouteStatus;
+
+  @IsOptional()
+  @IsEnum(CollectionInterval)
+  collectionInterval?: CollectionInterval;
 
   @IsOptional()
   @IsString()

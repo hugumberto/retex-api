@@ -1,6 +1,6 @@
 import { EntitySchema } from 'typeorm';
 import { AgeGroup, Quality, Season, Sex, Type } from '../../../../domain/item/item.entity';
-import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
+import { StorageUnit, StorageUnitStatus } from '../../../../domain/storage-unit/storage-unit.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
 
 export const storageUnitSchema = new EntitySchema<StorageUnit>({
@@ -10,6 +10,13 @@ export const storageUnitSchema = new EntitySchema<StorageUnit>({
       primary: true,
       type: 'uuid',
       generated: 'uuid',
+    },
+    friendlyCode: {
+      type: 'varchar',
+      length: 32,
+      nullable: true,
+      unique: true,
+      name: 'friendly_code',
     },
     quality: {
       type: 'enum',
@@ -36,6 +43,12 @@ export const storageUnitSchema = new EntitySchema<StorageUnit>({
       type: 'enum',
       enum: Season,
       nullable: false,
+    },
+    status: {
+      type: 'enum',
+      enum: StorageUnitStatus,
+      nullable: false,
+      default: StorageUnitStatus.ATIVO,
     },
     weight: {
       type: 'decimal',

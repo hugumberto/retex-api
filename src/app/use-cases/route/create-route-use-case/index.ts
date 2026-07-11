@@ -7,6 +7,7 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { generateFriendlyCode } from '../../qr-code/qr-code.util';
 import { CreateRouteDto } from './create-route.dto';
 
 @Injectable()
@@ -56,6 +57,8 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
     // 5. Criar a route no status DRAFTING (packages permanecem CREATED)
     const routeData: Partial<Route> = {
       status: RouteStatus.DRAFTING,
+      friendlyCode: await this.generateUniqueFriendlyCode(),
+      collectionInterval: param.collectionInterval,
       driver: driver,
       packages: packages,
       startDate: new Date(param.startDate),
@@ -64,5 +67,21 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
     // A rota nasce DRAFTING; o email de confirmação só é enviado quando a rota
     // passa para CREATED (ver update-route-use-case).
     return this.routeRepository.create(routeData);
+  }
+
+  /**
+   * Gera um código amigável (`ano-XXXXXX`) único contra as rotas existentes. O
+   * índice único na coluna é a rede de segurança final.
+   */
+  private async generateUniqueFriendlyCode(): Promise<string> {
+    const year = new Date().getFullYear();
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = generateFriendlyCode(year);
+      const existing = await this.routeRepository.findOne({
+        friendlyCode: code,
+      } as Partial<Route>);
+      if (!existing) return code;
+    }
+    return `${generateFriendlyCode(year)}${Date.now().toString(36).slice(-2).toUpperCase()}`;
   }
 }

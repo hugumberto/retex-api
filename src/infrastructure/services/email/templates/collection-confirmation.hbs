@@ -9,8 +9,10 @@
         Olá, <strong style="color:#02748E;">{{firstName}} {{lastName}}</strong>!
       </p>
       <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
-        A recolha dos seus volumes foi agendada para
-        <strong style="color:#02748E;">{{collectionDate}}</strong>.
+        A recolha dos seus volumes (código
+        <strong style="color:#02748E;">{{friendlyCode}}</strong>) foi agendada para
+        <strong style="color:#02748E;">{{collectionDate}}</strong>{{#if collectionInterval}}, no intervalo
+        <strong style="color:#02748E;">{{collectionInterval}}</strong>{{/if}}.
         Confirme para garantirmos a passagem do nosso motorista nesse dia.
       </p>
     </td>
@@ -18,10 +20,24 @@
 
   {{> cta url=confirmUrl label="Confirmar o dia da recolha"}}
 
+  <!-- Botão recusar: remove a solicitação da rota -->
+  <tr>
+    <td align="center" style="padding:0 40px 8px;">
+      <a href="{{rejectUrl}}"
+        style="display:inline-block;padding:10px 22px;border:1px solid #C0362C;border-radius:6px;color:#C0362C;text-decoration:none;font-size:14px;font-weight:bold;">
+        Não vou poder — remover da recolha
+      </a>
+    </td>
+  </tr>
+
   <tr>
     <td style="padding:8px 40px 32px;">
       <p style="margin:0 0 12px;font-size:13px;color:#7F7F7F;line-height:1.6;">
-        Se o botão não funcionar, copie e cole o seguinte endereço no seu navegador:
+        Se preferir não receber neste dia, use o botão "Não vou poder" acima — a
+        sua solicitação será removida desta recolha.
+      </p>
+      <p style="margin:0 0 12px;font-size:13px;color:#7F7F7F;line-height:1.6;">
+        Se os botões não funcionarem, copie e cole o seguinte endereço no seu navegador:
       </p>
       <p style="margin:0 0 20px;font-size:13px;color:#02748E;word-break:break-all;">
         {{confirmUrl}}

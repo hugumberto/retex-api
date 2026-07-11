@@ -51,6 +51,10 @@ export class UpdateStorageUnitUseCase implements IUseCase<UpdateStorageUnitParam
       updateData.season = data.season;
     }
 
+    if (data.status !== undefined) {
+      updateData.status = data.status;
+    }
+
     if (data.weight !== undefined) {
       updateData.weight = data.weight;
     }

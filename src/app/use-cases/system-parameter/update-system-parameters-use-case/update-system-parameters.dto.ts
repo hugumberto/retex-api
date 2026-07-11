@@ -5,4 +5,9 @@ export class UpdateSystemParametersDto {
   @Min(0)
   @Max(30)
   collectionConfirmationDeadlineDays: number;
+
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  qrCodeThresholdPercentage: number;
 }

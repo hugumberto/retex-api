@@ -35,6 +35,7 @@ export class SendCollectionConfirmationUseCase implements IUseCase<string, void>
     );
 
     const confirmUrl = `${process.env.PORTAL_URL}/confirmar-coleta?token=${token}`;
+    const rejectUrl = `${process.env.PORTAL_URL}/confirmar-coleta?token=${token}&action=reject`;
     const collectionDate = new Date(pkg.route.startDate).toLocaleDateString(
       'pt-PT',
     );
@@ -46,8 +47,11 @@ export class SendCollectionConfirmationUseCase implements IUseCase<string, void>
       context: {
         firstName: pkg.user.firstName,
         lastName: pkg.user.lastName,
+        friendlyCode: pkg.friendlyCode,
         collectionDate,
+        collectionInterval: pkg.route.collectionInterval,
         confirmUrl,
+        rejectUrl,
         year: new Date().getFullYear(),
       },
     });

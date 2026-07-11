@@ -3,6 +3,7 @@ import { Item } from '../../../../domain/item/item.entity';
 import { IItemRepository } from '../../../../domain/item/item.repository';
 import { PackageStatus } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -29,6 +30,8 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
     private readonly storageUnitRepository: IStorageUnitRepository,
     @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
     private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
+    private readonly qrCodeRepository: IQrCodeRepository,
     @Inject(SERVICE_TOKENS.EMAIL_SERVICE)
     private readonly emailService: IEmailService,
   ) { }
@@ -59,39 +62,52 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
       throw new BadRequestException('Todos os itens devem pertencer ao mesmo package');
     }
     const packageId = packageIds[0];
+    // `finalize` (default true): finaliza a triagem. `false` só persiste os
+    // vínculos (salvar progresso), sem STOCKED/survey e sem exigir todos
+    // os volumes processados.
+    const finalize = param.finalize !== false;
 
-    // Coletar todos os erros sem fazer nenhum bind
-    const errors: string[] = [];
-    const bindingPlan: { item: Item; storageUnit: StorageUnit }[] = [];
-    const storageUnitsAvailable = [...storageUnits]; // Cópia para não modificar o original
-
-    for (const item of items) {
-      // Validar se item já não está associado a um storage unit
-      if (item.storageUnit) {
-        errors.push(`Item ${item.id} já está associado a um Storage Unit`);
-        continue;
-      }
-
-      // Buscar storage unit compatível
-      const compatibleStorageUnit = this.findCompatibleStorageUnit(item, storageUnitsAvailable);
-
-      if (!compatibleStorageUnit) {
-        errors.push(`Nenhum Storage Unit compatível encontrado para item ${item.id} (quality: ${item.quality}, sex: ${item.sex}, ageGroup: ${item.ageGroup}, type: ${item.type}, season: ${item.season})`);
-        continue;
-      }
-
-      // Adicionar ao plano de bind
-      bindingPlan.push({ item, storageUnit: compatibleStorageUnit });
-
-      // Remover storage unit da lista disponível para evitar conflitos
-      const index = storageUnitsAvailable.indexOf(compatibleStorageUnit);
-      if (index > -1) {
-        storageUnitsAvailable.splice(index, 1);
+    // Trava (só ao finalizar): todos os volumes (QR codes) do pacote
+    // precisam estar processados.
+    if (finalize) {
+      const qrCodes = await this.qrCodeRepository.find({ packageId });
+      if (qrCodes.some((qr) => qr.processedAt == null)) {
+        throw new BadRequestException('Nem todos os volumes foram processados');
       }
     }
 
-    // Se houver qualquer erro, falhar toda a operação
-    if (errors.length > 0) {
+    const errors: string[] = [];
+    const bindingPlan: { item: Item; storageUnit: StorageUnit }[] = [];
+
+    for (const item of items) {
+      // Item já vinculado → ignora (idempotente: permite salvar progresso e
+      // depois finalizar sem reerro).
+      if (item.storageUnit) {
+        continue;
+      }
+
+      // Uma unidade (bin) pode receber vários itens do mesmo tipo — a unidade
+      // NÃO é consumida. Itens iguais de volumes diferentes vão para a mesma
+      // unidade compatível (menor peso).
+      const compatibleStorageUnit = this.findCompatibleStorageUnit(
+        item,
+        storageUnits,
+      );
+
+      if (!compatibleStorageUnit) {
+        // Ao finalizar é erro; ao salvar progresso, apenas ignora o item.
+        if (finalize) {
+          errors.push(
+            `Nenhum Storage Unit compatível encontrado para item ${item.id} (quality: ${item.quality}, sex: ${item.sex}, ageGroup: ${item.ageGroup}, type: ${item.type}, season: ${item.season})`,
+          );
+        }
+        continue;
+      }
+
+      bindingPlan.push({ item, storageUnit: compatibleStorageUnit });
+    }
+
+    if (finalize && errors.length > 0) {
       throw new BadRequestException(`Operação cancelada devido a erros: ${errors.join('; ')}`);
     }
 
@@ -104,10 +120,16 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
         });
         successfulBinds.push(item.id);
       } catch (error) {
-        // Se falhar qualquer bind, reverter os anteriores seria ideal, 
-        // mas por simplicidade vamos logar o erro
         throw new BadRequestException(`Erro ao fazer bind do item ${item.id}: ${error.message}`);
       }
+    }
+
+    if (!finalize) {
+      return {
+        success: successfulBinds,
+        packageId,
+        packageStatus: PackageStatus.SCREENING,
+      };
     }
 
     await this.packageRepository.update({ id: packageId }, {

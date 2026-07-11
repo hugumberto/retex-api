@@ -6,11 +6,13 @@ import { IPackageRepository } from '../../../../domain/package/package.repositor
 import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
 import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
+import { FinishRouteIfAllCollectedUseCase } from '../../route/finish-route-if-all-collected-use-case';
 import { FinalizeCollectionUseCase } from '.';
 
 describe('FinalizeCollectionUseCase', () => {
   const packageRepo = mock<IPackageRepository>();
   const qrCodeRepo = mock<IQrCodeRepository>();
+  const finishRoute = mock<FinishRouteIfAllCollectedUseCase>();
   let useCase: FinalizeCollectionUseCase;
 
   beforeEach(async () => {
@@ -20,9 +22,11 @@ describe('FinalizeCollectionUseCase', () => {
         FinalizeCollectionUseCase,
         { provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY, useValue: packageRepo },
         { provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY, useValue: qrCodeRepo },
+        { provide: FinishRouteIfAllCollectedUseCase, useValue: finishRoute },
       ],
     }).compile();
     useCase = module.get(FinalizeCollectionUseCase);
+    finishRoute.call.mockResolvedValue(undefined);
   });
 
   const waiting = { id: 'p1', status: 'WAITING_FOR_COLLECTION' } as Package;

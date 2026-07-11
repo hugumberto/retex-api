@@ -8,27 +8,30 @@ import {
   generateFriendlyCode,
   generateToken,
 } from '../qr-code.util';
-import { GenerateQrCodesDto } from './generate-qr-codes.dto';
 
-export { GenerateQrCodesDto };
-
-// Códigos não utilizados expiram após 24h.
-const UNUSED_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_COLLISION_RETRIES = 5;
 
+export interface GenerateCollectionQrCodesParams {
+  routeId: string;
+  quantity: number;
+}
+
+/**
+ * Gera `quantity` QR codes vinculados a uma rota (pool da rota): `routeId`
+ * preenchido, `packageId` nulo, `usedAt` nulo. Todos partilham o mesmo `batchId`.
+ * Usado na entrada da rota em IN_TRANSIT. Reutiliza o util de token/friendlyCode
+ * e a retentativa por colisão de friendlyCode.
+ */
 @Injectable()
-export class GenerateQrCodesUseCase implements IUseCase<GenerateQrCodesDto, QrCode[]> {
+export class GenerateCollectionQrCodesUseCase
+  implements IUseCase<GenerateCollectionQrCodesParams, QrCode[]>
+{
   constructor(
     @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
     private readonly qrCodeRepository: IQrCodeRepository,
-  ) { }
+  ) {}
 
-  async call(param: GenerateQrCodesDto): Promise<QrCode[]> {
-    // Limpeza preguiçosa: remove os não utilizados com mais de 24h.
-    await this.qrCodeRepository.deleteExpiredUnused(
-      new Date(Date.now() - UNUSED_TTL_MS),
-    );
-
+  async call(param: GenerateCollectionQrCodesParams): Promise<QrCode[]> {
     const year = new Date().getFullYear();
     const batchId = generateBatchId();
     const usedInBatch = new Set<string>();
@@ -51,6 +54,7 @@ export class GenerateQrCodesUseCase implements IUseCase<GenerateQrCodesDto, QrCo
         token: generateToken(),
         friendlyCode,
         batchId,
+        routeId: param.routeId,
       });
       created.push(qrCode);
     }

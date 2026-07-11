@@ -36,6 +36,22 @@ export const qrCodeSchema = new EntitySchema<QrCode>({
       nullable: true,
       name: 'package_id',
     },
+    routeId: {
+      type: 'uuid',
+      nullable: true,
+      name: 'route_id',
+    },
+    weight: {
+      type: 'decimal',
+      precision: 10,
+      scale: 2,
+      nullable: true,
+    },
+    processedAt: {
+      type: 'timestamp with time zone',
+      nullable: true,
+      name: 'processed_at',
+    },
     ...BaseTimestampColumns,
   },
 });

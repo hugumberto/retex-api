@@ -192,6 +192,7 @@ export class PackageRepository
       .leftJoinAndSelect('package.items', 'items')
       .leftJoinAndSelect('items.brand', 'brand')
       .leftJoinAndSelect('items.storageUnit', 'storageUnit')
+      .leftJoinAndSelect('items.qrCode', 'itemQrCode')
       .where('package.id = :id', { id })
       .getOne();
   }
@@ -223,7 +224,7 @@ export class PackageRepository
     return repository
       .createQueryBuilder('package')
       .innerJoinAndSelect('package.route', 'route')
-      .where('package.status = :status', { status: PackageStatus.CREATED })
+      .where('package.status = :status', { status: PackageStatus.CONFIRMED })
       .andWhere('package.collectionConfirmedAt IS NOT NULL')
       .andWhere('route.start_date::date <= CURRENT_DATE')
       .getMany();

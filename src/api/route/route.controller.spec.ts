@@ -5,6 +5,7 @@ import { GetAllRoutesUseCase } from '../../app/use-cases/route/get-all-routes-us
 import { GetRouteByIdUseCase } from '../../app/use-cases/route/get-route-by-id-use-case';
 import { UpdateRouteUseCase } from '../../app/use-cases/route/update-route-use-case';
 import { ProcessCollectionSchedulesUseCase } from '../../app/use-cases/collection/process-collection-schedules-use-case';
+import { GetRouteQrCodesUseCase } from '../../app/use-cases/qr-code/get-route-qr-codes-use-case';
 import { RouteController } from './route.controller';
 
 describe('RouteController', () => {
@@ -51,6 +52,12 @@ describe('RouteController', () => {
         },
         {
           provide: ProcessCollectionSchedulesUseCase,
+          useValue: {
+            call: jest.fn(),
+          },
+        },
+        {
+          provide: GetRouteQrCodesUseCase,
           useValue: {
             call: jest.fn(),
           },

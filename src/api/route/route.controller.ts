@@ -6,6 +6,7 @@ import { DeleteRouteUseCase } from "../../app/use-cases/route/delete-route-use-c
 import { GetAllRoutesUseCase } from "../../app/use-cases/route/get-all-routes-use-case";
 import { GetAllRoutesDto } from "../../app/use-cases/route/get-all-routes-use-case/get-all-routes.dto";
 import { GetRouteByIdUseCase } from "../../app/use-cases/route/get-route-by-id-use-case";
+import { GetRouteQrCodesUseCase } from "../../app/use-cases/qr-code/get-route-qr-codes-use-case";
 import { UpdateRouteUseCase } from "../../app/use-cases/route/update-route-use-case";
 import { UpdateRouteDto } from "../../app/use-cases/route/update-route-use-case/update-route.dto";
 import { Role } from "../../domain/user/user-roles.entity";
@@ -21,6 +22,7 @@ export class RouteController {
     private readonly getRouteByIdUseCase: GetRouteByIdUseCase,
     private readonly updateRouteUseCase: UpdateRouteUseCase,
     private readonly processCollectionSchedulesUseCase: ProcessCollectionSchedulesUseCase,
+    private readonly getRouteQrCodesUseCase: GetRouteQrCodesUseCase,
   ) { }
 
   @Post()
@@ -44,6 +46,12 @@ export class RouteController {
   @Get(':id')
   getRouteById(@Param('id') id: string) {
     return this.getRouteByIdUseCase.call(id);
+  }
+
+  // QR codes gerados para a rota (para impressão).
+  @Get(':id/qr-codes')
+  getRouteQrCodes(@Param('id') id: string) {
+    return this.getRouteQrCodesUseCase.call(id);
   }
 
   @Put(':id')

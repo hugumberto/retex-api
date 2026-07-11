@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class MarkQrCodeUsedDto {
+export class RejectCollectionDto {
   @IsString()
   @IsNotEmpty()
   token: string;

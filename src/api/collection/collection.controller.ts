@@ -2,9 +2,11 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import {
   BindQrCodeDto,
   BindQrCodeUseCase,
+  CancelCollectionUseCase,
   FinalizeCollectionUseCase,
   GetCollectionUseCase,
 } from '../../app/use-cases/collection';
+import { CancelCollectionDto } from '../../app/use-cases/collection/cancel-collection-use-case/cancel-collection.dto';
 import { Role } from '../../domain/user/user-roles.entity';
 import { Roles } from '../auth/decorators/roles.decorator';
 
@@ -15,6 +17,7 @@ export class CollectionController {
     private readonly getCollectionUseCase: GetCollectionUseCase,
     private readonly bindQrCodeUseCase: BindQrCodeUseCase,
     private readonly finalizeCollectionUseCase: FinalizeCollectionUseCase,
+    private readonly cancelCollectionUseCase: CancelCollectionUseCase,
   ) { }
 
   @Get(':packageId')
@@ -33,5 +36,13 @@ export class CollectionController {
   @Post(':packageId/finalize')
   async finalize(@Param('packageId') packageId: string) {
     return this.finalizeCollectionUseCase.call(packageId);
+  }
+
+  @Post(':packageId/cancel')
+  async cancel(
+    @Param('packageId') packageId: string,
+    @Body() dto: CancelCollectionDto,
+  ) {
+    return this.cancelCollectionUseCase.call({ packageId, reason: dto.reason });
   }
 }

@@ -32,4 +32,24 @@ export class QrCodeRepository
       .execute();
     return result.affected ?? 0;
   }
+
+  async findByRoute(routeId: string): Promise<QrCode[]> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('qr_code')
+      .where('qr_code.route_id = :routeId', { routeId })
+      .orderBy('qr_code.created_at', 'ASC')
+      .getMany();
+  }
+
+  async deleteUnusedByRoute(routeId: string): Promise<number> {
+    const repository = await this.getRepository();
+    const result = await repository
+      .createQueryBuilder()
+      .delete()
+      .where('route_id = :routeId', { routeId })
+      .andWhere('used_at IS NULL')
+      .execute();
+    return result.affected ?? 0;
+  }
 }

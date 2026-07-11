@@ -65,5 +65,13 @@ export const itemSchema = new EntitySchema<Item>({
         name: 'brand_id',
       },
     },
+    qrCode: {
+      type: 'many-to-one',
+      target: 'qr_code',
+      joinColumn: {
+        name: 'qr_code_id',
+      },
+      nullable: true,
+    },
   },
 }); 

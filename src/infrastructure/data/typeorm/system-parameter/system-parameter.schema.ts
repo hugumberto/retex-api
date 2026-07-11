@@ -16,6 +16,12 @@ export const systemParameterSchema = new EntitySchema<SystemParameter>({
       default: 2,
       name: 'collection_confirmation_deadline_days',
     },
+    qrCodeThresholdPercentage: {
+      type: 'integer',
+      nullable: false,
+      default: 10,
+      name: 'qr_code_threshold_percentage',
+    },
     ...BaseTimestampColumns,
   },
 });

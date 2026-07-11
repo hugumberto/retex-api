@@ -1,14 +1,19 @@
 import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PackageStatus } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { Route, RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
+import { ISystemParameterRepository } from '../../../../domain/system-parameter/system-parameter.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { SendCollectionConfirmationUseCase } from '../../package/send-collection-confirmation-use-case';
+import { GenerateCollectionQrCodesUseCase } from '../../qr-code/generate-collection-qr-codes-use-case';
 import { UpdateRouteDto } from './update-route.dto';
+
+const DEFAULT_QR_CODE_THRESHOLD_PERCENTAGE = 10;
 
 export interface UpdateRouteParamDto {
   id: string;
@@ -26,7 +31,12 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     private readonly userRepository: IUserRepository,
     @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
     private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
+    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.SYSTEM_PARAMETER_REPOSITORY)
+    private readonly systemParameterRepository: ISystemParameterRepository,
     private readonly sendCollectionConfirmationUseCase: SendCollectionConfirmationUseCase,
+    private readonly generateCollectionQrCodesUseCase: GenerateCollectionQrCodesUseCase,
   ) { }
 
   async call(param: UpdateRouteParamDto): Promise<Route> {
@@ -40,9 +50,14 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
 
     // 2. Rota já confirmada trava a composição — só o status/endDate avançam.
     if (existingRoute.status !== RouteStatus.DRAFTING) {
-      if (data.driverId || data.packageIds || data.startDate) {
+      if (
+        data.driverId ||
+        data.packageIds ||
+        data.startDate ||
+        data.collectionInterval
+      ) {
         throw new BadRequestException(
-          'A rota já foi confirmada e não permite alterar motorista, solicitações ou data',
+          'A rota já foi confirmada e não permite alterar motorista, solicitações, data ou intervalo',
         );
       }
     }
@@ -96,6 +111,10 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
       updateData.status = data.status;
     }
 
+    if (data.collectionInterval) {
+      updateData.collectionInterval = data.collectionInterval;
+    }
+
     if (data.startDate) {
       updateData.startDate = new Date(data.startDate);
     }
@@ -142,6 +161,49 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
             ),
           );
       }
+    }
+
+    // 9. Transição → IN_TRANSIT: as solicitações confirmadas vão para
+    // WAITING_FOR_COLLECTION e são gerados os QR codes (volumes + threshold%).
+    if (
+      existingRoute.status !== RouteStatus.IN_TRANSIT &&
+      data.status === RouteStatus.IN_TRANSIT
+    ) {
+      const params = await this.systemParameterRepository.getSingleton();
+      const threshold =
+        params?.qrCodeThresholdPercentage ??
+        DEFAULT_QR_CODE_THRESHOLD_PERCENTAGE;
+
+      for (const pkg of existingRoute.packages ?? []) {
+        // Confirmadas (inclui as já movidas a WAITING_FOR_COLLECTION pelo cron).
+        if (pkg.collectionConfirmedAt == null) {
+          continue;
+        }
+        // Nunca gerar menos de 1 QR code por solicitação confirmada.
+        const quantity = Math.max(
+          1,
+          Math.ceil((pkg.estimatedVolumes ?? 0) * (1 + threshold / 100)),
+        );
+        await this.packageRepository.update(
+          { id: pkg.id },
+          {
+            status: PackageStatus.WAITING_FOR_COLLECTION,
+            qrCodesGenerated: quantity,
+          },
+        );
+        await this.generateCollectionQrCodesUseCase.call({
+          routeId: id,
+          quantity,
+        });
+      }
+    }
+
+    // 10. Transição → FINISHED: apaga os QR codes da rota não utilizados.
+    if (
+      existingRoute.status !== RouteStatus.FINISHED &&
+      data.status === RouteStatus.FINISHED
+    ) {
+      await this.qrCodeRepository.deleteUnusedByRoute(id);
     }
 
     return updatedRoute;

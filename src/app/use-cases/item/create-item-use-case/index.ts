@@ -4,6 +4,7 @@ import { Item } from '../../../../domain/item/item.entity';
 import { IItemRepository } from '../../../../domain/item/item.repository';
 import { PackageStatus } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { CreateItemDto } from './create-item.dto';
@@ -17,6 +18,8 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
     private readonly packageRepository: IPackageRepository,
     @Inject(DOMAIN_TOKENS.BRAND_REPOSITORY)
     private readonly brandRepository: IBrandRepository,
+    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
+    private readonly qrCodeRepository: IQrCodeRepository,
   ) { }
 
   async call(param: CreateItemDto): Promise<Item> {
@@ -30,6 +33,15 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
     const brand = await this.brandRepository.findOne({ id: param.brandId });
     if (!brand) {
       throw new BadRequestException('Brand não encontrada');
+    }
+
+    // Validar o volume (QR code) quando informado (triagem por volume)
+    let qrCode = null;
+    if (param.qrCodeId) {
+      qrCode = await this.qrCodeRepository.findOne({ id: param.qrCodeId });
+      if (!qrCode) {
+        throw new BadRequestException('QR code não encontrado');
+      }
     }
 
     // Verificar se é o primeiro item do package
@@ -47,6 +59,7 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
       brand: brand,
       quantity: param.quantity,
       storageUnit: null, // Inicialmente vazio
+      qrCode: qrCode,
     };
 
     const createdItem = await this.itemRepository.create(itemData);

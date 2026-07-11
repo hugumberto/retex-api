@@ -12,6 +12,8 @@ import { Request } from 'express';
 import { JwtPayload } from '../../app/services/interfaces/auth.interface';
 import { ConfirmCollectionUseCase } from '../../app/use-cases/package/confirm-collection-use-case';
 import { ConfirmCollectionDto } from '../../app/use-cases/package/confirm-collection-use-case/confirm-collection.dto';
+import { RejectCollectionUseCase } from '../../app/use-cases/package/reject-collection-use-case';
+import { RejectCollectionDto } from '../../app/use-cases/package/reject-collection-use-case/reject-collection.dto';
 import { CreatePackageUseCase } from '../../app/use-cases/package/create-package-use-case';
 import { CreatePackageDto } from '../../app/use-cases/package/create-package-use-case/create-package.dto';
 import { GetAllPackagesUseCase } from '../../app/use-cases/package/get-all-packages-use-case';
@@ -41,12 +43,19 @@ export class PackageController {
     private readonly updatePackageUseCase: UpdatePackageUseCase,
     private readonly getAllPackagesUseCase: GetAllPackagesUseCase,
     private readonly confirmCollectionUseCase: ConfirmCollectionUseCase,
+    private readonly rejectCollectionUseCase: RejectCollectionUseCase,
   ) {}
 
   @Post('confirm-collection')
   @Public()
   confirmCollection(@Body() body: ConfirmCollectionDto) {
     return this.confirmCollectionUseCase.call(body);
+  }
+
+  @Post('reject-collection')
+  @Public()
+  rejectCollection(@Body() body: RejectCollectionDto) {
+    return this.rejectCollectionUseCase.call(body);
   }
 
   @Get()

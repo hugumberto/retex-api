@@ -5,6 +5,7 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
 const DEFAULT_CONFIRMATION_DEADLINE_DAYS = 2;
+const DEFAULT_QR_CODE_THRESHOLD_PERCENTAGE = 10;
 
 @Injectable()
 export class GetSystemParametersUseCase implements IUseCase<void, SystemParameter> {
@@ -21,6 +22,7 @@ export class GetSystemParametersUseCase implements IUseCase<void, SystemParamete
     // Cria a linha default na primeira leitura, caso a seed/migração não a tenha criado.
     return this.systemParameterRepository.create({
       collectionConfirmationDeadlineDays: DEFAULT_CONFIRMATION_DEADLINE_DAYS,
+      qrCodeThresholdPercentage: DEFAULT_QR_CODE_THRESHOLD_PERCENTAGE,
     });
   }
 }

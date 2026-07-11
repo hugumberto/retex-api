@@ -40,7 +40,15 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
     queryBuilder
       .leftJoinAndSelect('route.driver', 'driver')
       .leftJoinAndSelect('driver.roles', 'driverRoles')
-      .loadRelationCountAndMap('route.packagesCount', 'route.packages');
+      .loadRelationCountAndMap('route.packagesCount', 'route.packages')
+      // Nº de recolhas já confirmadas pelo cliente (collectionConfirmedAt != null).
+      .loadRelationCountAndMap(
+        'route.confirmedCount',
+        'route.packages',
+        'confirmedPkg',
+        (qb) =>
+          qb.andWhere('confirmedPkg.collectionConfirmedAt IS NOT NULL'),
+      );
 
     // Aplicar paginação
     const offset = (pagination.page - 1) * pagination.limit;

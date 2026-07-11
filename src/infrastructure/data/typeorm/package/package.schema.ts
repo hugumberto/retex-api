@@ -18,6 +18,13 @@ export const packageSchema = new EntitySchema<Package>({
       enum: PackageStatus,
       nullable: false,
     },
+    friendlyCode: {
+      type: 'varchar',
+      length: 32,
+      nullable: true,
+      unique: true,
+      name: 'friendly_code',
+    },
     weight: {
       type: 'decimal',
       precision: 10,
@@ -46,6 +53,17 @@ export const packageSchema = new EntitySchema<Package>({
       type: 'timestamp with time zone',
       nullable: true,
       name: 'collection_confirmed_at',
+    },
+    qrCodesGenerated: {
+      type: 'integer',
+      nullable: false,
+      default: 0,
+      name: 'qr_codes_generated',
+    },
+    cancellationReason: {
+      type: 'text',
+      nullable: true,
+      name: 'cancellation_reason',
     },
     ...BaseTimestampColumns,
   },

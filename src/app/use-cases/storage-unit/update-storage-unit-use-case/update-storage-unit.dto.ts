@@ -1,5 +1,6 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
 import { AgeGroup, Quality, Season, Sex, Type } from "../../../../domain/item/item.entity";
+import { StorageUnitStatus } from "../../../../domain/storage-unit/storage-unit.entity";
 
 export class UpdateStorageUnitDto {
   @IsOptional()
@@ -26,6 +27,11 @@ export class UpdateStorageUnitDto {
   @IsNotEmpty()
   @IsEnum(Season)
   season?: Season;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsEnum(StorageUnitStatus)
+  status?: StorageUnitStatus;
 
   @IsOptional()
   @IsNumber()

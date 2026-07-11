@@ -4,6 +4,7 @@ import { GetAllPackagesUseCase } from './get-all-packages-use-case';
 import { GetCreatedPackagesUseCase } from './get-created-packages-use-case';
 import { GetPackageByIdUseCase } from './get-package-by-id-use-case';
 import { GetUserPackagesUseCase } from './get-user-packages-use-case';
+import { RejectCollectionUseCase } from './reject-collection-use-case';
 import { SendCollectionConfirmationUseCase } from './send-collection-confirmation-use-case';
 import { UpdatePackageUseCase } from './update-package-use-case';
 
@@ -16,6 +17,7 @@ export const PACKAGE_USE_CASES = [
   GetAllPackagesUseCase,
   SendCollectionConfirmationUseCase,
   ConfirmCollectionUseCase,
+  RejectCollectionUseCase,
 ];
 
 export { ConfirmCollectionUseCase } from './confirm-collection-use-case';

@@ -22,6 +22,7 @@ export class UpdateSystemParametersUseCase
       return this.systemParameterRepository.create({
         collectionConfirmationDeadlineDays:
           param.collectionConfirmationDeadlineDays,
+        qrCodeThresholdPercentage: param.qrCodeThresholdPercentage,
       });
     }
 
@@ -30,6 +31,7 @@ export class UpdateSystemParametersUseCase
       {
         collectionConfirmationDeadlineDays:
           param.collectionConfirmationDeadlineDays,
+        qrCodeThresholdPercentage: param.qrCodeThresholdPercentage,
       },
     );
     return updated;

@@ -1,10 +1,10 @@
-import { GenerateQrCodesUseCase } from './generate-qr-codes-use-case';
-import { MarkQrCodeUsedUseCase } from './mark-qr-code-used-use-case';
+import { GenerateCollectionQrCodesUseCase } from './generate-collection-qr-codes-use-case';
+import { GetRouteQrCodesUseCase } from './get-route-qr-codes-use-case';
 
 export const QR_CODE_USE_CASES = [
-  GenerateQrCodesUseCase,
-  MarkQrCodeUsedUseCase,
+  GenerateCollectionQrCodesUseCase,
+  GetRouteQrCodesUseCase,
 ];
 
-export * from './generate-qr-codes-use-case';
-export * from './mark-qr-code-used-use-case';
+export * from './generate-collection-qr-codes-use-case';
+export * from './get-route-qr-codes-use-case';

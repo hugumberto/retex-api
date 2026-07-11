@@ -4,8 +4,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Package } from '../../../../domain/package/package.entity';
+import { Package, PackageStatus } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { RouteStatus } from '../../../../domain/route/route.entity';
+import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { ISystemParameterRepository } from '../../../../domain/system-parameter/system-parameter.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
@@ -22,6 +24,8 @@ export class ConfirmCollectionUseCase implements IUseCase<ConfirmCollectionDto, 
     private readonly packageRepository: IPackageRepository,
     @Inject(DOMAIN_TOKENS.SYSTEM_PARAMETER_REPOSITORY)
     private readonly systemParameterRepository: ISystemParameterRepository,
+    @Inject(DOMAIN_TOKENS.ROUTE_REPOSITORY)
+    private readonly routeRepository: IRouteRepository,
   ) { }
 
   async call(param: ConfirmCollectionDto): Promise<Package> {
@@ -43,9 +47,43 @@ export class ConfirmCollectionUseCase implements IUseCase<ConfirmCollectionDto, 
 
     const [updated] = await this.packageRepository.update(
       { id: pkg.id },
-      { collectionConfirmedAt: new Date(), collectionConfirmationToken: null },
+      {
+        status: PackageStatus.CONFIRMED,
+        collectionConfirmedAt: new Date(),
+        collectionConfirmationToken: null,
+      },
     );
+
+    // Se, com esta confirmação, todas as solicitações da rota ficaram
+    // confirmadas, a rota avança para o próximo estado.
+    await this.advanceRouteIfAllConfirmed(pkg.route?.id);
+
     return updated;
+  }
+
+  /**
+   * Avança a rota de CREATED para WAITING_TO_START quando todas as suas
+   * solicitações têm a recolha confirmada pelo cliente. Só atua em rotas CREATED
+   * (as demais já avançaram ou ainda não foram confirmadas).
+   */
+  private async advanceRouteIfAllConfirmed(routeId?: string): Promise<void> {
+    if (!routeId) return;
+
+    const route = await this.routeRepository.findOneWithAllRelations(routeId);
+    if (!route || route.status !== RouteStatus.CREATED) return;
+
+    const packages = route.packages ?? [];
+    if (packages.length === 0) return;
+
+    const allConfirmed = packages.every(
+      (pkg) => pkg.collectionConfirmedAt != null,
+    );
+    if (!allConfirmed) return;
+
+    await this.routeRepository.update(
+      { id: route.id },
+      { status: RouteStatus.WAITING_TO_START },
+    );
   }
 
   private async getDeadlineDays(): Promise<number> {
