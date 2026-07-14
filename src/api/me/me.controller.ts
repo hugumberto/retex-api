@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, Matches, MinLength } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 import { Request } from 'express';
 import { CreateAddressUseCase } from '../../app/use-cases/address/create-address-use-case';
 import { DeleteAddressUseCase } from '../../app/use-cases/address/delete-address-use-case';
@@ -26,14 +26,14 @@ import { JwtPayload } from '../../app/services/interfaces/auth.interface';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 class CreateMeAddressDto {
-  @IsString() @IsNotEmpty() street: string;
-  @IsString() @IsNotEmpty() number: string;
-  @IsString() @IsOptional() complement?: string;
-  @IsString() @IsNotEmpty() city: string;
-  @IsString() @IsOptional() cityDivision?: string;
-  @IsString() @IsOptional() country?: string;
-  @IsString() @IsOptional() countryDivision?: string;
-  @IsString() @IsNotEmpty() zipCode: string;
+  @IsString() @IsNotEmpty() @MaxLength(255) street: string;
+  @IsString() @IsNotEmpty() @MaxLength(20) number: string;
+  @IsString() @IsOptional() @MaxLength(255) complement?: string;
+  @IsString() @IsNotEmpty() @MaxLength(255) city: string;
+  @IsString() @IsOptional() @MaxLength(255) cityDivision?: string;
+  @IsString() @IsOptional() @MaxLength(255) country?: string;
+  @IsString() @IsOptional() @MaxLength(255) countryDivision?: string;
+  @IsString() @IsNotEmpty() @MaxLength(20) zipCode: string;
   @IsString() @IsOptional() @Matches(/^(-?\d+(\.\d+)?)?$/, { message: 'lat deve ser um número' }) lat?: string;
   @IsString() @IsOptional() @Matches(/^(-?\d+(\.\d+)?)?$/, { message: 'long deve ser um número' }) long?: string;
   @IsBoolean() @IsOptional() isDefault?: boolean;
