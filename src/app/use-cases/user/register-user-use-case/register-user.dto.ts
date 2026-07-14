@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   Matches,
+  MaxLength,
   MinLength,
   ValidateNested,
 } from 'class-validator';
@@ -15,34 +16,42 @@ import { Gender } from '../../../../domain/user/gender.enum';
 export class RegisterAddressDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(255)
   street: string;
 
   @IsString()
   @IsOptional()
+  @MaxLength(20)
   number?: string;
 
   @IsString()
   @IsOptional()
+  @MaxLength(255)
   complement?: string;
 
   @IsString()
   @IsOptional()
+  @MaxLength(255)
   city?: string;
 
   @IsString()
   @IsOptional()
+  @MaxLength(255)
   cityDivision?: string;
 
   @IsString()
   @IsOptional()
+  @MaxLength(255)
   country?: string;
 
   @IsString()
   @IsOptional()
+  @MaxLength(255)
   countryDivision?: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(20)
   zipCode: string;
 
   @IsString()
