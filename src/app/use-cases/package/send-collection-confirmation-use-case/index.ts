@@ -54,6 +54,7 @@ export class SendCollectionConfirmationUseCase implements IUseCase<string, void>
         rejectUrl,
         year: new Date().getFullYear(),
       },
+      meta: { type: 'collection-confirmation', userId: pkg.user.id },
     });
 
     this.logger.log(`Email de confirmação de coleta enviado para ${pkg.user.email}`);

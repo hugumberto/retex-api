@@ -16,6 +16,7 @@ import { BlogPostRepository } from './infrastructure/data/typeorm/blog-post/blog
 import { FaqCategoryRepository } from './infrastructure/data/typeorm/faq/faq-category.repository';
 import { FaqItemRepository } from './infrastructure/data/typeorm/faq/faq-item.repository';
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
+import { EmailLogRepository } from './infrastructure/data/typeorm/email-log/email-log.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
 import { PackageRepository } from './infrastructure/data/typeorm/package/package.repository';
 import { QrCodeRepository } from './infrastructure/data/typeorm/qr-code/qr-code.repository';
@@ -59,6 +60,7 @@ export class AppModule {
         blogCategoryRepository: BlogCategoryRepository,
         faqCategoryRepository: FaqCategoryRepository,
         faqItemRepository: FaqItemRepository,
+        emailLogRepository: EmailLogRepository,
         unitOfWork: TypeORMUnitOfWork,
         imports: [AppTypeORMModule],
       }),

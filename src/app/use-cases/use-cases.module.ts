@@ -10,6 +10,7 @@ import { BRAND_USE_CASES } from './brand';
 import { COLLECTION_USE_CASES } from './collection';
 import { CONTACT_USE_CASES } from './contact';
 import { DASHBOARD_USE_CASES } from './dashboard';
+import { EMAIL_LOG_USE_CASES } from './email-log';
 import { FAQ_USE_CASES } from './faq';
 import { TEST_ZONE_USE_CASES } from './test-zone';
 import { ITEM_USE_CASES } from './item/item.use-cases';
@@ -44,6 +45,7 @@ export class UseCasesModule {
       ...FAQ_USE_CASES,
       ...CONTACT_USE_CASES,
       ...DASHBOARD_USE_CASES,
+      ...EMAIL_LOG_USE_CASES,
     ];
 
     return {

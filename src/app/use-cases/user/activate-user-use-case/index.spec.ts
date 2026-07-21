@@ -91,6 +91,7 @@ describe('ActivateUserUseCase', () => {
         status: UserStatus.ACTIVE,
         activationToken: null,
         activationTokenExpiresAt: null,
+        activationBypassZone: false,
       },
     );
   });

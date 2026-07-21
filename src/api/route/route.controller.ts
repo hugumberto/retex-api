@@ -7,6 +7,7 @@ import { GetAllRoutesUseCase } from "../../app/use-cases/route/get-all-routes-us
 import { GetAllRoutesDto } from "../../app/use-cases/route/get-all-routes-use-case/get-all-routes.dto";
 import { GetRouteByIdUseCase } from "../../app/use-cases/route/get-route-by-id-use-case";
 import { GetRouteQrCodesUseCase } from "../../app/use-cases/qr-code/get-route-qr-codes-use-case";
+import { SendRouteSurveyUseCase } from "../../app/use-cases/route/send-route-survey-use-case";
 import { UpdateRouteUseCase } from "../../app/use-cases/route/update-route-use-case";
 import { UpdateRouteDto } from "../../app/use-cases/route/update-route-use-case/update-route.dto";
 import { Role } from "../../domain/user/user-roles.entity";
@@ -23,6 +24,7 @@ export class RouteController {
     private readonly updateRouteUseCase: UpdateRouteUseCase,
     private readonly processCollectionSchedulesUseCase: ProcessCollectionSchedulesUseCase,
     private readonly getRouteQrCodesUseCase: GetRouteQrCodesUseCase,
+    private readonly sendRouteSurveyUseCase: SendRouteSurveyUseCase,
   ) { }
 
   @Post()
@@ -52,6 +54,14 @@ export class RouteController {
   @Get(':id/qr-codes')
   getRouteQrCodes(@Param('id') id: string) {
     return this.getRouteQrCodesUseCase.call(id);
+  }
+
+  // Disparo manual do questionário de satisfação aos clientes da recolha.
+  // Só permitido quando a recolha está finalizada (FINISHED).
+  @Post(':id/send-survey')
+  @Roles(Role.ADMIN, Role.OPS)
+  sendSurvey(@Param('id') id: string) {
+    return this.sendRouteSurveyUseCase.call(id);
   }
 
   @Put(':id')

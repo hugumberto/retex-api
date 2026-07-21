@@ -3,6 +3,7 @@ import { IAddressRepository } from './address/address.repository';
 import { IBlogCategoryRepository } from './blog-post/blog-category.repository';
 import { IBlogPostRepository } from './blog-post/blog-post.repository';
 import { IBrandRepository } from './brand/brand.repository';
+import { IEmailLogRepository } from './email-log/email-log.repository';
 import { IFaqCategoryRepository } from './faq/faq-category.repository';
 import { IFaqItemRepository } from './faq/faq-item.repository';
 import { IUnitOfWork } from './interfaces/unit-of-work.interface';
@@ -35,6 +36,7 @@ export interface DomainModuleOptions {
   blogCategoryRepository: Type<IBlogCategoryRepository>;
   faqCategoryRepository: Type<IFaqCategoryRepository>;
   faqItemRepository: Type<IFaqItemRepository>;
+  emailLogRepository: Type<IEmailLogRepository>;
   unitOfWork: Type<IUnitOfWork>;
   imports?: Array<
     Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
@@ -113,6 +115,10 @@ export class DomainModule {
           useClass: options.faqItemRepository,
         },
         {
+          provide: DOMAIN_TOKENS.EMAIL_LOG_REPOSITORY,
+          useClass: options.emailLogRepository,
+        },
+        {
           provide: DOMAIN_TOKENS.UNIT_OF_WORK,
           useClass: options.unitOfWork,
         },
@@ -181,6 +187,10 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.FAQ_ITEM_REPOSITORY,
           useClass: options.faqItemRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.EMAIL_LOG_REPOSITORY,
+          useClass: options.emailLogRepository,
         },
         {
           provide: DOMAIN_TOKENS.UNIT_OF_WORK,

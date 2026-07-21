@@ -11,6 +11,7 @@ import { IUserRepository } from '../../../../domain/user/user.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { SendCollectionConfirmationUseCase } from '../../package/send-collection-confirmation-use-case';
 import { GenerateCollectionQrCodesUseCase } from '../../qr-code/generate-collection-qr-codes-use-case';
+import { SendRouteSurveyUseCase } from '../send-route-survey-use-case';
 import { UpdateRouteUseCase } from '.';
 
 describe('UpdateRouteUseCase', () => {
@@ -21,6 +22,7 @@ describe('UpdateRouteUseCase', () => {
   const systemParamRepo = mock<ISystemParameterRepository>();
   const sendConfirmation = mock<SendCollectionConfirmationUseCase>();
   const generateQrCodes = mock<GenerateCollectionQrCodesUseCase>();
+  const sendRouteSurvey = mock<SendRouteSurveyUseCase>();
   let useCase: UpdateRouteUseCase;
 
   beforeEach(async () => {
@@ -38,11 +40,13 @@ describe('UpdateRouteUseCase', () => {
         },
         { provide: SendCollectionConfirmationUseCase, useValue: sendConfirmation },
         { provide: GenerateCollectionQrCodesUseCase, useValue: generateQrCodes },
+        { provide: SendRouteSurveyUseCase, useValue: sendRouteSurvey },
       ],
     }).compile();
     useCase = module.get(UpdateRouteUseCase);
     sendConfirmation.call.mockResolvedValue(undefined);
     generateQrCodes.call.mockResolvedValue([]);
+    sendRouteSurvey.sendForRoute.mockResolvedValue({ sent: 0 });
     systemParamRepo.getSingleton.mockResolvedValue({
       qrCodeThresholdPercentage: 10,
     } as SystemParameter);

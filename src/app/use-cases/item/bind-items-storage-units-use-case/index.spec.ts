@@ -105,13 +105,9 @@ describe('BindItemsStorageUnitsUseCase', () => {
     expect(emailServiceMock.send).not.toHaveBeenCalled();
   });
 
-  it('binds compatible item/unit, moves package to STOCKED and sends the survey', async () => {
+  it('binds compatible item/unit and moves package to STOCKED', async () => {
     itemRepositoryMock.findByIds.mockResolvedValue([item()]);
     storageUnitRepositoryMock.findByIds.mockResolvedValue([su()]);
-    packageRepositoryMock.findOneWithAllRelations.mockResolvedValue({
-      id: 'p1',
-      user: { email: 'cliente@example.com', firstName: 'Ana', lastName: 'Silva' },
-    } as any);
 
     const result = await useCase.call({ items: ['i1'], storageUnits: ['s1'] });
 
@@ -129,13 +125,8 @@ describe('BindItemsStorageUnitsUseCase', () => {
       packageStatus: PackageStatus.STOCKED,
     });
 
-    // O envio do survey é fire-and-forget — aguardar a microtask antes de asserir.
+    // O survey deixou de ser enviado na triagem — passou para a finalização da rota.
     await new Promise((resolve) => setImmediate(resolve));
-    expect(emailServiceMock.send).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: 'cliente@example.com',
-        template: 'survey',
-      }),
-    );
+    expect(emailServiceMock.send).not.toHaveBeenCalled();
   });
 });

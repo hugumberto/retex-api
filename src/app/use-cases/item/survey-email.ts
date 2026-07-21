@@ -10,7 +10,7 @@ const DEFAULT_SURVEY_URL =
  * sua solicitação de recolha é finalizada.
  */
 export function buildSurveyEmail(
-  user: Pick<User, 'firstName' | 'lastName' | 'email'>,
+  user: Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>,
 ): SendEmailOptions {
   const surveyUrl = process.env.SURVEY_FORM_URL ?? DEFAULT_SURVEY_URL;
 
@@ -24,5 +24,6 @@ export function buildSurveyEmail(
       surveyUrl,
       year: new Date().getFullYear(),
     },
+    meta: { type: 'survey', userId: user.id },
   };
 }

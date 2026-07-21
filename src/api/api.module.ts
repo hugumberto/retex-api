@@ -11,6 +11,7 @@ import { BlogPostController } from './blog-post/blog-post.controller';
 import { CollectionController } from './collection/collection.controller';
 import { ContactController } from './contact/contact.controller';
 import { DashboardController } from './dashboard/dashboard.controller';
+import { EmailLogController } from './email-log/email-log.controller';
 import { FaqController } from './faq/faq.controller';
 import { TestZoneController } from './test-zone/test-zone.controller';
 import { BrandController } from './brand/brand.controller';
@@ -51,6 +52,7 @@ import { WelcomeController } from './welcome/welcome.controller';
     FaqController,
     ContactController,
     DashboardController,
+    EmailLogController,
   ],
   providers: [
     JwtAuthGuard,

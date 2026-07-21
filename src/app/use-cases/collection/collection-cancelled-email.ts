@@ -6,7 +6,7 @@ import { User } from '../../../domain/user/user.entity';
  * pelo motorista, com o motivo (comentário).
  */
 export function buildCollectionCancelledEmail(
-  user: Pick<User, 'firstName' | 'lastName' | 'email'>,
+  user: Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>,
   reason: string,
   friendlyCode?: string | null,
 ): SendEmailOptions {
@@ -21,5 +21,6 @@ export function buildCollectionCancelledEmail(
       friendlyCode,
       year: new Date().getFullYear(),
     },
+    meta: { type: 'collection-cancelled', userId: user.id },
   };
 }

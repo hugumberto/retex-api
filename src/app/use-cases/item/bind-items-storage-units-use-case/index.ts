@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Item } from '../../../../domain/item/item.entity';
 import { IItemRepository } from '../../../../domain/item/item.repository';
 import { PackageStatus } from '../../../../domain/package/package.entity';
@@ -7,10 +7,7 @@ import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
-import { IEmailService } from '../../../services/interfaces/email.interface';
-import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
-import { buildSurveyEmail } from '../survey-email';
 import { BindItemsStorageUnitsDto } from './bind-items-storage-units.dto';
 
 export interface BindItemsStorageUnitsResult {
@@ -21,8 +18,6 @@ export interface BindItemsStorageUnitsResult {
 
 @Injectable()
 export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUnitsDto, BindItemsStorageUnitsResult> {
-  private readonly logger = new Logger(BindItemsStorageUnitsUseCase.name);
-
   constructor(
     @Inject(DOMAIN_TOKENS.ITEM_REPOSITORY)
     private readonly itemRepository: IItemRepository,
@@ -32,8 +27,6 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
     private readonly packageRepository: IPackageRepository,
     @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
     private readonly qrCodeRepository: IQrCodeRepository,
-    @Inject(SERVICE_TOKENS.EMAIL_SERVICE)
-    private readonly emailService: IEmailService,
   ) { }
 
   async call(param: BindItemsStorageUnitsDto): Promise<BindItemsStorageUnitsResult> {
@@ -136,27 +129,11 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
       status: PackageStatus.STOCKED,
     });
 
-    // Triagem finalizada → enviar questionário de satisfação ao cliente.
-    this.sendSurveyEmail(packageId).catch((err) =>
-      this.logger.error(
-        `Falha ao enviar questionário do package ${packageId}: ${err.message}`,
-      ),
-    );
-
     return {
       success: successfulBinds,
       packageId: packageId,
       packageStatus: PackageStatus.STOCKED,
     };
-  }
-
-  private async sendSurveyEmail(packageId: string): Promise<void> {
-    const packageEntity =
-      await this.packageRepository.findOneWithAllRelations(packageId);
-    if (!packageEntity?.user?.email) {
-      return;
-    }
-    await this.emailService.send(buildSurveyEmail(packageEntity.user));
   }
 
   private findCompatibleStorageUnit(item: Item, storageUnits: StorageUnit[]): StorageUnit | null {
