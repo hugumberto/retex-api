@@ -4,11 +4,13 @@ import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository
 import { Route } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
+import { SendRouteSurveyUseCase } from '../send-route-survey-use-case';
 import { FinishRouteIfAllCollectedUseCase } from '.';
 
 describe('FinishRouteIfAllCollectedUseCase', () => {
   const routeRepo = mock<IRouteRepository>();
   const qrCodeRepo = mock<IQrCodeRepository>();
+  const sendRouteSurvey = mock<SendRouteSurveyUseCase>();
   let useCase: FinishRouteIfAllCollectedUseCase;
 
   beforeEach(async () => {
@@ -18,9 +20,11 @@ describe('FinishRouteIfAllCollectedUseCase', () => {
         FinishRouteIfAllCollectedUseCase,
         { provide: DOMAIN_TOKENS.ROUTE_REPOSITORY, useValue: routeRepo },
         { provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY, useValue: qrCodeRepo },
+        { provide: SendRouteSurveyUseCase, useValue: sendRouteSurvey },
       ],
     }).compile();
     useCase = module.get(FinishRouteIfAllCollectedUseCase);
+    sendRouteSurvey.sendForRoute.mockResolvedValue({ sent: 0 });
   });
 
   it('finishes the route and deletes unused QR when all packages are COLLECTED/CANCELLED', async () => {
@@ -38,6 +42,7 @@ describe('FinishRouteIfAllCollectedUseCase', () => {
       { status: 'FINISHED' },
     );
     expect(qrCodeRepo.deleteUnusedByRoute).toHaveBeenCalledWith('r1');
+    expect(sendRouteSurvey.sendForRoute).toHaveBeenCalled();
   });
 
   it('does nothing when a package is not yet collected/cancelled', async () => {

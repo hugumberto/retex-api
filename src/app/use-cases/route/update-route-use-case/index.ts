@@ -210,7 +210,9 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
       await this.qrCodeRepository.deleteUnusedByRoute(id);
       this.sendRouteSurveyUseCase.sendForRoute(existingRoute).catch((err) =>
         this.logger.error(
-          `Falha ao enviar questionário da rota ${id}: ${err.message}`,
+          `Falha ao enviar questionário da rota ${id}: ${
+            err instanceof Error ? err.message : String(err)
+          }`,
         ),
       );
     }

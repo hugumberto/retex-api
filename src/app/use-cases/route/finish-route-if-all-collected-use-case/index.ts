@@ -49,7 +49,9 @@ export class FinishRouteIfAllCollectedUseCase implements IUseCase<string, void> 
     // Rota finalizada → questionário de satisfação aos clientes (fire-and-forget).
     this.sendRouteSurveyUseCase.sendForRoute(route).catch((err) =>
       this.logger.error(
-        `Falha ao enviar questionário da rota ${routeId}: ${err.message}`,
+        `Falha ao enviar questionário da rota ${routeId}: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
       ),
     );
   }
