@@ -11,6 +11,11 @@ export interface CollectionResult {
   qrCodes: QrCode[];
 }
 
+// Deteta se o identificador recebido é um UUID (id do pacote) ou não — caso não
+// seja, assume-se o código amigável (`ano-XXXXXX`).
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 @Injectable()
 export class GetCollectionUseCase implements IUseCase<string, CollectionResult> {
   constructor(
@@ -20,7 +25,9 @@ export class GetCollectionUseCase implements IUseCase<string, CollectionResult> 
     private readonly qrCodeRepository: IQrCodeRepository,
   ) { }
 
-  async call(packageId: string): Promise<CollectionResult> {
+  async call(identifier: string): Promise<CollectionResult> {
+    const packageId = await this.resolvePackageId(identifier);
+
     const packageEntity =
       await this.packageRepository.findOneWithAllRelations(packageId);
     if (!packageEntity) {
@@ -29,5 +36,24 @@ export class GetCollectionUseCase implements IUseCase<string, CollectionResult> 
 
     const qrCodes = await this.qrCodeRepository.find({ packageId });
     return { package: packageEntity, qrCodes };
+  }
+
+  // Aceita o id (UUID) ou o código amigável do pacote e devolve o id.
+  private async resolvePackageId(identifier: string): Promise<string> {
+    const value = identifier.trim();
+
+    if (UUID_REGEX.test(value)) {
+      return value;
+    }
+
+    const byFriendlyCode = await this.packageRepository.findOne({
+      friendlyCode: value,
+    } as Partial<Package>);
+
+    if (!byFriendlyCode) {
+      throw new NotFoundException('Solicitação não encontrada');
+    }
+
+    return byFriendlyCode.id;
   }
 }
