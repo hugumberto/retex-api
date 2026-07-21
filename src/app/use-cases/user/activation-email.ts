@@ -7,7 +7,7 @@ import { User } from '../../../domain/user/user.entity';
  * o utilizador se torna elegível após a criação de uma zona.
  */
 export function buildActivationEmail(
-  user: Pick<User, 'firstName' | 'lastName' | 'email'>,
+  user: Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>,
   token: string,
 ): SendEmailOptions {
   const activationUrl = `${process.env.PORTAL_URL}/auth/activate?token=${token}`;
@@ -22,6 +22,7 @@ export function buildActivationEmail(
       activationUrl,
       year: new Date().getFullYear(),
     },
+    meta: { type: 'account-activation', userId: user.id },
   };
 }
 
@@ -29,7 +30,7 @@ export function buildActivationEmail(
  * Constrói o email de reposição de palavra-passe (link com token, válido 1h).
  */
 export function buildPasswordResetEmail(
-  user: Pick<User, 'firstName' | 'lastName' | 'email'>,
+  user: Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>,
   token: string,
 ): SendEmailOptions {
   const resetUrl = `${process.env.PORTAL_URL}/auth/reset-password?token=${token}`;
@@ -44,5 +45,6 @@ export function buildPasswordResetEmail(
       resetUrl,
       year: new Date().getFullYear(),
     },
+    meta: { type: 'password-reset', userId: user.id },
   };
 }

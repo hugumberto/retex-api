@@ -11,6 +11,7 @@ import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { SendCollectionConfirmationUseCase } from '../../package/send-collection-confirmation-use-case';
 import { GenerateCollectionQrCodesUseCase } from '../../qr-code/generate-collection-qr-codes-use-case';
+import { SendRouteSurveyUseCase } from '../send-route-survey-use-case';
 import { UpdateRouteDto } from './update-route.dto';
 
 const DEFAULT_QR_CODE_THRESHOLD_PERCENTAGE = 10;
@@ -37,6 +38,7 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     private readonly systemParameterRepository: ISystemParameterRepository,
     private readonly sendCollectionConfirmationUseCase: SendCollectionConfirmationUseCase,
     private readonly generateCollectionQrCodesUseCase: GenerateCollectionQrCodesUseCase,
+    private readonly sendRouteSurveyUseCase: SendRouteSurveyUseCase,
   ) { }
 
   async call(param: UpdateRouteParamDto): Promise<Route> {
@@ -199,12 +201,18 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
       }
     }
 
-    // 10. Transição → FINISHED: apaga os QR codes da rota não utilizados.
+    // 10. Transição → FINISHED: apaga os QR codes da rota não utilizados e
+    // envia o questionário de satisfação aos clientes (fire-and-forget).
     if (
       existingRoute.status !== RouteStatus.FINISHED &&
       data.status === RouteStatus.FINISHED
     ) {
       await this.qrCodeRepository.deleteUnusedByRoute(id);
+      this.sendRouteSurveyUseCase.sendForRoute(existingRoute).catch((err) =>
+        this.logger.error(
+          `Falha ao enviar questionário da rota ${id}: ${err.message}`,
+        ),
+      );
     }
 
     return updatedRoute;

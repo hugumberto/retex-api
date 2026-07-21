@@ -84,7 +84,7 @@ export class CreatePackageUseCase
   }
 
   private async sendConfirmationEmail(
-    user: { firstName: string; lastName: string; email: string },
+    user: { id: string; firstName: string; lastName: string; email: string },
     address: { street: string; number: string; city: string; zipCode: string },
     pkg: Package,
   ): Promise<void> {
@@ -102,6 +102,7 @@ export class CreatePackageUseCase
         address,
         year: new Date().getFullYear(),
       },
+      meta: { type: 'package-confirmation', userId: user.id },
     });
   }
 

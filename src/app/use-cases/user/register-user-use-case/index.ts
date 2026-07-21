@@ -126,6 +126,7 @@ export class RegisterUserUseCase implements IUseCase<RegisterUserDto, RegisterUs
             city: param.address.city ?? '',
             year: new Date().getFullYear(),
           },
+          meta: { type: 'out-of-service-zone', userId: result.id },
         })
         .catch((err) =>
           this.logger.error(
