@@ -18,4 +18,12 @@ export class BrandRepository extends BaseRepository<Brand> implements IBrandRepo
   ) {
     super(brandRepository, localStorageService);
   }
-} 
+
+  async findByName(name: string): Promise<Brand | null> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('brand')
+      .where('LOWER(TRIM(brand.name)) = LOWER(TRIM(:name))', { name })
+      .getOne();
+  }
+}

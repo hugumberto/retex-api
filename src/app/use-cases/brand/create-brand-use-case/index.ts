@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { Brand } from '../../../../domain/brand/brand.entity';
 import { IBrandRepository } from '../../../../domain/brand/brand.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -15,9 +15,17 @@ export class CreateBrandUseCase implements IUseCase<CreateBrandDto, Brand> {
   ) { }
 
   async call(param: CreateBrandDto): Promise<Brand> {
+    const name = param.name.trim();
+
+    // Não permitir marcas com o mesmo nome (ignorando maiúsculas/espaços).
+    const existing = await this.brandRepository.findByName(name);
+    if (existing) {
+      throw new ConflictException('Já existe uma marca com este nome');
+    }
+
     // Criar a marca com manual = true (como especificado)
     const brand = await this.brandRepository.create({
-      name: param.name,
+      name,
       manual: true,
     });
 
