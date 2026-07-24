@@ -28,9 +28,25 @@ export class StorageUnitRepository extends BaseRepository<StorageUnit> implement
 
   async findAllWithBrand(query: Partial<StorageUnit>): Promise<StorageUnit[]> {
     const repository = await this.getRepository();
+    // `itemsCount` é uma coluna denormalizada — vem na leitura sem custo extra.
     return repository.find({
       where: this.buildWhereClause(query) as any,
+      order: { createdAt: 'DESC' } as any,
     });
+  }
+
+  async incrementItemsCount(
+    storageUnitId: string,
+    delta: number,
+  ): Promise<void> {
+    if (!delta) return;
+    const repository = await this.getRepository();
+    await repository
+      .createQueryBuilder()
+      .update()
+      .set({ itemsCount: () => `GREATEST("items_count" + ${delta}, 0)` })
+      .where('id = :id', { id: storageUnitId })
+      .execute();
   }
 
   async findByIds(ids: string[]): Promise<StorageUnit[]> {

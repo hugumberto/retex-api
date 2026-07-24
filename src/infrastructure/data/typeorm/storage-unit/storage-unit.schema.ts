@@ -56,6 +56,21 @@ export const storageUnitSchema = new EntitySchema<StorageUnit>({
       scale: 2,
       nullable: false,
     },
+    // Contador denormalizado de itens associados (mantido no bind/delete),
+    // para leitura O(1) sem contar a tabela item a cada consulta.
+    itemsCount: {
+      type: 'integer',
+      nullable: false,
+      default: 0,
+      name: 'items_count',
+    },
     ...BaseTimestampColumns,
+  },
+  relations: {
+    items: {
+      type: 'one-to-many',
+      target: 'item',
+      inverseSide: 'storageUnit',
+    },
   },
 });

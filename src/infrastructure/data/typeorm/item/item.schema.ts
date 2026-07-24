@@ -57,6 +57,7 @@ export const itemSchema = new EntitySchema<Item>({
       joinColumn: {
         name: 'storage_unit_id',
       },
+      inverseSide: 'items',
     },
     brand: {
       type: 'many-to-one',
