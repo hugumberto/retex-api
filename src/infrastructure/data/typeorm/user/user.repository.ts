@@ -44,7 +44,7 @@ export class UserRepository
 
     return repository.find({
       where: where as FindOptionsWhere<User>,
-      relations: ['roles'],
+      relations: ['roles', 'addresses'],
     });
   }
 

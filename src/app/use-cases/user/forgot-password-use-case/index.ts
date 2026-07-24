@@ -9,8 +9,17 @@ import { buildPasswordResetEmail } from '../activation-email';
 import { generateResetToken } from '../activation-token.util';
 import { ForgotPasswordDto } from './forgot-password.dto';
 
+export interface ForgotPasswordResult {
+  ok: true;
+  // true quando o utilizador está fora da zona de atuação: não enviamos reset;
+  // o frontend informa que receberá um email quando passarmos a atuar na zona.
+  outOfZone: boolean;
+}
+
 @Injectable()
-export class ForgotPasswordUseCase implements IUseCase<ForgotPasswordDto, { ok: true }> {
+export class ForgotPasswordUseCase
+  implements IUseCase<ForgotPasswordDto, ForgotPasswordResult>
+{
   private readonly logger = new Logger(ForgotPasswordUseCase.name);
 
   constructor(
@@ -20,30 +29,43 @@ export class ForgotPasswordUseCase implements IUseCase<ForgotPasswordDto, { ok: 
     private readonly emailService: IEmailService,
   ) {}
 
-  async call({ email }: ForgotPasswordDto): Promise<{ ok: true }> {
-    const user = await this.userRepository.findOne({ email });
+  async call({ email }: ForgotPasswordDto): Promise<ForgotPasswordResult> {
+    // Carrega o utilizador com os endereços para avaliar a zona de atuação.
+    const [user] = await this.userRepository.findWithRelations({ email });
 
-    // Anti-enumeração: respondemos sempre de forma genérica. Só enviamos o
-    // email quando o utilizador existe.
-    if (user) {
-      const { token, expiresAt } = generateResetToken();
-      await this.userRepository.update(
-        { id: user.id } as Partial<User>,
-        {
-          resetToken: token,
-          resetTokenExpiresAt: expiresAt,
-        } as Partial<User>,
-      );
-
-      this.emailService
-        .send(buildPasswordResetEmail(user, token))
-        .catch((err) =>
-          this.logger.error(
-            `Falha ao enviar email de reset para ${user.email}: ${err.message}`,
-          ),
-        );
+    // Anti-enumeração: para email inexistente respondemos de forma genérica
+    // (sem revelar que não existe) e sem enviar nada.
+    if (!user) {
+      return { ok: true, outOfZone: false };
     }
 
-    return { ok: true };
+    // Fora da zona: tem endereços mas nenhum dentro da zona de atuação. Estes
+    // utilizadores ainda não têm conta ativa — não faz sentido repor a senha.
+    const addresses = user.addresses ?? [];
+    const outOfZone =
+      addresses.length > 0 && !addresses.some((a) => a.isInServiceZone);
+
+    if (outOfZone) {
+      return { ok: true, outOfZone: true };
+    }
+
+    const { token, expiresAt } = generateResetToken();
+    await this.userRepository.update(
+      { id: user.id } as Partial<User>,
+      {
+        resetToken: token,
+        resetTokenExpiresAt: expiresAt,
+      } as Partial<User>,
+    );
+
+    this.emailService
+      .send(buildPasswordResetEmail(user, token))
+      .catch((err) =>
+        this.logger.error(
+          `Falha ao enviar email de reset para ${user.email}: ${err.message}`,
+        ),
+      );
+
+    return { ok: true, outOfZone: false };
   }
 }
