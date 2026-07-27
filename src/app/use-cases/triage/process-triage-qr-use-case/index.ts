@@ -6,13 +6,13 @@ import {
 } from '@nestjs/common';
 import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
 export interface ProcessTriageQrParams {
-  qrCodeId: string;
+  bagId: string;
   weight: number;
 }
 
@@ -20,32 +20,32 @@ export interface ProcessTriageQrParams {
  * Processa um volume (QR code) na triagem: grava o peso do volume, marca-o como
  * processado e recalcula o peso do pacote como a soma dos pesos dos volumes.
  * A solicitação passa (ou permanece) em SCREENING. Os itens do volume são
- * criados/removidos pelos endpoints de item (com o qrCodeId).
+ * criados/removidos pelos endpoints de item (com o bagId).
  */
 @Injectable()
 export class ProcessTriageQrUseCase
-  implements IUseCase<ProcessTriageQrParams, QrCode>
+  implements IUseCase<ProcessTriageQrParams, CollectionRequestBag>
 {
   constructor(
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
   ) {}
 
-  async call({ qrCodeId, weight }: ProcessTriageQrParams): Promise<QrCode> {
-    const qrCode = await this.qrCodeRepository.findOne({ id: qrCodeId });
-    if (!qrCode) {
+  async call({ bagId, weight }: ProcessTriageQrParams): Promise<CollectionRequestBag> {
+    const bag = await this.collectionRequestBagRepository.findOne({ id: bagId });
+    if (!bag) {
       throw new NotFoundException('QR code não encontrado');
     }
-    if (!qrCode.collectionRequestId) {
+    if (!bag.collectionRequestId) {
       throw new BadRequestException(
         'O QR code não está vinculado a uma solicitação',
       );
     }
 
     const collectionRequestEntity = await this.collectionRequestRepository.findOne({
-      id: qrCode.collectionRequestId,
+      id: bag.collectionRequestId,
     });
     if (!collectionRequestEntity) {
       throw new NotFoundException('Solicitação não encontrada');
@@ -59,21 +59,21 @@ export class ProcessTriageQrUseCase
       );
     }
 
-    const [updatedQr] = await this.qrCodeRepository.update(
-      { id: qrCodeId },
+    const [updatedQr] = await this.collectionRequestBagRepository.update(
+      { id: bagId },
       { weight, processedAt: new Date() },
     );
 
     // Peso do pacote = soma dos pesos dos volumes (decimais vêm como string).
-    const qrCodes = await this.qrCodeRepository.find({
-      collectionRequestId: qrCode.collectionRequestId,
+    const bags = await this.collectionRequestBagRepository.find({
+      collectionRequestId: bag.collectionRequestId,
     });
-    const totalWeight = qrCodes.reduce(
+    const totalWeight = bags.reduce(
       (sum, code) => sum + Number(code.weight ?? 0),
       0,
     );
     await this.collectionRequestRepository.update(
-      { id: qrCode.collectionRequestId },
+      { id: bag.collectionRequestId },
       { weight: totalWeight, status: CollectionRequestStatus.SCREENING },
     );
 

@@ -48,7 +48,7 @@ describe('CollectionRequestController', () => {
     const body = {
       userId: 'victim-id',
       addressId: 'address-id',
-      estimatedVolumes: 2,
+      estimatedBags: 2,
     } as any;
 
     it('forces a USER to create the package for themselves (ignores body.userId)', async () => {

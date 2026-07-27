@@ -1,9 +1,9 @@
 import { EntitySchema } from 'typeorm';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
 
-export const qrCodeSchema = new EntitySchema<QrCode>({
-  name: 'qr_code',
+export const collectionRequestBagSchema = new EntitySchema<CollectionRequestBag>({
+  name: 'collection_request_bag',
   columns: {
     id: {
       primary: true,

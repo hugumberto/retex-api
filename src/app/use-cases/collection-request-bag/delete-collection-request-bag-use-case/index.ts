@@ -1,8 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CollectionRequest } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
@@ -11,29 +11,29 @@ import { IUseCase } from '../../interfaces/use-case.interface';
  * pacote a que estava associado.
  */
 @Injectable()
-export class DeleteQrCodeUseCase implements IUseCase<string, QrCode> {
+export class DeleteCollectionRequestBagUseCase implements IUseCase<string, CollectionRequestBag> {
   constructor(
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
   ) {}
 
-  async call(qrCodeId: string): Promise<QrCode> {
-    const qr = await this.qrCodeRepository.findOne({ id: qrCodeId });
+  async call(bagId: string): Promise<CollectionRequestBag> {
+    const qr = await this.collectionRequestBagRepository.findOne({ id: bagId });
     if (!qr) {
-      throw new NotFoundException('Volume não encontrado');
+      throw new NotFoundException('Saco não encontrado');
     }
 
     const collectionRequestId = qr.collectionRequestId;
 
-    const deleted = await this.qrCodeRepository.delete({ id: qrCodeId });
+    const deleted = await this.collectionRequestBagRepository.delete({ id: bagId });
 
     if (collectionRequestId) {
-      const remaining = await this.qrCodeRepository.find({ collectionRequestId });
+      const remaining = await this.collectionRequestBagRepository.find({ collectionRequestId });
       await this.collectionRequestRepository.update(
         { id: collectionRequestId } as Partial<CollectionRequest>,
-        { qrCodesGenerated: remaining.length } as Partial<CollectionRequest>,
+        { bagsGenerated: remaining.length } as Partial<CollectionRequest>,
       );
     }
 

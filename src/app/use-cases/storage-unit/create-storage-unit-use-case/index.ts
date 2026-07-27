@@ -3,7 +3,7 @@ import { StorageUnit, StorageUnitStatus } from '../../../../domain/storage-unit/
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
-import { generateFriendlyCode } from '../../qr-code/qr-code.util';
+import { generateFriendlyCode } from '../../collection-request-bag/bag.util';
 import { CreateStorageUnitDto } from './create-storage-unit.dto';
 
 export { CreateStorageUnitDto };

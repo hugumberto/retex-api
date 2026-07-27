@@ -19,7 +19,7 @@ import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repos
 import { EmailLogRepository } from './infrastructure/data/typeorm/email-log/email-log.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
 import { CollectionRequestRepository } from './infrastructure/data/typeorm/collection-request/collection-request.repository';
-import { QrCodeRepository } from './infrastructure/data/typeorm/qr-code/qr-code.repository';
+import { CollectionRequestBagRepository } from './infrastructure/data/typeorm/collection-request-bag/collection-request-bag.repository';
 import { RouteRepository } from './infrastructure/data/typeorm/route/route.repository';
 import { StorageUnitRepository } from './infrastructure/data/typeorm/storage-unit/storage-unit.repository';
 import { SystemParameterRepository } from './infrastructure/data/typeorm/system-parameter/system-parameter.repository';
@@ -52,7 +52,7 @@ export class AppModule {
         collectionRequestRepository: CollectionRequestRepository,
         routeRepository: RouteRepository,
         storageUnitRepository: StorageUnitRepository,
-        qrCodeRepository: QrCodeRepository,
+        collectionRequestBagRepository: CollectionRequestBagRepository,
         systemParameterRepository: SystemParameterRepository,
         userRoleRepository: UserRoleRepository,
         refreshTokenRepository: RefreshTokenRepository,

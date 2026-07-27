@@ -5,7 +5,7 @@ import { Item } from '../../../../domain/item/item.entity';
 import { IItemRepository } from '../../../../domain/item/item.repository';
 import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -18,7 +18,7 @@ describe('BindItemsStorageUnitsUseCase', () => {
   const itemRepositoryMock = mock<IItemRepository>();
   const storageUnitRepositoryMock = mock<IStorageUnitRepository>();
   const collectionRequestRepositoryMock = mock<ICollectionRequestRepository>();
-  const qrCodeRepositoryMock = mock<IQrCodeRepository>();
+  const collectionRequestBagRepositoryMock = mock<ICollectionRequestBagRepository>();
   const emailServiceMock = mock<IEmailService>();
 
   beforeEach(async () => {
@@ -29,12 +29,12 @@ describe('BindItemsStorageUnitsUseCase', () => {
         { provide: DOMAIN_TOKENS.ITEM_REPOSITORY, useValue: itemRepositoryMock },
         { provide: DOMAIN_TOKENS.STORAGE_UNIT_REPOSITORY, useValue: storageUnitRepositoryMock },
         { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepositoryMock },
-        { provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY, useValue: qrCodeRepositoryMock },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY, useValue: collectionRequestBagRepositoryMock },
         { provide: SERVICE_TOKENS.EMAIL_SERVICE, useValue: emailServiceMock },
       ],
     }).compile();
     useCase = module.get(BindItemsStorageUnitsUseCase);
-    qrCodeRepositoryMock.find.mockResolvedValue([]);
+    collectionRequestBagRepositoryMock.find.mockResolvedValue([]);
     itemRepositoryMock.findByCollectionRequestId.mockResolvedValue([]);
   });
 

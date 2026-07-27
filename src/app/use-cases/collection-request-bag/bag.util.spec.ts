@@ -1,4 +1,4 @@
-import { generateBatchId, generateFriendlyCode, generateToken } from './qr-code.util';
+import { generateBatchId, generateFriendlyCode, generateToken } from './bag.util';
 
 describe('qr-code.util', () => {
   it('generates a friendly code as `year-XXXXXX` with 6 unambiguous chars', () => {

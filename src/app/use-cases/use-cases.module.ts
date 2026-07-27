@@ -15,7 +15,7 @@ import { FAQ_USE_CASES } from './faq';
 import { TEST_ZONE_USE_CASES } from './test-zone';
 import { ITEM_USE_CASES } from './item/item.use-cases';
 import { COLLECTION_REQUEST_USE_CASES } from './collection-request';
-import { QR_CODE_USE_CASES } from './qr-code';
+import { COLLECTION_REQUEST_BAG_USE_CASES } from './collection-request-bag';
 import { ROUTE_USE_CASES } from './route';
 import { STORAGE_UNIT_USE_CASES } from './storage-unit';
 import { SYSTEM_PARAMETER_USE_CASES } from './system-parameter';
@@ -33,7 +33,7 @@ export class UseCasesModule {
       ...COLLECTION_REQUEST_USE_CASES,
       ...ROUTE_USE_CASES,
       ...STORAGE_UNIT_USE_CASES,
-      ...QR_CODE_USE_CASES,
+      ...COLLECTION_REQUEST_BAG_USE_CASES,
       ...COLLECTION_USE_CASES,
       ...SYSTEM_PARAMETER_USE_CASES,
       ...TRIAGE_USE_CASES,

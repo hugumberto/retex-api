@@ -1,14 +1,14 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CollectionRequest } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
 export interface CollectionResult {
   collectionRequest: CollectionRequest;
-  qrCodes: QrCode[];
+  bags: CollectionRequestBag[];
 }
 
 // Deteta se o identificador recebido é um UUID (id do pacote) ou não — caso não
@@ -21,8 +21,8 @@ export class GetCollectionUseCase implements IUseCase<string, CollectionResult> 
   constructor(
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
   ) { }
 
   async call(identifier: string): Promise<CollectionResult> {
@@ -34,8 +34,8 @@ export class GetCollectionUseCase implements IUseCase<string, CollectionResult> 
       throw new NotFoundException('Solicitação não encontrada');
     }
 
-    const qrCodes = await this.qrCodeRepository.find({ collectionRequestId });
-    return { collectionRequest: collectionRequestEntity, qrCodes };
+    const bags = await this.collectionRequestBagRepository.find({ collectionRequestId });
+    return { collectionRequest: collectionRequestEntity, bags };
   }
 
   // Aceita o id (UUID) ou o código amigável do pacote e devolve o id.

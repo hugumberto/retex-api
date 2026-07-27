@@ -1,15 +1,15 @@
 import { Entity } from "../interfaces/entity.interface"
 
-export interface QrCode extends Entity {
+export interface CollectionRequestBag extends Entity {
   token: string
   friendlyCode: string
   batchId: string
   usedAt?: Date | null
   collectionRequestId?: string | null
-  // Rota que gerou o código (pool da rota). Preenchido na entrada em IN_TRANSIT.
+  // Rota que gerou o saco (pool da rota). Preenchido na entrada em IN_TRANSIT.
   routeId?: string | null
-  // Peso do volume, informado na triagem.
+  // Peso do saco, informado na triagem.
   weight?: number | null
-  // Momento em que o volume foi processado na triagem.
+  // Momento em que o saco foi processado na triagem.
   processedAt?: Date | null
 }

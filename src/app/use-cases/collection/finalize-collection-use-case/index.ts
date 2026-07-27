@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { CollectionRequest, CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { FinishRouteIfAllCollectedUseCase } from '../../route/finish-route-if-all-collected-use-case';
@@ -19,8 +19,8 @@ export class FinalizeCollectionUseCase implements IUseCase<string, CollectionReq
   constructor(
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
     private readonly finishRouteIfAllCollectedUseCase: FinishRouteIfAllCollectedUseCase,
   ) { }
 
@@ -33,10 +33,10 @@ export class FinalizeCollectionUseCase implements IUseCase<string, CollectionReq
       throw new BadRequestException('A solicitação não está aguardando recolha');
     }
 
-    const qrCodes = await this.qrCodeRepository.find({ collectionRequestId });
-    if (qrCodes.length === 0) {
+    const bags = await this.collectionRequestBagRepository.find({ collectionRequestId });
+    if (bags.length === 0) {
       throw new BadRequestException(
-        'Vincule ao menos um volume antes de finalizar a coleta',
+        'Vincule ao menos um saco antes de finalizar a recolha',
       );
     }
 

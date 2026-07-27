@@ -1,18 +1,18 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { randomBytes } from 'crypto';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import {
   generateBatchId,
   generateFriendlyCode,
   generateToken,
-} from '../qr-code.util';
+} from '../bag.util';
 
 const MAX_COLLISION_RETRIES = 5;
 
-export interface GenerateCollectionQrCodesParams {
+export interface GenerateCollectionBagsParams {
   routeId: string;
   quantity: number;
 }
@@ -24,19 +24,19 @@ export interface GenerateCollectionQrCodesParams {
  * e a retentativa por colisão de friendlyCode.
  */
 @Injectable()
-export class GenerateCollectionQrCodesUseCase
-  implements IUseCase<GenerateCollectionQrCodesParams, QrCode[]>
+export class GenerateCollectionBagsUseCase
+  implements IUseCase<GenerateCollectionBagsParams, CollectionRequestBag[]>
 {
   constructor(
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
   ) {}
 
-  async call(param: GenerateCollectionQrCodesParams): Promise<QrCode[]> {
+  async call(param: GenerateCollectionBagsParams): Promise<CollectionRequestBag[]> {
     const year = new Date().getFullYear();
     const batchId = generateBatchId();
     const usedInBatch = new Set<string>();
-    const created: QrCode[] = [];
+    const created: CollectionRequestBag[] = [];
 
     for (let i = 0; i < param.quantity; i++) {
       const friendlyCode = await this.generateUniqueFriendlyCode(
@@ -45,13 +45,13 @@ export class GenerateCollectionQrCodesUseCase
       );
       usedInBatch.add(friendlyCode);
 
-      const qrCode = await this.qrCodeRepository.create({
+      const bag = await this.collectionRequestBagRepository.create({
         token: generateToken(),
         friendlyCode,
         batchId,
         routeId: param.routeId,
       });
-      created.push(qrCode);
+      created.push(bag);
     }
 
     return created;
@@ -69,7 +69,7 @@ export class GenerateCollectionQrCodesUseCase
   ): Promise<string> {
     const isFree = async (code: string) =>
       !usedInBatch.has(code) &&
-      !(await this.qrCodeRepository.findOne({ friendlyCode: code }));
+      !(await this.collectionRequestBagRepository.findOne({ friendlyCode: code }));
 
     for (let attempt = 0; attempt < MAX_COLLISION_RETRIES; attempt++) {
       const code = generateFriendlyCode(year);

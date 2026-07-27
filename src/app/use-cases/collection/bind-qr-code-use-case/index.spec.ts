@@ -7,14 +7,14 @@ import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
 import { CollectionRequest } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { BindQrCodeUseCase } from '.';
 
 describe('BindQrCodeUseCase', () => {
   const collectionRequestRepo = mock<ICollectionRequestRepository>();
-  const qrCodeRepo = mock<IQrCodeRepository>();
+  const collectionRequestBagRepo = mock<ICollectionRequestBagRepository>();
   let useCase: BindQrCodeUseCase;
 
   beforeEach(async () => {
@@ -23,7 +23,7 @@ describe('BindQrCodeUseCase', () => {
       providers: [
         BindQrCodeUseCase,
         { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepo },
-        { provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY, useValue: qrCodeRepo },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY, useValue: collectionRequestBagRepo },
       ],
     }).compile();
     useCase = module.get(BindQrCodeUseCase);
@@ -40,7 +40,7 @@ describe('BindQrCodeUseCase', () => {
 
   it('throws NotFound when the code matches no qr code', async () => {
     collectionRequestRepo.findOneWithAllRelations.mockResolvedValue(waiting);
-    qrCodeRepo.findOne.mockResolvedValue(undefined);
+    collectionRequestBagRepo.findOne.mockResolvedValue(undefined);
     await expect(
       useCase.call({ collectionRequestId: 'p1', code: 'x' }),
     ).rejects.toThrow(NotFoundException);
@@ -48,7 +48,7 @@ describe('BindQrCodeUseCase', () => {
 
   it('rejects an already-used qr code', async () => {
     collectionRequestRepo.findOneWithAllRelations.mockResolvedValue(waiting);
-    qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', usedAt: new Date() } as QrCode);
+    collectionRequestBagRepo.findOne.mockResolvedValue({ id: 'q1', usedAt: new Date() } as CollectionRequestBag);
     await expect(
       useCase.call({ collectionRequestId: 'p1', code: 'tok' }),
     ).rejects.toThrow(ConflictException);
@@ -60,11 +60,11 @@ describe('BindQrCodeUseCase', () => {
       status: 'WAITING_FOR_COLLECTION',
       route: { id: 'r1' },
     } as unknown as CollectionRequest);
-    qrCodeRepo.findOne.mockResolvedValue({
+    collectionRequestBagRepo.findOne.mockResolvedValue({
       id: 'q1',
       usedAt: null,
       routeId: 'r2',
-    } as QrCode);
+    } as CollectionRequestBag);
     await expect(
       useCase.call({ collectionRequestId: 'p1', code: 'tok' }),
     ).rejects.toThrow(BadRequestException);
@@ -72,12 +72,12 @@ describe('BindQrCodeUseCase', () => {
 
   it('binds by token: sets collectionRequestId + usedAt', async () => {
     collectionRequestRepo.findOneWithAllRelations.mockResolvedValue(waiting);
-    qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', usedAt: null } as QrCode);
-    qrCodeRepo.update.mockResolvedValue([{ id: 'q1' } as QrCode]);
+    collectionRequestBagRepo.findOne.mockResolvedValue({ id: 'q1', usedAt: null } as CollectionRequestBag);
+    collectionRequestBagRepo.update.mockResolvedValue([{ id: 'q1' } as CollectionRequestBag]);
 
     await useCase.call({ collectionRequestId: 'p1', code: 'tok' });
 
-    expect(qrCodeRepo.update).toHaveBeenCalledWith(
+    expect(collectionRequestBagRepo.update).toHaveBeenCalledWith(
       { id: 'q1' },
       expect.objectContaining({ collectionRequestId: 'p1', usedAt: expect.any(Date) }),
     );
@@ -85,15 +85,15 @@ describe('BindQrCodeUseCase', () => {
 
   it('falls back to friendlyCode when token lookup misses', async () => {
     collectionRequestRepo.findOneWithAllRelations.mockResolvedValue(waiting);
-    qrCodeRepo.findOne
+    collectionRequestBagRepo.findOne
       .mockResolvedValueOnce(undefined) // por token
-      .mockResolvedValueOnce({ id: 'q2', usedAt: null } as QrCode); // por friendlyCode
-    qrCodeRepo.update.mockResolvedValue([{ id: 'q2' } as QrCode]);
+      .mockResolvedValueOnce({ id: 'q2', usedAt: null } as CollectionRequestBag); // por friendlyCode
+    collectionRequestBagRepo.update.mockResolvedValue([{ id: 'q2' } as CollectionRequestBag]);
 
     await useCase.call({ collectionRequestId: 'p1', code: '2026-ABC123' });
 
-    expect(qrCodeRepo.findOne).toHaveBeenNthCalledWith(1, { token: '2026-ABC123' });
-    expect(qrCodeRepo.findOne).toHaveBeenNthCalledWith(2, { friendlyCode: '2026-ABC123' });
-    expect(qrCodeRepo.update).toHaveBeenCalled();
+    expect(collectionRequestBagRepo.findOne).toHaveBeenNthCalledWith(1, { token: '2026-ABC123' });
+    expect(collectionRequestBagRepo.findOne).toHaveBeenNthCalledWith(2, { friendlyCode: '2026-ABC123' });
+    expect(collectionRequestBagRepo.update).toHaveBeenCalled();
   });
 });

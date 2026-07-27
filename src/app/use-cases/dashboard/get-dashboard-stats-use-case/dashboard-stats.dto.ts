@@ -3,7 +3,7 @@ import { CollectionRequestStatus } from '../../../../domain/collection-request/c
 export interface CollectionRequestsStats {
   total: number;
   totalWeightKg: number;
-  totalVolumes: number;
+  totalBags: number;
   byStatus: { status: CollectionRequestStatus; count: number }[];
   trend: { period: string; weightKg: number; count: number }[];
 }

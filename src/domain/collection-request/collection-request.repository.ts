@@ -22,7 +22,7 @@ export interface CollectionRequestStatusCount {
 export interface CollectionRequestTotals {
   totalCollectionRequests: number;
   totalWeight: number;
-  totalVolumes: number;
+  totalBags: number;
 }
 
 export interface CollectionRequestTrendPoint {

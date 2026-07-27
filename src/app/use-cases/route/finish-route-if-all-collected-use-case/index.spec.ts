@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { Route } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -9,7 +9,7 @@ import { FinishRouteIfAllCollectedUseCase } from '.';
 
 describe('FinishRouteIfAllCollectedUseCase', () => {
   const routeRepo = mock<IRouteRepository>();
-  const qrCodeRepo = mock<IQrCodeRepository>();
+  const collectionRequestBagRepo = mock<ICollectionRequestBagRepository>();
   const sendRouteSurvey = mock<SendRouteSurveyUseCase>();
   let useCase: FinishRouteIfAllCollectedUseCase;
 
@@ -19,7 +19,7 @@ describe('FinishRouteIfAllCollectedUseCase', () => {
       providers: [
         FinishRouteIfAllCollectedUseCase,
         { provide: DOMAIN_TOKENS.ROUTE_REPOSITORY, useValue: routeRepo },
-        { provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY, useValue: qrCodeRepo },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY, useValue: collectionRequestBagRepo },
         { provide: SendRouteSurveyUseCase, useValue: sendRouteSurvey },
       ],
     }).compile();
@@ -41,7 +41,7 @@ describe('FinishRouteIfAllCollectedUseCase', () => {
       { id: 'r1' },
       { status: 'FINISHED' },
     );
-    expect(qrCodeRepo.deleteUnusedByRoute).toHaveBeenCalledWith('r1');
+    expect(collectionRequestBagRepo.deleteUnusedByRoute).toHaveBeenCalledWith('r1');
     expect(sendRouteSurvey.sendForRoute).toHaveBeenCalled();
   });
 
@@ -55,7 +55,7 @@ describe('FinishRouteIfAllCollectedUseCase', () => {
     await useCase.call('r1');
 
     expect(routeRepo.update).not.toHaveBeenCalled();
-    expect(qrCodeRepo.deleteUnusedByRoute).not.toHaveBeenCalled();
+    expect(collectionRequestBagRepo.deleteUnusedByRoute).not.toHaveBeenCalled();
   });
 
   it('does nothing when the route is already FINISHED', async () => {

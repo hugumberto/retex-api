@@ -17,7 +17,7 @@ export class CreateItemDto {
   // Volume (QR code) ao qual o item pertence (triagem por volume).
   @IsOptional()
   @IsUUID()
-  qrCodeId?: string;
+  bagId?: string;
 
   @IsEnum(Quality)
   @IsNotEmpty()

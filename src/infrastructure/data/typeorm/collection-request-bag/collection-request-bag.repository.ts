@@ -3,23 +3,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
 import { SERVICE_TOKENS } from '../../../../app/services/tokens';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { BaseRepository } from '../abstraction/base.repository';
-import { qrCodeSchema } from './qr-code.schema';
+import { collectionRequestBagSchema } from './collection-request-bag.schema';
 
 @Injectable()
-export class QrCodeRepository
-  extends BaseRepository<QrCode>
-  implements IQrCodeRepository
+export class CollectionRequestBagRepository
+  extends BaseRepository<CollectionRequestBag>
+  implements ICollectionRequestBagRepository
 {
   constructor(
-    @InjectRepository(qrCodeSchema)
-    qrCodeRepository: Repository<QrCode>,
+    @InjectRepository(collectionRequestBagSchema)
+    collectionRequestBagRepository: Repository<CollectionRequestBag>,
     @Inject(SERVICE_TOKENS.LOCAL_STORAGE_SERVICE)
     localStorageService: ILocalStorageService,
   ) {
-    super(qrCodeRepository, localStorageService);
+    super(collectionRequestBagRepository, localStorageService);
   }
 
   async deleteExpiredUnused(olderThan: Date): Promise<number> {
@@ -33,12 +33,12 @@ export class QrCodeRepository
     return result.affected ?? 0;
   }
 
-  async findByRoute(routeId: string): Promise<QrCode[]> {
+  async findByRoute(routeId: string): Promise<CollectionRequestBag[]> {
     const repository = await this.getRepository();
     return repository
-      .createQueryBuilder('qr_code')
-      .where('qr_code.route_id = :routeId', { routeId })
-      .orderBy('qr_code.createdAt', 'ASC')
+      .createQueryBuilder('collectionRequestBag')
+      .where('collectionRequestBag.route_id = :routeId', { routeId })
+      .orderBy('collectionRequestBag.createdAt', 'ASC')
       .getMany();
   }
 

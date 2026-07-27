@@ -9,7 +9,7 @@ export class CreateCollectionRequestDto {
   @IsNotEmpty()
   addressId: string;
 
-  @IsInt({ message: 'Estimativa de volumes deve ser um número inteiro' })
-  @Min(1, { message: 'Estimativa de volumes deve ser pelo menos 1' })
-  estimatedVolumes: number;
+  @IsInt({ message: 'Estimativa de sacos deve ser um número inteiro' })
+  @Min(1, { message: 'Estimativa de sacos deve ser pelo menos 1' })
+  estimatedBags: number;
 }

@@ -130,19 +130,19 @@ export class CollectionRequestRepository
       .select('COUNT(*)', 'totalCollectionRequests')
       .addSelect('COALESCE(SUM(collectionRequest.weight), 0)', 'totalWeight')
       .addSelect(
-        'COALESCE(SUM(collectionRequest.estimatedVolumes), 0)',
-        'totalVolumes',
+        'COALESCE(SUM(collectionRequest.estimatedBags), 0)',
+        'totalBags',
       )
       .getRawOne<{
         totalCollectionRequests: string;
         totalWeight: string;
-        totalVolumes: string;
+        totalBags: string;
       }>();
 
     return {
       totalCollectionRequests: Number(row?.totalCollectionRequests ?? 0),
       totalWeight: Number(row?.totalWeight ?? 0),
-      totalVolumes: Number(row?.totalVolumes ?? 0),
+      totalBags: Number(row?.totalBags ?? 0),
     };
   }
 
@@ -204,7 +204,7 @@ export class CollectionRequestRepository
       .leftJoinAndSelect('collectionRequest.items', 'items')
       .leftJoinAndSelect('items.brand', 'brand')
       .leftJoinAndSelect('items.storageUnit', 'storageUnit')
-      .leftJoinAndSelect('items.qrCode', 'itemQrCode')
+      .leftJoinAndSelect('items.bag', 'itemBag')
       .where('collectionRequest.id = :id', { id })
       .getOne();
   }

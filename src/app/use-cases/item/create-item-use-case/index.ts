@@ -4,7 +4,7 @@ import { Item } from '../../../../domain/item/item.entity';
 import { IItemRepository } from '../../../../domain/item/item.repository';
 import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { CreateItemDto } from './create-item.dto';
@@ -18,8 +18,8 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
     private readonly collectionRequestRepository: ICollectionRequestRepository,
     @Inject(DOMAIN_TOKENS.BRAND_REPOSITORY)
     private readonly brandRepository: IBrandRepository,
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
   ) { }
 
   async call(param: CreateItemDto): Promise<Item> {
@@ -36,10 +36,10 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
     }
 
     // Validar o volume (QR code) quando informado (triagem por volume)
-    let qrCode = null;
-    if (param.qrCodeId) {
-      qrCode = await this.qrCodeRepository.findOne({ id: param.qrCodeId });
-      if (!qrCode) {
+    let bag = null;
+    if (param.bagId) {
+      bag = await this.collectionRequestBagRepository.findOne({ id: param.bagId });
+      if (!bag) {
         throw new BadRequestException('QR code não encontrado');
       }
     }
@@ -59,7 +59,7 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
       brand: brand,
       quantity: param.quantity,
       storageUnit: null, // Inicialmente vazio
-      qrCode: qrCode,
+      bag: bag,
     };
 
     const createdItem = await this.itemRepository.create(itemData);

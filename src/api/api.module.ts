@@ -19,7 +19,7 @@ import { MeController } from './me/me.controller';
 import { HealthController } from './health/health.controller';
 import { ItemController } from './item/item.controller';
 import { CollectionRequestController } from './collection-request/collection-request.controller';
-import { QrCodeController } from './qr-code/qr-code.controller';
+import { CollectionRequestBagController } from './collection-request-bag/collection-request-bag.controller';
 import { RouteController } from './route/route.controller';
 import { StorageUnitController } from './storage-unit/storage-unit.controller';
 import { SystemParameterController } from './system-parameter/system-parameter.controller';
@@ -40,7 +40,7 @@ import { WelcomeController } from './welcome/welcome.controller';
     AuthController,
     HealthController,
     CollectionRequestController,
-    QrCodeController,
+    CollectionRequestBagController,
     RouteController,
     StorageUnitController,
     CollectionController,

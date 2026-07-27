@@ -1,19 +1,19 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
-export interface RouteCollectionRequestVolumes {
+export interface RouteCollectionRequestBags {
   collectionRequest: {
     id: string;
     friendlyCode?: string | null;
     status: string;
     clientName: string;
-    estimatedVolumes?: number;
+    estimatedBags?: number;
   };
-  qrCodes: QrCode[];
+  bags: CollectionRequestBag[];
 }
 
 /**
@@ -21,26 +21,26 @@ export interface RouteCollectionRequestVolumes {
  * a cada um. Usado no modal de detalhe da tela Gerir Recolha.
  */
 @Injectable()
-export class GetRouteCollectionRequestVolumesUseCase
-  implements IUseCase<string, RouteCollectionRequestVolumes[]>
+export class GetRouteCollectionRequestBagsUseCase
+  implements IUseCase<string, RouteCollectionRequestBags[]>
 {
   constructor(
     @Inject(DOMAIN_TOKENS.ROUTE_REPOSITORY)
     private readonly routeRepository: IRouteRepository,
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
   ) {}
 
-  async call(routeId: string): Promise<RouteCollectionRequestVolumes[]> {
+  async call(routeId: string): Promise<RouteCollectionRequestBags[]> {
     const route = await this.routeRepository.findOneWithAllRelations(routeId);
     if (!route) {
       throw new NotFoundException('Recolha não encontrada');
     }
 
     // Todos os QR codes da rota, agrupados por pacote.
-    const qrCodes = await this.qrCodeRepository.findByRoute(routeId);
-    const byCollectionRequest = new Map<string, QrCode[]>();
-    for (const qr of qrCodes) {
+    const bags = await this.collectionRequestBagRepository.findByRoute(routeId);
+    const byCollectionRequest = new Map<string, CollectionRequestBag[]>();
+    for (const qr of bags) {
       if (!qr.collectionRequestId) continue;
       const list = byCollectionRequest.get(qr.collectionRequestId) ?? [];
       list.push(qr);
@@ -55,9 +55,9 @@ export class GetRouteCollectionRequestVolumesUseCase
         clientName: `${pkg.user?.firstName ?? ''} ${
           pkg.user?.lastName ?? ''
         }`.trim(),
-        estimatedVolumes: pkg.estimatedVolumes,
+        estimatedBags: pkg.estimatedBags,
       },
-      qrCodes: byCollectionRequest.get(pkg.id) ?? [],
+      bags: byCollectionRequest.get(pkg.id) ?? [],
     }));
   }
 }

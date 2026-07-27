@@ -12,14 +12,14 @@ export interface CollectionRequest extends Entity {
   user: User;
   route?: Route;
   weight?: number;
-  estimatedVolumes?: number;
+  estimatedBags?: number;
   address?: Address;
   addressId?: string;
   items?: Item[];
   collectionConfirmationToken?: string | null;
   collectionConfirmedAt?: Date | null;
-  // Nº de QR codes gerados para esta solicitação na entrada da rota em IN_TRANSIT.
-  qrCodesGenerated?: number;
+  // Nº de sacos gerados para esta solicitação na entrada da rota em IN_TRANSIT.
+  bagsGenerated?: number;
   // Motivo do cancelamento (comentário do motorista na recolha).
   cancellationReason?: string | null;
 }

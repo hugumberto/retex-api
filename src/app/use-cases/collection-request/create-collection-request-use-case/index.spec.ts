@@ -41,7 +41,7 @@ describe('CreateCollectionRequestUseCase', () => {
     useCase = module.get(CreateCollectionRequestUseCase);
   });
 
-  const param = { userId: 'user-id', addressId: 'addr-id', estimatedVolumes: 2 } as any;
+  const param = { userId: 'user-id', addressId: 'addr-id', estimatedBags: 2 } as any;
   const user = { id: 'user-id', firstName: 'John', lastName: 'Doe', email: 'j@d.pt' } as User;
   const address = {
     id: 'addr-id', userId: 'user-id', city: 'Lisboa', street: 'R', number: '1', zipCode: '1000',
@@ -72,7 +72,7 @@ describe('CreateCollectionRequestUseCase', () => {
     await useCase.call(param);
 
     expect(collectionRequestRepositoryMock.create).toHaveBeenCalledWith(
-      expect.objectContaining({ status: CollectionRequestStatus.CREATED, estimatedVolumes: 2 }),
+      expect.objectContaining({ status: CollectionRequestStatus.CREATED, estimatedBags: 2 }),
     );
   });
 

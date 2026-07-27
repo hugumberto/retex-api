@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { Route, RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { ISystemParameterRepository } from '../../../../domain/system-parameter/system-parameter.repository';
@@ -10,7 +10,7 @@ import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { SendCollectionConfirmationUseCase } from '../../collection-request/send-collection-confirmation-use-case';
-import { GenerateCollectionQrCodesUseCase } from '../../qr-code/generate-collection-qr-codes-use-case';
+import { GenerateCollectionBagsUseCase } from '../../collection-request-bag/generate-collection-bags-use-case';
 import { SendRouteSurveyUseCase } from '../send-route-survey-use-case';
 import { UpdateRouteDto } from './update-route.dto';
 
@@ -32,12 +32,12 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     private readonly userRepository: IUserRepository,
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
     @Inject(DOMAIN_TOKENS.SYSTEM_PARAMETER_REPOSITORY)
     private readonly systemParameterRepository: ISystemParameterRepository,
     private readonly sendCollectionConfirmationUseCase: SendCollectionConfirmationUseCase,
-    private readonly generateCollectionQrCodesUseCase: GenerateCollectionQrCodesUseCase,
+    private readonly generateCollectionBagsUseCase: GenerateCollectionBagsUseCase,
     private readonly sendRouteSurveyUseCase: SendRouteSurveyUseCase,
   ) { }
 
@@ -185,16 +185,16 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
         // Nunca gerar menos de 1 QR code por solicitação confirmada.
         const quantity = Math.max(
           1,
-          Math.ceil((pkg.estimatedVolumes ?? 0) * (1 + threshold / 100)),
+          Math.ceil((pkg.estimatedBags ?? 0) * (1 + threshold / 100)),
         );
         await this.collectionRequestRepository.update(
           { id: pkg.id },
           {
             status: CollectionRequestStatus.WAITING_FOR_COLLECTION,
-            qrCodesGenerated: quantity,
+            bagsGenerated: quantity,
           },
         );
-        await this.generateCollectionQrCodesUseCase.call({
+        await this.generateCollectionBagsUseCase.call({
           routeId: id,
           quantity,
         });
@@ -207,7 +207,7 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
       existingRoute.status !== RouteStatus.FINISHED &&
       data.status === RouteStatus.FINISHED
     ) {
-      await this.qrCodeRepository.deleteUnusedByRoute(id);
+      await this.collectionRequestBagRepository.deleteUnusedByRoute(id);
       this.sendRouteSurveyUseCase.sendForRoute(existingRoute).catch((err) =>
         this.logger.error(
           `Falha ao enviar questionário da rota ${id}: ${

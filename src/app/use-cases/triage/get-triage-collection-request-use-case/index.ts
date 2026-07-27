@@ -1,14 +1,14 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CollectionRequest } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
 export interface TriageCollectionRequestResult {
   collectionRequest: CollectionRequest;
-  qrCodes: QrCode[];
+  bags: CollectionRequestBag[];
 }
 
 /**
@@ -23,8 +23,8 @@ export class GetTriageCollectionRequestUseCase
   constructor(
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
   ) {}
 
   async call(code: string): Promise<TriageCollectionRequestResult> {
@@ -38,9 +38,9 @@ export class GetTriageCollectionRequestUseCase
       collectionRequestId = byCollectionRequest.id;
     } else {
       // 2. Tenta por um QR (token ou código amigável) → sua solicitação.
-      let qr = await this.qrCodeRepository.findOne({ token: code });
+      let qr = await this.collectionRequestBagRepository.findOne({ token: code });
       if (!qr) {
-        qr = await this.qrCodeRepository.findOne({ friendlyCode: code });
+        qr = await this.collectionRequestBagRepository.findOne({ friendlyCode: code });
       }
       if (qr?.collectionRequestId) {
         collectionRequestId = qr.collectionRequestId;
@@ -59,7 +59,7 @@ export class GetTriageCollectionRequestUseCase
       throw new NotFoundException('Solicitação não encontrada');
     }
 
-    const qrCodes = await this.qrCodeRepository.find({ collectionRequestId });
-    return { collectionRequest: collectionRequestEntity, qrCodes };
+    const bags = await this.collectionRequestBagRepository.find({ collectionRequestId });
+    return { collectionRequest: collectionRequestEntity, bags };
   }
 }

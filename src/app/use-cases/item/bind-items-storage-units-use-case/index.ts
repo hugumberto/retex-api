@@ -3,7 +3,7 @@ import { Item } from '../../../../domain/item/item.entity';
 import { IItemRepository } from '../../../../domain/item/item.repository';
 import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -25,8 +25,8 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
     private readonly storageUnitRepository: IStorageUnitRepository,
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
   ) { }
 
   async call(param: BindItemsStorageUnitsDto): Promise<BindItemsStorageUnitsResult> {
@@ -67,9 +67,9 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
     // Trava (só ao finalizar): todos os volumes (QR codes) do pacote
     // precisam estar processados.
     if (finalize) {
-      const qrCodes = await this.qrCodeRepository.find({ collectionRequestId });
-      if (qrCodes.some((qr) => qr.processedAt == null)) {
-        throw new BadRequestException('Nem todos os volumes foram processados');
+      const bags = await this.collectionRequestBagRepository.find({ collectionRequestId });
+      if (bags.some((qr) => qr.processedAt == null)) {
+        throw new BadRequestException('Nem todos os sacos foram processados');
       }
     }
 

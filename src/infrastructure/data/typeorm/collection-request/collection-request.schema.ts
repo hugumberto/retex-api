@@ -31,10 +31,10 @@ export const collectionRequestSchema = new EntitySchema<CollectionRequest>({
       scale: 2,
       nullable: true,
     },
-    estimatedVolumes: {
+    estimatedBags: {
       type: 'integer',
       nullable: true,
-      name: 'estimated_volumes',
+      name: 'estimated_bags',
     },
     addressId: {
       type: 'uuid',
@@ -54,11 +54,11 @@ export const collectionRequestSchema = new EntitySchema<CollectionRequest>({
       nullable: true,
       name: 'collection_confirmed_at',
     },
-    qrCodesGenerated: {
+    bagsGenerated: {
       type: 'integer',
       nullable: false,
       default: 0,
-      name: 'qr_codes_generated',
+      name: 'bags_generated',
     },
     cancellationReason: {
       type: 'text',

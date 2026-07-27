@@ -66,11 +66,11 @@ export const itemSchema = new EntitySchema<Item>({
         name: 'brand_id',
       },
     },
-    qrCode: {
+    bag: {
       type: 'many-to-one',
-      target: 'qr_code',
+      target: 'collection_request_bag',
       joinColumn: {
-        name: 'qr_code_id',
+        name: 'collection_request_bag_id',
       },
       nullable: true,
     },

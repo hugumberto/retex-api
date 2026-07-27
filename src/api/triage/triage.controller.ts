@@ -20,11 +20,11 @@ export class TriageController {
   }
 
   // Processa um volume (peso + marca como processado).
-  @Post('qr/:qrCodeId/process')
+  @Post('bag/:bagId/process')
   processQr(
-    @Param('qrCodeId') qrCodeId: string,
+    @Param('bagId') bagId: string,
     @Body() dto: ProcessTriageQrDto,
   ) {
-    return this.processTriageQrUseCase.call({ qrCodeId, weight: dto.weight });
+    return this.processTriageQrUseCase.call({ bagId, weight: dto.weight });
   }
 }

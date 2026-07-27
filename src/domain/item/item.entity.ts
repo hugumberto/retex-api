@@ -1,7 +1,7 @@
 import { Brand } from "../brand/brand.entity"
 import { Entity } from "../interfaces/entity.interface"
 import { CollectionRequest } from "../collection-request/collection-request.entity"
-import { QrCode } from "../qr-code/qr-code.entity"
+import { CollectionRequestBag } from "../collection-request-bag/collection-request-bag.entity"
 import { StorageUnit } from "../storage-unit/storage-unit.entity"
 
 export interface Item extends Entity {
@@ -14,8 +14,8 @@ export interface Item extends Entity {
   ageGroup: AgeGroup
   brand: Brand
   quantity: number
-  // Volume (QR code) ao qual este item pertence, definido na triagem.
-  qrCode?: QrCode | null
+  // Saco (com etiqueta QR) ao qual este item pertence, definido na triagem.
+  bag?: CollectionRequestBag | null
 }
 
 export enum Quality {

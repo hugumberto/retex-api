@@ -13,7 +13,7 @@ import { IEmailService } from '../../../services/interfaces/email.interface';
 import { ISanitizationService } from '../../../services/interfaces/sanitization.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
-import { generateFriendlyCode } from '../../qr-code/qr-code.util';
+import { generateFriendlyCode } from '../../collection-request-bag/bag.util';
 import { CreateCollectionRequestDto } from './create-collection-request.dto';
 
 @Injectable()
@@ -68,7 +68,7 @@ export class CreateCollectionRequestUseCase
         friendlyCode,
         user: user,
         address: address,
-        estimatedVolumes: param.estimatedVolumes,
+        estimatedBags: param.estimatedBags,
       };
 
       return this.collectionRequestRepository.create(collectionRequestDto);

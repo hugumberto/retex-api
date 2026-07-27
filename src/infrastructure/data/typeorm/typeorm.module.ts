@@ -9,7 +9,7 @@ import { TEST_DATABASE_CONFIG } from './config/typeorm-test.config';
 import { DATABASE_CONFIG } from './config/typeorm.config';
 import { itemSchema } from './item/item.schema';
 import { collectionRequestSchema } from './collection-request/collection-request.schema';
-import { qrCodeSchema } from './qr-code/qr-code.schema';
+import { collectionRequestBagSchema } from './collection-request-bag/collection-request-bag.schema';
 import { routeSchema } from './route/route.schema';
 import { systemParameterSchema } from './system-parameter/system-parameter.schema';
 import { storageUnitSchema } from './storage-unit/storage-unit.schema';
@@ -34,7 +34,7 @@ import { userSchema } from './user/user.schema';
       collectionRequestSchema,
       routeSchema,
       storageUnitSchema,
-      qrCodeSchema,
+      collectionRequestBagSchema,
       systemParameterSchema,
       userRoleSchema,
       refreshTokenSchema,

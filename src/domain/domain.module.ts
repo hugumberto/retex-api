@@ -9,7 +9,7 @@ import { IFaqItemRepository } from './faq/faq-item.repository';
 import { IUnitOfWork } from './interfaces/unit-of-work.interface';
 import { IItemRepository } from './item/item.repository';
 import { ICollectionRequestRepository } from './collection-request/collection-request.repository';
-import { IQrCodeRepository } from './qr-code/qr-code.repository';
+import { ICollectionRequestBagRepository } from './collection-request-bag/collection-request-bag.repository';
 import { IRouteRepository } from './route/route.repository';
 import { IStorageUnitRepository } from './storage-unit/storage-unit.repository';
 import { ISystemParameterRepository } from './system-parameter/system-parameter.repository';
@@ -28,7 +28,7 @@ export interface DomainModuleOptions {
   collectionRequestRepository: Type<ICollectionRequestRepository>;
   routeRepository: Type<IRouteRepository>;
   storageUnitRepository: Type<IStorageUnitRepository>;
-  qrCodeRepository: Type<IQrCodeRepository>;
+  collectionRequestBagRepository: Type<ICollectionRequestBagRepository>;
   systemParameterRepository: Type<ISystemParameterRepository>;
   userRoleRepository: Type<IUserRoleRepository>;
   refreshTokenRepository: Type<IRefreshTokenRepository>;
@@ -83,8 +83,8 @@ export class DomainModule {
           useClass: options.storageUnitRepository,
         },
         {
-          provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY,
-          useClass: options.qrCodeRepository,
+          provide: DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY,
+          useClass: options.collectionRequestBagRepository,
         },
         {
           provide: DOMAIN_TOKENS.SYSTEM_PARAMETER_REPOSITORY,
@@ -157,8 +157,8 @@ export class DomainModule {
           useClass: options.storageUnitRepository,
         },
         {
-          provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY,
-          useClass: options.qrCodeRepository,
+          provide: DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY,
+          useClass: options.collectionRequestBagRepository,
         },
         {
           provide: DOMAIN_TOKENS.SYSTEM_PARAMETER_REPOSITORY,

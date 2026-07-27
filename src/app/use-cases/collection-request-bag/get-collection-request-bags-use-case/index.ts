@@ -1,38 +1,38 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CollectionRequest } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export interface CollectionRequestVolumesResult {
+export interface CollectionRequestBagsResult {
   collectionRequest: Pick<
     CollectionRequest,
-    'id' | 'friendlyCode' | 'status' | 'estimatedVolumes' | 'qrCodesGenerated'
+    'id' | 'friendlyCode' | 'status' | 'estimatedBags' | 'bagsGenerated'
   >;
-  volumes: QrCode[];
+  bags: CollectionRequestBag[];
 }
 
 /**
- * Lista os volumes (QR codes) de um pacote, resolvido por UUID ou código
- * amigável. Usado na tela de gestão de volumes.
+ * Lista os sacos (com etiqueta QR) de uma solicitação, resolvida por UUID ou
+ * código amigável. Usado na tela de gestão de sacos.
  */
 @Injectable()
-export class GetCollectionRequestVolumesUseCase
-  implements IUseCase<string, CollectionRequestVolumesResult>
+export class GetCollectionRequestBagsUseCase
+  implements IUseCase<string, CollectionRequestBagsResult>
 {
   constructor(
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
   ) {}
 
-  async call(identifier: string): Promise<CollectionRequestVolumesResult> {
+  async call(identifier: string): Promise<CollectionRequestBagsResult> {
     const value = identifier.trim();
 
     const pkg = UUID_REGEX.test(value)
@@ -45,17 +45,17 @@ export class GetCollectionRequestVolumesUseCase
       throw new NotFoundException('Solicitação não encontrada');
     }
 
-    const volumes = await this.qrCodeRepository.find({ collectionRequestId: pkg.id });
+    const bags = await this.collectionRequestBagRepository.find({ collectionRequestId: pkg.id });
 
     return {
       collectionRequest: {
         id: pkg.id,
         friendlyCode: pkg.friendlyCode,
         status: pkg.status,
-        estimatedVolumes: pkg.estimatedVolumes,
-        qrCodesGenerated: pkg.qrCodesGenerated,
+        estimatedBags: pkg.estimatedBags,
+        bagsGenerated: pkg.bagsGenerated,
       },
-      volumes,
+      bags,
     };
   }
 }

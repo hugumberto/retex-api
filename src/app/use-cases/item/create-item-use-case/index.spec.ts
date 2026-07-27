@@ -6,7 +6,7 @@ import { Item } from '../../../../domain/item/item.entity';
 import { IItemRepository } from '../../../../domain/item/item.repository';
 import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { CreateItemUseCase } from '.';
 
@@ -15,7 +15,7 @@ describe('CreateItemUseCase', () => {
   const itemRepositoryMock = mock<IItemRepository>();
   const collectionRequestRepositoryMock = mock<ICollectionRequestRepository>();
   const brandRepositoryMock = mock<IBrandRepository>();
-  const qrCodeRepositoryMock = mock<IQrCodeRepository>();
+  const collectionRequestBagRepositoryMock = mock<ICollectionRequestBagRepository>();
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -25,7 +25,7 @@ describe('CreateItemUseCase', () => {
         { provide: DOMAIN_TOKENS.ITEM_REPOSITORY, useValue: itemRepositoryMock },
         { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepositoryMock },
         { provide: DOMAIN_TOKENS.BRAND_REPOSITORY, useValue: brandRepositoryMock },
-        { provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY, useValue: qrCodeRepositoryMock },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY, useValue: collectionRequestBagRepositoryMock },
       ],
     }).compile();
     useCase = module.get(CreateItemUseCase);

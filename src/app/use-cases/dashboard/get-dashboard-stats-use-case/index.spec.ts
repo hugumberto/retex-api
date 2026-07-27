@@ -37,7 +37,7 @@ describe('GetDashboardStatsUseCase', () => {
     collectionRequestRepo.getTotals.mockResolvedValue({
       totalCollectionRequests: 5,
       totalWeight: 100,
-      totalVolumes: 12,
+      totalBags: 12,
     });
     collectionRequestRepo.countByStatus.mockResolvedValue([
       { status: CollectionRequestStatus.CREATED, count: 3 },

@@ -7,7 +7,7 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
-import { generateFriendlyCode } from '../../qr-code/qr-code.util';
+import { generateFriendlyCode } from '../../collection-request-bag/bag.util';
 import { CreateRouteDto } from './create-route.dto';
 
 @Injectable()
