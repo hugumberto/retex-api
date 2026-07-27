@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { Route, RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -11,8 +11,8 @@ export class DeleteRouteUseCase implements IUseCase<string, Route> {
   constructor(
     @Inject(DOMAIN_TOKENS.ROUTE_REPOSITORY)
     private readonly routeRepository: IRouteRepository,
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
   ) { }
 
   async call(id: string): Promise<Route> {
@@ -29,14 +29,14 @@ export class DeleteRouteUseCase implements IUseCase<string, Route> {
       );
     }
 
-    // 2. Liberar os packages: desassociar da rota e voltar a CREATED (elegíveis).
-    if (existingRoute.packages && existingRoute.packages.length > 0) {
-      for (const packageEntity of existingRoute.packages) {
-        await this.packageRepository.update(
-          { id: packageEntity.id },
+    // 2. Liberar os collectionRequests: desassociar da rota e voltar a CREATED (elegíveis).
+    if (existingRoute.collectionRequests && existingRoute.collectionRequests.length > 0) {
+      for (const collectionRequestEntity of existingRoute.collectionRequests) {
+        await this.collectionRequestRepository.update(
+          { id: collectionRequestEntity.id },
           {
             route: null,
-            status: PackageStatus.CREATED,
+            status: CollectionRequestStatus.CREATED,
             collectionConfirmationToken: null,
             collectionConfirmedAt: null,
           }

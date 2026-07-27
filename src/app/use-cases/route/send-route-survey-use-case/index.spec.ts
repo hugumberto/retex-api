@@ -37,16 +37,16 @@ describe('SendRouteSurveyUseCase', () => {
     routeRepo.findOneWithAllRelations.mockResolvedValue({
       id: 'r1',
       status: 'IN_TRANSIT',
-      packages: [],
+      collectionRequests: [],
     } as unknown as Route);
     await expect(useCase.call('r1')).rejects.toBeInstanceOf(BadRequestException);
   });
 
-  it('sends only to COLLECTED packages, deduped by email', async () => {
+  it('sends only to COLLECTED collectionRequests, deduped by email', async () => {
     routeRepo.findOneWithAllRelations.mockResolvedValue({
       id: 'r1',
       status: 'FINISHED',
-      packages: [
+      collectionRequests: [
         { status: 'COLLECTED', user: { id: 'u1', email: 'a@x.pt', firstName: 'A', lastName: 'A' } },
         { status: 'CANCELLED', user: { id: 'u2', email: 'b@x.pt', firstName: 'B', lastName: 'B' } },
         // Mesmo cliente (email) em dois pacotes COLLECTED → um único envio.
@@ -67,7 +67,7 @@ describe('SendRouteSurveyUseCase', () => {
     routeRepo.findOneWithAllRelations.mockResolvedValue({
       id: 'r1',
       status: 'FINISHED',
-      packages: [
+      collectionRequests: [
         { status: 'COLLECTED', user: { id: 'u1', email: 'a@x.pt', firstName: 'A', lastName: 'A' } },
         { status: 'COLLECTED', user: { id: 'u2', email: 'b@x.pt', firstName: 'B', lastName: 'B' } },
       ],

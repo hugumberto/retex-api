@@ -5,8 +5,8 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Package, PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequest, CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IEmailService } from '../../../services/interfaces/email.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
@@ -18,18 +18,18 @@ import { CancelCollectionDto } from './cancel-collection.dto';
 export { CancelCollectionDto };
 
 export interface CancelCollectionParams {
-  packageId: string;
+  collectionRequestId: string;
   reason: string;
 }
 
 // Estados em que a solicitação já não pode ser cancelada na recolha.
-const NON_CANCELLABLE = new Set<PackageStatus>([
-  PackageStatus.COLLECTED,
-  PackageStatus.IN_TRANSIT,
-  PackageStatus.IN_HOUSE,
-  PackageStatus.SCREENING,
-  PackageStatus.STOCKED,
-  PackageStatus.CANCELLED,
+const NON_CANCELLABLE = new Set<CollectionRequestStatus>([
+  CollectionRequestStatus.COLLECTED,
+  CollectionRequestStatus.IN_TRANSIT,
+  CollectionRequestStatus.IN_HOUSE,
+  CollectionRequestStatus.SCREENING,
+  CollectionRequestStatus.STOCKED,
+  CollectionRequestStatus.CANCELLED,
 ]);
 
 /**
@@ -39,25 +39,25 @@ const NON_CANCELLABLE = new Set<PackageStatus>([
  */
 @Injectable()
 export class CancelCollectionUseCase
-  implements IUseCase<CancelCollectionParams, Package>
+  implements IUseCase<CancelCollectionParams, CollectionRequest>
 {
   private readonly logger = new Logger(CancelCollectionUseCase.name);
 
   constructor(
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
     @Inject(SERVICE_TOKENS.EMAIL_SERVICE)
     private readonly emailService: IEmailService,
     private readonly finishRouteIfAllCollectedUseCase: FinishRouteIfAllCollectedUseCase,
   ) {}
 
-  async call({ packageId, reason }: CancelCollectionParams): Promise<Package> {
+  async call({ collectionRequestId, reason }: CancelCollectionParams): Promise<CollectionRequest> {
     const trimmed = (reason ?? '').trim();
     if (!trimmed) {
       throw new BadRequestException('Informe o motivo do cancelamento');
     }
 
-    const pkg = await this.packageRepository.findOneWithAllRelations(packageId);
+    const pkg = await this.collectionRequestRepository.findOneWithAllRelations(collectionRequestId);
     if (!pkg) {
       throw new NotFoundException('Solicitação não encontrada');
     }
@@ -65,9 +65,9 @@ export class CancelCollectionUseCase
       throw new BadRequestException('Esta solicitação não pode ser cancelada');
     }
 
-    const [updated] = await this.packageRepository.update(
-      { id: packageId },
-      { status: PackageStatus.CANCELLED, cancellationReason: trimmed },
+    const [updated] = await this.collectionRequestRepository.update(
+      { id: collectionRequestId },
+      { status: CollectionRequestStatus.CANCELLED, cancellationReason: trimmed },
     );
 
     // Email ao cliente com o motivo (fire-and-forget).
@@ -76,7 +76,7 @@ export class CancelCollectionUseCase
         .send(buildCollectionCancelledEmail(pkg.user, trimmed, pkg.friendlyCode))
         .catch((err) =>
           this.logger.error(
-            `Falha ao enviar email de cancelamento do package ${packageId}: ${err.message}`,
+            `Falha ao enviar email de cancelamento do package ${collectionRequestId}: ${err.message}`,
           ),
         );
     }

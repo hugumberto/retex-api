@@ -12,7 +12,7 @@ import { AgeGroup, Quality, Season, Sex, Type } from '../../../../domain/item/it
 export class CreateItemDto {
   @IsString()
   @IsNotEmpty()
-  packageId: string;
+  collectionRequestId: string;
 
   // Volume (QR code) ao qual o item pertence (triagem por volume).
   @IsOptional()

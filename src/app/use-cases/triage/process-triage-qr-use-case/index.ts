@@ -4,8 +4,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
 import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -29,8 +29,8 @@ export class ProcessTriageQrUseCase
   constructor(
     @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
     private readonly qrCodeRepository: IQrCodeRepository,
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
   ) {}
 
   async call({ qrCodeId, weight }: ProcessTriageQrParams): Promise<QrCode> {
@@ -38,21 +38,21 @@ export class ProcessTriageQrUseCase
     if (!qrCode) {
       throw new NotFoundException('QR code não encontrado');
     }
-    if (!qrCode.packageId) {
+    if (!qrCode.collectionRequestId) {
       throw new BadRequestException(
         'O QR code não está vinculado a uma solicitação',
       );
     }
 
-    const packageEntity = await this.packageRepository.findOne({
-      id: qrCode.packageId,
+    const collectionRequestEntity = await this.collectionRequestRepository.findOne({
+      id: qrCode.collectionRequestId,
     });
-    if (!packageEntity) {
+    if (!collectionRequestEntity) {
       throw new NotFoundException('Solicitação não encontrada');
     }
     if (
-      packageEntity.status !== PackageStatus.COLLECTED &&
-      packageEntity.status !== PackageStatus.SCREENING
+      collectionRequestEntity.status !== CollectionRequestStatus.COLLECTED &&
+      collectionRequestEntity.status !== CollectionRequestStatus.SCREENING
     ) {
       throw new BadRequestException(
         'A solicitação não está em coleta/triagem',
@@ -66,15 +66,15 @@ export class ProcessTriageQrUseCase
 
     // Peso do pacote = soma dos pesos dos volumes (decimais vêm como string).
     const qrCodes = await this.qrCodeRepository.find({
-      packageId: qrCode.packageId,
+      collectionRequestId: qrCode.collectionRequestId,
     });
     const totalWeight = qrCodes.reduce(
       (sum, code) => sum + Number(code.weight ?? 0),
       0,
     );
-    await this.packageRepository.update(
-      { id: qrCode.packageId },
-      { weight: totalWeight, status: PackageStatus.SCREENING },
+    await this.collectionRequestRepository.update(
+      { id: qrCode.collectionRequestId },
+      { weight: totalWeight, status: CollectionRequestStatus.SCREENING },
     );
 
     return updatedQr;

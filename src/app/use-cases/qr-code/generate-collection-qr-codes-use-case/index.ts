@@ -19,7 +19,7 @@ export interface GenerateCollectionQrCodesParams {
 
 /**
  * Gera `quantity` QR codes vinculados a uma rota (pool da rota): `routeId`
- * preenchido, `packageId` nulo, `usedAt` nulo. Todos partilham o mesmo `batchId`.
+ * preenchido, `collectionRequestId` nulo, `usedAt` nulo. Todos partilham o mesmo `batchId`.
  * Usado na entrada da rota em IN_TRANSIT. Reutiliza o util de token/friendlyCode
  * e a retentativa por colisão de friendlyCode.
  */

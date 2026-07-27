@@ -18,7 +18,7 @@ import { BrandController } from './brand/brand.controller';
 import { MeController } from './me/me.controller';
 import { HealthController } from './health/health.controller';
 import { ItemController } from './item/item.controller';
-import { PackageController } from './package/package.controller';
+import { CollectionRequestController } from './collection-request/collection-request.controller';
 import { QrCodeController } from './qr-code/qr-code.controller';
 import { RouteController } from './route/route.controller';
 import { StorageUnitController } from './storage-unit/storage-unit.controller';
@@ -39,7 +39,7 @@ import { WelcomeController } from './welcome/welcome.controller';
     UserController,
     AuthController,
     HealthController,
-    PackageController,
+    CollectionRequestController,
     QrCodeController,
     RouteController,
     StorageUnitController,

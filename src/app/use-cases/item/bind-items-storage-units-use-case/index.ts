@@ -1,8 +1,8 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Item } from '../../../../domain/item/item.entity';
 import { IItemRepository } from '../../../../domain/item/item.repository';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
@@ -12,8 +12,8 @@ import { BindItemsStorageUnitsDto } from './bind-items-storage-units.dto';
 
 export interface BindItemsStorageUnitsResult {
   success: string[];
-  packageId: string;
-  packageStatus: PackageStatus;
+  collectionRequestId: string;
+  collectionRequestStatus: CollectionRequestStatus;
 }
 
 @Injectable()
@@ -23,8 +23,8 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
     private readonly itemRepository: IItemRepository,
     @Inject(DOMAIN_TOKENS.STORAGE_UNIT_REPOSITORY)
     private readonly storageUnitRepository: IStorageUnitRepository,
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
     @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
     private readonly qrCodeRepository: IQrCodeRepository,
   ) { }
@@ -49,12 +49,16 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
       throw new BadRequestException(`Storage Units não encontrados: ${missingStorageUnits.join(', ')}`);
     }
 
-    // Verificar se todos os itens pertencem ao mesmo package
-    const packageIds = [...new Set(items.map(item => item.package.id))];
-    if (packageIds.length !== 1) {
-      throw new BadRequestException('Todos os itens devem pertencer ao mesmo package');
+    // Verificar se todos os itens pertencem à mesma solicitação de recolha
+    const collectionRequestIds = [
+      ...new Set(items.map((item) => item.collectionRequest.id)),
+    ];
+    if (collectionRequestIds.length !== 1) {
+      throw new BadRequestException(
+        'Todos os itens devem pertencer à mesma solicitação de recolha',
+      );
     }
-    const packageId = packageIds[0];
+    const collectionRequestId = collectionRequestIds[0];
     // `finalize` (default true): finaliza a triagem. `false` só persiste os
     // vínculos (salvar progresso), sem STOCKED/survey e sem exigir todos
     // os volumes processados.
@@ -63,7 +67,7 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
     // Trava (só ao finalizar): todos os volumes (QR codes) do pacote
     // precisam estar processados.
     if (finalize) {
-      const qrCodes = await this.qrCodeRepository.find({ packageId });
+      const qrCodes = await this.qrCodeRepository.find({ collectionRequestId });
       if (qrCodes.some((qr) => qr.processedAt == null)) {
         throw new BadRequestException('Nem todos os volumes foram processados');
       }
@@ -129,19 +133,19 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
     if (!finalize) {
       return {
         success: successfulBinds,
-        packageId,
-        packageStatus: PackageStatus.SCREENING,
+        collectionRequestId,
+        collectionRequestStatus: CollectionRequestStatus.SCREENING,
       };
     }
 
-    await this.packageRepository.update({ id: packageId }, {
-      status: PackageStatus.STOCKED,
+    await this.collectionRequestRepository.update({ id: collectionRequestId }, {
+      status: CollectionRequestStatus.STOCKED,
     });
 
     return {
       success: successfulBinds,
-      packageId: packageId,
-      packageStatus: PackageStatus.STOCKED,
+      collectionRequestId: collectionRequestId,
+      collectionRequestStatus: CollectionRequestStatus.STOCKED,
     };
   }
 

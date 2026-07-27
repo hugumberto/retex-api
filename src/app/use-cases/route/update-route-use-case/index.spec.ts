@@ -1,7 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { Route } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
@@ -9,7 +9,7 @@ import { SystemParameter } from '../../../../domain/system-parameter/system-para
 import { ISystemParameterRepository } from '../../../../domain/system-parameter/system-parameter.repository';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
-import { SendCollectionConfirmationUseCase } from '../../package/send-collection-confirmation-use-case';
+import { SendCollectionConfirmationUseCase } from '../../collection-request/send-collection-confirmation-use-case';
 import { GenerateCollectionQrCodesUseCase } from '../../qr-code/generate-collection-qr-codes-use-case';
 import { SendRouteSurveyUseCase } from '../send-route-survey-use-case';
 import { UpdateRouteUseCase } from '.';
@@ -17,7 +17,7 @@ import { UpdateRouteUseCase } from '.';
 describe('UpdateRouteUseCase', () => {
   const routeRepo = mock<IRouteRepository>();
   const userRepo = mock<IUserRepository>();
-  const packageRepo = mock<IPackageRepository>();
+  const collectionRequestRepo = mock<ICollectionRequestRepository>();
   const qrCodeRepo = mock<IQrCodeRepository>();
   const systemParamRepo = mock<ISystemParameterRepository>();
   const sendConfirmation = mock<SendCollectionConfirmationUseCase>();
@@ -32,7 +32,7 @@ describe('UpdateRouteUseCase', () => {
         UpdateRouteUseCase,
         { provide: DOMAIN_TOKENS.ROUTE_REPOSITORY, useValue: routeRepo },
         { provide: DOMAIN_TOKENS.USER_REPOSITORY, useValue: userRepo },
-        { provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY, useValue: packageRepo },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepo },
         { provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY, useValue: qrCodeRepo },
         {
           provide: DOMAIN_TOKENS.SYSTEM_PARAMETER_REPOSITORY,
@@ -61,19 +61,19 @@ describe('UpdateRouteUseCase', () => {
 
   it('blocks composition changes when the route is not DRAFTING', async () => {
     routeRepo.findOneWithAllRelations.mockResolvedValue({
-      id: 'r1', status: 'CREATED', packages: [],
+      id: 'r1', status: 'CREATED', collectionRequests: [],
     } as unknown as Route);
 
     await expect(
-      useCase.call({ id: 'r1', data: { packageIds: ['p1'] } } as any),
+      useCase.call({ id: 'r1', data: { collectionRequestIds: ['p1'] } } as any),
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('sends confirmation to all packages when moving DRAFTING -> CREATED', async () => {
+  it('sends confirmation to all collectionRequests when moving DRAFTING -> CREATED', async () => {
     routeRepo.findOneWithAllRelations.mockResolvedValue({
       id: 'r1',
       status: 'DRAFTING',
-      packages: [{ id: 'p1' }, { id: 'p2' }],
+      collectionRequests: [{ id: 'p1' }, { id: 'p2' }],
     } as unknown as Route);
     routeRepo.update.mockResolvedValue([{ id: 'r1' } as Route]);
 
@@ -83,11 +83,11 @@ describe('UpdateRouteUseCase', () => {
     expect(sendConfirmation.call).toHaveBeenCalledWith('p2');
   });
 
-  it('on IN_TRANSIT: moves confirmed packages to WAITING_FOR_COLLECTION, records count and generates QR', async () => {
+  it('on IN_TRANSIT: moves confirmed collectionRequests to WAITING_FOR_COLLECTION, records count and generates QR', async () => {
     routeRepo.findOneWithAllRelations.mockResolvedValue({
       id: 'r1',
       status: 'WAITING_TO_START',
-      packages: [
+      collectionRequests: [
         { id: 'p1', collectionConfirmedAt: new Date(), estimatedVolumes: 3 },
         { id: 'p2', collectionConfirmedAt: null, estimatedVolumes: 5 },
       ],
@@ -97,7 +97,7 @@ describe('UpdateRouteUseCase', () => {
     await useCase.call({ id: 'r1', data: { status: 'IN_TRANSIT' } } as any);
 
     // p1 confirmado (3 * 1.1 = 3.3 -> ceil 4).
-    expect(packageRepo.update).toHaveBeenCalledWith(
+    expect(collectionRequestRepo.update).toHaveBeenCalledWith(
       { id: 'p1' },
       { status: 'WAITING_FOR_COLLECTION', qrCodesGenerated: 4 },
     );
@@ -106,7 +106,7 @@ describe('UpdateRouteUseCase', () => {
       quantity: 4,
     });
     // p2 não confirmado — não é tocado.
-    expect(packageRepo.update).not.toHaveBeenCalledWith(
+    expect(collectionRequestRepo.update).not.toHaveBeenCalledWith(
       { id: 'p2' },
       expect.anything(),
     );
@@ -116,7 +116,7 @@ describe('UpdateRouteUseCase', () => {
     routeRepo.findOneWithAllRelations.mockResolvedValue({
       id: 'r1',
       status: 'WAITING_TO_START',
-      packages: [
+      collectionRequests: [
         { id: 'p1', collectionConfirmedAt: new Date(), estimatedVolumes: null },
       ],
     } as unknown as Route);
@@ -124,7 +124,7 @@ describe('UpdateRouteUseCase', () => {
 
     await useCase.call({ id: 'r1', data: { status: 'IN_TRANSIT' } } as any);
 
-    expect(packageRepo.update).toHaveBeenCalledWith(
+    expect(collectionRequestRepo.update).toHaveBeenCalledWith(
       { id: 'p1' },
       { status: 'WAITING_FOR_COLLECTION', qrCodesGenerated: 1 },
     );
@@ -136,7 +136,7 @@ describe('UpdateRouteUseCase', () => {
 
   it('on FINISHED: deletes unused QR codes of the route', async () => {
     routeRepo.findOneWithAllRelations.mockResolvedValue({
-      id: 'r1', status: 'IN_TRANSIT', packages: [],
+      id: 'r1', status: 'IN_TRANSIT', collectionRequests: [],
     } as unknown as Route);
     routeRepo.update.mockResolvedValue([{ id: 'r1' } as Route]);
     qrCodeRepo.deleteUnusedByRoute.mockResolvedValue(2);

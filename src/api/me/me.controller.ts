@@ -17,10 +17,10 @@ import { CreateAddressUseCase } from '../../app/use-cases/address/create-address
 import { DeleteAddressUseCase } from '../../app/use-cases/address/delete-address-use-case';
 import { GetUserAddressesUseCase } from '../../app/use-cases/address/get-user-addresses-use-case';
 import { SetDefaultAddressUseCase } from '../../app/use-cases/address/set-default-address-use-case';
-import { GetUserPackagesUseCase } from '../../app/use-cases/package';
+import { GetUserCollectionRequestsUseCase } from '../../app/use-cases/collection-request';
 import { UpdateMePasswordUseCase, UpdateUserUseCase } from '../../app/use-cases/user';
 import { Address } from '../../domain/address/address.entity';
-import { Package } from '../../domain/package/package.entity';
+import { CollectionRequest } from '../../domain/collection-request/collection-request.entity';
 import { User } from '../../domain/user/user.entity';
 import { JwtPayload } from '../../app/services/interfaces/auth.interface';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -58,7 +58,7 @@ export class MeController {
     private readonly getUserAddressesUseCase: GetUserAddressesUseCase,
     private readonly setDefaultAddressUseCase: SetDefaultAddressUseCase,
     private readonly deleteAddressUseCase: DeleteAddressUseCase,
-    private readonly getUserPackagesUseCase: GetUserPackagesUseCase,
+    private readonly getUserCollectionRequestsUseCase: GetUserCollectionRequestsUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly updateMePasswordUseCase: UpdateMePasswordUseCase,
   ) {}
@@ -86,12 +86,18 @@ export class MeController {
     return this.updateMePasswordUseCase.call({ userId: sub, currentPassword: dto.currentPassword, newPassword: dto.newPassword });
   }
 
-  @Get('packages')
-  @ApiOperation({ summary: 'Listar solicitações de coleta do usuário autenticado' })
-  @ApiResponse({ status: 200, description: 'Lista de pacotes', type: Array })
-  getMyPackages(@Req() req: Request): Promise<Package[]> {
+  @Get('collection-requests')
+  @ApiOperation({
+    summary: 'Listar solicitações de recolha do utilizador autenticado',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de solicitações de recolha',
+    type: Array,
+  })
+  getMyCollectionRequests(@Req() req: Request): Promise<CollectionRequest[]> {
     const { sub } = req['user'] as JwtPayload;
-    return this.getUserPackagesUseCase.call({ userId: sub });
+    return this.getUserCollectionRequestsUseCase.call({ userId: sub });
   }
 
   @Get('address')

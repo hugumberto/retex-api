@@ -8,7 +8,7 @@ import { emailLogSchema } from './email-log/email-log.schema';
 import { TEST_DATABASE_CONFIG } from './config/typeorm-test.config';
 import { DATABASE_CONFIG } from './config/typeorm.config';
 import { itemSchema } from './item/item.schema';
-import { packageSchema } from './package/package.schema';
+import { collectionRequestSchema } from './collection-request/collection-request.schema';
 import { qrCodeSchema } from './qr-code/qr-code.schema';
 import { routeSchema } from './route/route.schema';
 import { systemParameterSchema } from './system-parameter/system-parameter.schema';
@@ -31,7 +31,7 @@ import { userSchema } from './user/user.schema';
       testZoneSchema,
       brandSchema,
       itemSchema,
-      packageSchema,
+      collectionRequestSchema,
       routeSchema,
       storageUnitSchema,
       qrCodeSchema,

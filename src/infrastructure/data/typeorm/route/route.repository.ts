@@ -36,15 +36,15 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
       queryBuilder.andWhere('route.driverId = :driverId', { driverId: filters.driverId });
     }
 
-    // Incluir relacionamentos (SEM packages para performance)
+    // Incluir relacionamentos (SEM collectionRequests para performance)
     queryBuilder
       .leftJoinAndSelect('route.driver', 'driver')
       .leftJoinAndSelect('driver.roles', 'driverRoles')
-      .loadRelationCountAndMap('route.packagesCount', 'route.packages')
+      .loadRelationCountAndMap('route.collectionRequestsCount', 'route.collectionRequests')
       // Nº de recolhas já confirmadas pelo cliente (collectionConfirmedAt != null).
       .loadRelationCountAndMap(
         'route.confirmedCount',
-        'route.packages',
+        'route.collectionRequests',
         'confirmedPkg',
         (qb) =>
           qb.andWhere('confirmedPkg.collectionConfirmedAt IS NOT NULL'),
@@ -79,9 +79,9 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
       .createQueryBuilder('route')
       .leftJoinAndSelect('route.driver', 'driver')
       .leftJoinAndSelect('driver.roles', 'driverRoles')
-      .leftJoinAndSelect('route.packages', 'packages')
-      .leftJoinAndSelect('packages.user', 'packageUser')
-      .leftJoinAndSelect('packages.address', 'packageAddress')
+      .leftJoinAndSelect('route.collectionRequests', 'collectionRequests')
+      .leftJoinAndSelect('collectionRequests.user', 'collectionRequestUser')
+      .leftJoinAndSelect('collectionRequests.address', 'collectionRequestAddress')
       .where('route.id = :id', { id })
       .getOne();
   }

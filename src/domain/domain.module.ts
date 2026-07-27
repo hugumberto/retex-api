@@ -8,7 +8,7 @@ import { IFaqCategoryRepository } from './faq/faq-category.repository';
 import { IFaqItemRepository } from './faq/faq-item.repository';
 import { IUnitOfWork } from './interfaces/unit-of-work.interface';
 import { IItemRepository } from './item/item.repository';
-import { IPackageRepository } from './package/package.repository';
+import { ICollectionRequestRepository } from './collection-request/collection-request.repository';
 import { IQrCodeRepository } from './qr-code/qr-code.repository';
 import { IRouteRepository } from './route/route.repository';
 import { IStorageUnitRepository } from './storage-unit/storage-unit.repository';
@@ -25,7 +25,7 @@ export interface DomainModuleOptions {
   testZoneRepository: Type<ITestZoneRepository>;
   brandRepository: Type<IBrandRepository>;
   itemRepository: Type<IItemRepository>;
-  packageRepository: Type<IPackageRepository>;
+  collectionRequestRepository: Type<ICollectionRequestRepository>;
   routeRepository: Type<IRouteRepository>;
   storageUnitRepository: Type<IStorageUnitRepository>;
   qrCodeRepository: Type<IQrCodeRepository>;
@@ -71,8 +71,8 @@ export class DomainModule {
           useClass: options.itemRepository,
         },
         {
-          provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY,
-          useClass: options.packageRepository,
+          provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY,
+          useClass: options.collectionRequestRepository,
         },
         {
           provide: DOMAIN_TOKENS.ROUTE_REPOSITORY,
@@ -145,8 +145,8 @@ export class DomainModule {
           useClass: options.itemRepository,
         },
         {
-          provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY,
-          useClass: options.packageRepository,
+          provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY,
+          useClass: options.collectionRequestRepository,
         },
         {
           provide: DOMAIN_TOKENS.ROUTE_REPOSITORY,

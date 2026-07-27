@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
 import { IItemRepository } from '../../../../domain/item/item.repository';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IRefreshTokenRepository } from '../../../../domain/user/refresh-token.repository';
 import { UserStatus } from '../../../../domain/user/user-status.enum';
@@ -10,7 +10,7 @@ import { IUserRepository } from '../../../../domain/user/user.repository';
 import { GetDashboardStatsUseCase } from '.';
 
 describe('GetDashboardStatsUseCase', () => {
-  const packageRepo = mock<IPackageRepository>();
+  const collectionRequestRepo = mock<ICollectionRequestRepository>();
   const itemRepo = mock<IItemRepository>();
   const userRepo = mock<IUserRepository>();
   const refreshTokenRepo = mock<IRefreshTokenRepository>();
@@ -21,7 +21,7 @@ describe('GetDashboardStatsUseCase', () => {
     const module = await Test.createTestingModule({
       providers: [
         GetDashboardStatsUseCase,
-        { provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY, useValue: packageRepo },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepo },
         { provide: DOMAIN_TOKENS.ITEM_REPOSITORY, useValue: itemRepo },
         { provide: DOMAIN_TOKENS.USER_REPOSITORY, useValue: userRepo },
         {
@@ -34,19 +34,19 @@ describe('GetDashboardStatsUseCase', () => {
   });
 
   it('aggregates stats and derives environmental impact + totals', async () => {
-    packageRepo.getTotals.mockResolvedValue({
-      totalPackages: 5,
+    collectionRequestRepo.getTotals.mockResolvedValue({
+      totalCollectionRequests: 5,
       totalWeight: 100,
       totalVolumes: 12,
     });
-    packageRepo.countByStatus.mockResolvedValue([
-      { status: PackageStatus.CREATED, count: 3 },
-      { status: PackageStatus.OUT_OF_ZONE, count: 2 },
+    collectionRequestRepo.countByStatus.mockResolvedValue([
+      { status: CollectionRequestStatus.CREATED, count: 3 },
+      { status: CollectionRequestStatus.OUT_OF_ZONE, count: 2 },
     ]);
-    packageRepo.getWeightTrend.mockResolvedValue([
+    collectionRequestRepo.getWeightTrend.mockResolvedValue([
       { period: '2026-06', weightKg: 100, count: 5 },
     ]);
-    packageRepo.countOutOfZoneByCity.mockResolvedValue([
+    collectionRequestRepo.countOutOfZoneByCity.mockResolvedValue([
       { city: 'Porto', count: 2 },
     ]);
     itemRepo.aggregateBy.mockImplementation(async (dimension) =>
@@ -66,13 +66,13 @@ describe('GetDashboardStatsUseCase', () => {
 
     const result = await useCase.call();
 
-    expect(result.packages.total).toBe(5);
-    expect(result.packages.totalWeightKg).toBe(100);
+    expect(result.collectionRequests.total).toBe(5);
+    expect(result.collectionRequests.totalWeightKg).toBe(100);
     expect(result.triage.totalItems).toBe(5);
     expect(result.environment.co2AvoidedKg).toBe(100 * 3.6);
     expect(result.environment.waterSavedLiters).toBe(100 * 10000);
     expect(result.users).toEqual({ total: 20, active: 7, statusActive: 15 });
-    expect(result.outOfZone.totalPackages).toBe(2);
+    expect(result.outOfZone.totalCollectionRequests).toBe(2);
     expect(result.outOfZone.topCities).toEqual([{ city: 'Porto', count: 2 }]);
     expect(userRepo.countByStatus).toHaveBeenCalledWith(UserStatus.ACTIVE);
   });

@@ -27,11 +27,11 @@ describe('FinishRouteIfAllCollectedUseCase', () => {
     sendRouteSurvey.sendForRoute.mockResolvedValue({ sent: 0 });
   });
 
-  it('finishes the route and deletes unused QR when all packages are COLLECTED/CANCELLED', async () => {
+  it('finishes the route and deletes unused QR when all collectionRequests are COLLECTED/CANCELLED', async () => {
     routeRepo.findOneWithAllRelations.mockResolvedValue({
       id: 'r1',
       status: 'IN_TRANSIT',
-      packages: [{ status: 'COLLECTED' }, { status: 'CANCELLED' }],
+      collectionRequests: [{ status: 'COLLECTED' }, { status: 'CANCELLED' }],
     } as unknown as Route);
     routeRepo.update.mockResolvedValue([{ id: 'r1' } as Route]);
 
@@ -49,7 +49,7 @@ describe('FinishRouteIfAllCollectedUseCase', () => {
     routeRepo.findOneWithAllRelations.mockResolvedValue({
       id: 'r1',
       status: 'IN_TRANSIT',
-      packages: [{ status: 'COLLECTED' }, { status: 'SCREENING' }],
+      collectionRequests: [{ status: 'COLLECTED' }, { status: 'SCREENING' }],
     } as unknown as Route);
 
     await useCase.call('r1');
@@ -62,7 +62,7 @@ describe('FinishRouteIfAllCollectedUseCase', () => {
     routeRepo.findOneWithAllRelations.mockResolvedValue({
       id: 'r1',
       status: 'FINISHED',
-      packages: [{ status: 'COLLECTED' }],
+      collectionRequests: [{ status: 'COLLECTED' }],
     } as unknown as Route);
 
     await useCase.call('r1');

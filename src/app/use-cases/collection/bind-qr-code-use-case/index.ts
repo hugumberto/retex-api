@@ -5,8 +5,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
 import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -16,26 +16,26 @@ import { BindQrCodeDto } from './bind-qr-code.dto';
 export { BindQrCodeDto };
 
 export interface BindQrCodeParams {
-  packageId: string;
+  collectionRequestId: string;
   code: string;
 }
 
 @Injectable()
 export class BindQrCodeUseCase implements IUseCase<BindQrCodeParams, QrCode> {
   constructor(
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
     @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
     private readonly qrCodeRepository: IQrCodeRepository,
   ) { }
 
-  async call({ packageId, code }: BindQrCodeParams): Promise<QrCode> {
-    const packageEntity =
-      await this.packageRepository.findOneWithAllRelations(packageId);
-    if (!packageEntity) {
+  async call({ collectionRequestId, code }: BindQrCodeParams): Promise<QrCode> {
+    const collectionRequestEntity =
+      await this.collectionRequestRepository.findOneWithAllRelations(collectionRequestId);
+    if (!collectionRequestEntity) {
       throw new NotFoundException('Solicitação não encontrada');
     }
-    if (packageEntity.status !== PackageStatus.WAITING_FOR_COLLECTION) {
+    if (collectionRequestEntity.status !== CollectionRequestStatus.WAITING_FOR_COLLECTION) {
       throw new BadRequestException('A solicitação não está aguardando recolha');
     }
 
@@ -47,22 +47,22 @@ export class BindQrCodeUseCase implements IUseCase<BindQrCodeParams, QrCode> {
     if (!qrCode) {
       throw new NotFoundException('QR code não encontrado');
     }
-    if (qrCode.usedAt || qrCode.packageId) {
+    if (qrCode.usedAt || qrCode.collectionRequestId) {
       throw new ConflictException('QR code já utilizado');
     }
     // O QR pertence à rota do pacote (os códigos são gerados por rota) — evita
     // vincular um QR de outra rota.
     if (
       qrCode.routeId &&
-      packageEntity.route?.id &&
-      qrCode.routeId !== packageEntity.route.id
+      collectionRequestEntity.route?.id &&
+      qrCode.routeId !== collectionRequestEntity.route.id
     ) {
       throw new BadRequestException('O QR code não pertence a esta rota');
     }
 
     const [updated] = await this.qrCodeRepository.update(
       { id: qrCode.id },
-      { packageId, usedAt: new Date() },
+      { collectionRequestId, usedAt: new Date() },
     );
     return updated;
   }

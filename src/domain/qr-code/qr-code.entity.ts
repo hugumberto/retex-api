@@ -5,7 +5,7 @@ export interface QrCode extends Entity {
   friendlyCode: string
   batchId: string
   usedAt?: Date | null
-  packageId?: string | null
+  collectionRequestId?: string | null
   // Rota que gerou o código (pool da rota). Preenchido na entrada em IN_TRANSIT.
   routeId?: string | null
   // Peso do volume, informado na triagem.

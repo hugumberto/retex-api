@@ -1,8 +1,8 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
-import { Package } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequest } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
 import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -10,7 +10,7 @@ import { ProcessTriageQrUseCase } from '.';
 
 describe('ProcessTriageQrUseCase', () => {
   const qrCodeRepo = mock<IQrCodeRepository>();
-  const packageRepo = mock<IPackageRepository>();
+  const collectionRequestRepo = mock<ICollectionRequestRepository>();
   let useCase: ProcessTriageQrUseCase;
 
   beforeEach(async () => {
@@ -19,30 +19,30 @@ describe('ProcessTriageQrUseCase', () => {
       providers: [
         ProcessTriageQrUseCase,
         { provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY, useValue: qrCodeRepo },
-        { provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY, useValue: packageRepo },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepo },
       ],
     }).compile();
     useCase = module.get(ProcessTriageQrUseCase);
   });
 
   it('throws when the QR is not linked to a package', async () => {
-    qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', packageId: null } as QrCode);
+    qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', collectionRequestId: null } as QrCode);
     await expect(useCase.call({ qrCodeId: 'q1', weight: 2 })).rejects.toThrow(
       BadRequestException,
     );
   });
 
   it('throws when the package is not in collection/screening', async () => {
-    qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', packageId: 'p1' } as QrCode);
-    packageRepo.findOne.mockResolvedValue({ id: 'p1', status: 'STOCKED' } as Package);
+    qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', collectionRequestId: 'p1' } as QrCode);
+    collectionRequestRepo.findOne.mockResolvedValue({ id: 'p1', status: 'STOCKED' } as CollectionRequest);
     await expect(useCase.call({ qrCodeId: 'q1', weight: 2 })).rejects.toThrow(
       BadRequestException,
     );
   });
 
   it('sets weight+processedAt, recomputes the package weight and SCREENING', async () => {
-    qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', packageId: 'p1' } as QrCode);
-    packageRepo.findOne.mockResolvedValue({ id: 'p1', status: 'COLLECTED' } as Package);
+    qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', collectionRequestId: 'p1' } as QrCode);
+    collectionRequestRepo.findOne.mockResolvedValue({ id: 'p1', status: 'COLLECTED' } as CollectionRequest);
     qrCodeRepo.update.mockResolvedValue([{ id: 'q1', weight: 4 } as QrCode]);
     qrCodeRepo.find.mockResolvedValue([
       { weight: '4.00' } as unknown as QrCode,
@@ -55,7 +55,7 @@ describe('ProcessTriageQrUseCase', () => {
       { id: 'q1' },
       expect.objectContaining({ weight: 4, processedAt: expect.any(Date) }),
     );
-    expect(packageRepo.update).toHaveBeenCalledWith(
+    expect(collectionRequestRepo.update).toHaveBeenCalledWith(
       { id: 'p1' },
       { weight: 7, status: 'SCREENING' },
     );

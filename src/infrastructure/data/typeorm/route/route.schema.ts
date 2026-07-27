@@ -49,9 +49,9 @@ export const routeSchema = new EntitySchema<Route>({
       },
       inverseSide: 'routes',
     },
-    packages: {
+    collectionRequests: {
       type: 'one-to-many',
-      target: 'package',
+      target: 'collection_request',
       joinColumn: {
         name: 'route_id',
       },

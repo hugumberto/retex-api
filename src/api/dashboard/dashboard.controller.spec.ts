@@ -23,7 +23,7 @@ describe('DashboardController', () => {
   });
 
   it('delegates to the use-case', async () => {
-    const stats = { packages: { total: 1 } } as any;
+    const stats = { collectionRequests: { total: 1 } } as any;
     (getDashboardStatsUseCase.call as jest.Mock).mockResolvedValue(stats);
     expect(await controller.getStats()).toBe(stats);
     expect(getDashboardStatsUseCase.call).toHaveBeenCalledTimes(1);

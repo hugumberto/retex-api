@@ -3,7 +3,7 @@ import { DeleteRouteUseCase } from "./delete-route-use-case";
 import { FinishRouteIfAllCollectedUseCase } from "./finish-route-if-all-collected-use-case";
 import { GetAllRoutesUseCase } from "./get-all-routes-use-case";
 import { GetRouteByIdUseCase } from "./get-route-by-id-use-case";
-import { GetRoutePackageVolumesUseCase } from "./get-route-package-volumes-use-case";
+import { GetRouteCollectionRequestVolumesUseCase } from "./get-route-collection-request-volumes-use-case";
 import { SendRouteSurveyUseCase } from "./send-route-survey-use-case";
 import { UpdateRouteUseCase } from "./update-route-use-case";
 
@@ -13,7 +13,7 @@ export const ROUTE_USE_CASES = [
   FinishRouteIfAllCollectedUseCase,
   GetAllRoutesUseCase,
   GetRouteByIdUseCase,
-  GetRoutePackageVolumesUseCase,
+  GetRouteCollectionRequestVolumesUseCase,
   SendRouteSurveyUseCase,
   UpdateRouteUseCase,
 ];

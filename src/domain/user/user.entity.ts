@@ -1,6 +1,6 @@
 import { Address } from '../address/address.entity';
 import { Entity } from '../interfaces/entity.interface';
-import { Package } from '../package/package.entity';
+import { CollectionRequest } from '../collection-request/collection-request.entity';
 import { Route } from '../route/route.entity';
 import { UserRole } from './user-roles.entity';
 import { Gender } from './gender.enum';
@@ -22,7 +22,7 @@ export interface User extends Entity {
   activationBypassZone?: boolean;
   resetToken?: string | null;
   resetTokenExpiresAt?: Date | null;
-  packages?: Package[];
+  collectionRequests?: CollectionRequest[];
   routes?: Route[];
   roles: UserRole[];
   addresses?: Address[];

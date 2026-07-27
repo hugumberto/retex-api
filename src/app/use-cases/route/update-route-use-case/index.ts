@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { Route, RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
@@ -9,7 +9,7 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
-import { SendCollectionConfirmationUseCase } from '../../package/send-collection-confirmation-use-case';
+import { SendCollectionConfirmationUseCase } from '../../collection-request/send-collection-confirmation-use-case';
 import { GenerateCollectionQrCodesUseCase } from '../../qr-code/generate-collection-qr-codes-use-case';
 import { SendRouteSurveyUseCase } from '../send-route-survey-use-case';
 import { UpdateRouteDto } from './update-route.dto';
@@ -30,8 +30,8 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     private readonly routeRepository: IRouteRepository,
     @Inject(DOMAIN_TOKENS.USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
     @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
     private readonly qrCodeRepository: IQrCodeRepository,
     @Inject(DOMAIN_TOKENS.SYSTEM_PARAMETER_REPOSITORY)
@@ -44,7 +44,7 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
   async call(param: UpdateRouteParamDto): Promise<Route> {
     const { id, data } = param;
 
-    // 1. Verificar se a route existe (com packages, para reverter os removidos)
+    // 1. Verificar se a route existe (com collectionRequests, para reverter os removidos)
     const existingRoute = await this.routeRepository.findOneWithAllRelations(id);
     if (!existingRoute) {
       throw new NotFoundException('Route não encontrada');
@@ -54,7 +54,7 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     if (existingRoute.status !== RouteStatus.DRAFTING) {
       if (
         data.driverId ||
-        data.packageIds ||
+        data.collectionRequestIds ||
         data.startDate ||
         data.collectionInterval
       ) {
@@ -82,30 +82,30 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
       updateData.driver = driver;
     }
 
-    // 4. Validar e atualizar packages se fornecidos
-    if (data.packageIds) {
-      const packages = [];
-      for (const packageId of data.packageIds) {
-        const packageEntity = await this.packageRepository.findOneWithAllRelations(packageId);
-        if (!packageEntity) {
-          throw new NotFoundException(`Package com ID ${packageId} não encontrado`);
+    // 4. Validar e atualizar collectionRequests se fornecidos
+    if (data.collectionRequestIds) {
+      const collectionRequests = [];
+      for (const collectionRequestId of data.collectionRequestIds) {
+        const collectionRequestEntity = await this.collectionRequestRepository.findOneWithAllRelations(collectionRequestId);
+        if (!collectionRequestEntity) {
+          throw new NotFoundException(`CollectionRequest com ID ${collectionRequestId} não encontrado`);
         }
 
         // Apenas solicitações no status CREATED podem estar numa rota.
-        if (packageEntity.status !== PackageStatus.CREATED) {
+        if (collectionRequestEntity.status !== CollectionRequestStatus.CREATED) {
           throw new BadRequestException(
-            `Package ${packageId} não está no status CREATED`,
+            `CollectionRequest ${collectionRequestId} não está no status CREATED`,
           );
         }
 
         // Uma solicitação existe em no máximo uma rota (exceto a atual).
-        if (packageEntity.route && packageEntity.route.id !== id) {
-          throw new ConflictException(`Package ${packageId} já está associado a outra rota`);
+        if (collectionRequestEntity.route && collectionRequestEntity.route.id !== id) {
+          throw new ConflictException(`CollectionRequest ${collectionRequestId} já está associado a outra rota`);
         }
 
-        packages.push(packageEntity);
+        collectionRequests.push(collectionRequestEntity);
       }
-      updateData.packages = packages;
+      updateData.collectionRequests = collectionRequests;
     }
 
     // 5. Atualizar outros campos
@@ -129,15 +129,15 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     const [updatedRoute] = await this.routeRepository.update({ id }, updateData);
 
     // 7. Solicitações removidas da rota → voltam a CREATED (só em DRAFTING).
-    if (data.packageIds) {
-      const newIds = new Set(data.packageIds);
-      for (const previous of existingRoute.packages ?? []) {
+    if (data.collectionRequestIds) {
+      const newIds = new Set(data.collectionRequestIds);
+      for (const previous of existingRoute.collectionRequests ?? []) {
         if (!newIds.has(previous.id)) {
-          await this.packageRepository.update(
+          await this.collectionRequestRepository.update(
             { id: previous.id },
             {
               route: null,
-              status: PackageStatus.CREATED,
+              status: CollectionRequestStatus.CREATED,
               collectionConfirmationToken: null,
               collectionConfirmedAt: null,
             },
@@ -153,14 +153,14 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
       existingRoute.status === RouteStatus.DRAFTING &&
       data.status === RouteStatus.CREATED
     ) {
-      const packageIds =
-        data.packageIds ?? (existingRoute.packages ?? []).map((pkg) => pkg.id);
-      for (const packageId of packageIds) {
+      const collectionRequestIds =
+        data.collectionRequestIds ?? (existingRoute.collectionRequests ?? []).map((pkg) => pkg.id);
+      for (const collectionRequestId of collectionRequestIds) {
         this.sendCollectionConfirmationUseCase
-          .call(packageId)
+          .call(collectionRequestId)
           .catch((err) =>
             this.logger.error(
-              `Falha ao enviar confirmação de coleta do package ${packageId}: ${err.message}`,
+              `Falha ao enviar confirmação de coleta do package ${collectionRequestId}: ${err.message}`,
             ),
           );
       }
@@ -177,7 +177,7 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
         params?.qrCodeThresholdPercentage ??
         DEFAULT_QR_CODE_THRESHOLD_PERCENTAGE;
 
-      for (const pkg of existingRoute.packages ?? []) {
+      for (const pkg of existingRoute.collectionRequests ?? []) {
         // Confirmadas (inclui as já movidas a WAITING_FOR_COLLECTION pelo cron).
         if (pkg.collectionConfirmedAt == null) {
           continue;
@@ -187,10 +187,10 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
           1,
           Math.ceil((pkg.estimatedVolumes ?? 0) * (1 + threshold / 100)),
         );
-        await this.packageRepository.update(
+        await this.collectionRequestRepository.update(
           { id: pkg.id },
           {
-            status: PackageStatus.WAITING_FOR_COLLECTION,
+            status: CollectionRequestStatus.WAITING_FOR_COLLECTION,
             qrCodesGenerated: quantity,
           },
         );

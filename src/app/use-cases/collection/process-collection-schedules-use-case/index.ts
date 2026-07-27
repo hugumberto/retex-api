@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { ISystemParameterRepository } from '../../../../domain/system-parameter/system-parameter.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
@@ -22,8 +22,8 @@ export class ProcessCollectionSchedulesUseCase
   implements IUseCase<void, ProcessCollectionSchedulesResult>
 {
   constructor(
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
     @Inject(DOMAIN_TOKENS.SYSTEM_PARAMETER_REPOSITORY)
     private readonly systemParameterRepository: ISystemParameterRepository,
   ) { }
@@ -35,20 +35,20 @@ export class ProcessCollectionSchedulesUseCase
       DEFAULT_CONFIRMATION_DEADLINE_DAYS;
 
     // 1. Prazo expirado sem confirmação → sai da rota e volta a ficar elegível.
-    const expired = await this.packageRepository.findExpiredUnconfirmed(days);
+    const expired = await this.collectionRequestRepository.findExpiredUnconfirmed(days);
     for (const pkg of expired) {
-      await this.packageRepository.update(
+      await this.collectionRequestRepository.update(
         { id: pkg.id },
         { route: null, collectionConfirmationToken: null },
       );
     }
 
     // 2. Dia da coleta chegou (confirmadas) → aguardando recolha.
-    const due = await this.packageRepository.findDueConfirmed();
+    const due = await this.collectionRequestRepository.findDueConfirmed();
     for (const pkg of due) {
-      await this.packageRepository.update(
+      await this.collectionRequestRepository.update(
         { id: pkg.id },
-        { status: PackageStatus.WAITING_FOR_COLLECTION },
+        { status: CollectionRequestStatus.WAITING_FOR_COLLECTION },
       );
     }
 

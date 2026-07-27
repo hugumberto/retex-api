@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { PackageStatus } from '../../../../domain/package/package.entity';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
@@ -30,13 +30,13 @@ export class FinishRouteIfAllCollectedUseCase implements IUseCase<string, void> 
     const route = await this.routeRepository.findOneWithAllRelations(routeId);
     if (!route || route.status === RouteStatus.FINISHED) return;
 
-    const packages = route.packages ?? [];
-    if (packages.length === 0) return;
+    const collectionRequests = route.collectionRequests ?? [];
+    if (collectionRequests.length === 0) return;
 
-    const allDone = packages.every(
+    const allDone = collectionRequests.every(
       (pkg) =>
-        pkg.status === PackageStatus.COLLECTED ||
-        pkg.status === PackageStatus.CANCELLED,
+        pkg.status === CollectionRequestStatus.COLLECTED ||
+        pkg.status === CollectionRequestStatus.CANCELLED,
     );
     if (!allDone) return;
 

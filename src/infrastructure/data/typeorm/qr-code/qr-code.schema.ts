@@ -31,10 +31,10 @@ export const qrCodeSchema = new EntitySchema<QrCode>({
       nullable: true,
       name: 'used_at',
     },
-    packageId: {
+    collectionRequestId: {
       type: 'uuid',
       nullable: true,
-      name: 'package_id',
+      name: 'collection_request_id',
     },
     routeId: {
       type: 'uuid',

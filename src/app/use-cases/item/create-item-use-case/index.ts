@@ -2,8 +2,8 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { IBrandRepository } from '../../../../domain/brand/brand.repository';
 import { Item } from '../../../../domain/item/item.entity';
 import { IItemRepository } from '../../../../domain/item/item.repository';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
@@ -14,8 +14,8 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
   constructor(
     @Inject(DOMAIN_TOKENS.ITEM_REPOSITORY)
     private readonly itemRepository: IItemRepository,
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
     @Inject(DOMAIN_TOKENS.BRAND_REPOSITORY)
     private readonly brandRepository: IBrandRepository,
     @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
@@ -24,9 +24,9 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
 
   async call(param: CreateItemDto): Promise<Item> {
     // Validar se o package existe
-    const packageEntity = await this.packageRepository.findOne({ id: param.packageId });
-    if (!packageEntity) {
-      throw new BadRequestException('Package não encontrado');
+    const collectionRequestEntity = await this.collectionRequestRepository.findOne({ id: param.collectionRequestId });
+    if (!collectionRequestEntity) {
+      throw new BadRequestException('CollectionRequest não encontrado');
     }
 
     // Validar se a brand existe
@@ -45,12 +45,12 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
     }
 
     // Verificar se é o primeiro item do package
-    const existingItems = await this.itemRepository.findByPackageId(param.packageId);
+    const existingItems = await this.itemRepository.findByCollectionRequestId(param.collectionRequestId);
     const isFirstItem = existingItems.length === 0;
 
     // Criar o item com storageUnit vazio
     const itemData: Partial<Item> = {
-      package: packageEntity,
+      collectionRequest: collectionRequestEntity,
       quality: param.quality,
       type: param.type,
       season: param.season,
@@ -66,8 +66,8 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
 
     // Se for o primeiro item, atualizar o status do package para SCREENING
     if (isFirstItem) {
-      await this.packageRepository.update({ id: param.packageId }, {
-        status: PackageStatus.SCREENING,
+      await this.collectionRequestRepository.update({ id: param.collectionRequestId }, {
+        status: CollectionRequestStatus.SCREENING,
       });
     }
 

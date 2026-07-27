@@ -43,11 +43,11 @@ export const itemSchema = new EntitySchema<Item>({
     ...BaseTimestampColumns,
   },
   relations: {
-    package: {
+    collectionRequest: {
       type: 'many-to-one',
-      target: 'package',
+      target: 'collection_request',
       joinColumn: {
-        name: 'package_id',
+        name: 'collection_request_id',
       },
       inverseSide: 'items',
     },

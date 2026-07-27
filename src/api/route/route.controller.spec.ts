@@ -7,6 +7,7 @@ import { UpdateRouteUseCase } from '../../app/use-cases/route/update-route-use-c
 import { ProcessCollectionSchedulesUseCase } from '../../app/use-cases/collection/process-collection-schedules-use-case';
 import { GetRouteQrCodesUseCase } from '../../app/use-cases/qr-code/get-route-qr-codes-use-case';
 import { SendRouteSurveyUseCase } from '../../app/use-cases/route/send-route-survey-use-case';
+import { GetRouteCollectionRequestVolumesUseCase } from '../../app/use-cases/route/get-route-collection-request-volumes-use-case';
 import { RouteController } from './route.controller';
 
 describe('RouteController', () => {
@@ -64,6 +65,12 @@ describe('RouteController', () => {
           },
         },
         {
+          provide: GetRouteCollectionRequestVolumesUseCase,
+          useValue: {
+            call: jest.fn(),
+          },
+        },
+        {
           provide: SendRouteSurveyUseCase,
           useValue: {
             call: jest.fn(),
@@ -88,7 +95,7 @@ describe('RouteController', () => {
     it('should call CreateRouteUseCase with correct parameters', async () => {
       const createRouteDto = {
         driverId: 'driver-uuid-123',
-        packageIds: ['package-1', 'package-2'],
+        collectionRequestIds: ['package-1', 'package-2'],
         startDate: '2024-01-15T10:00:00Z',
       };
 
@@ -96,7 +103,7 @@ describe('RouteController', () => {
         id: 'route-uuid',
         status: 'DRAFTING',
         driverId: 'driver-uuid-123',
-        packageIds: ['package-1', 'package-2'],
+        collectionRequestIds: ['package-1', 'package-2'],
         startDate: new Date('2024-01-15T10:00:00Z'),
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -124,7 +131,7 @@ describe('RouteController', () => {
         data: [
           {
             id: 'route-uuid',
-            packagesCount: 3, // Agora retorna apenas o count
+            collectionRequestsCount: 3, // Agora retorna apenas o count
           }
         ],
         meta: {
@@ -152,7 +159,7 @@ describe('RouteController', () => {
         id: 'route-uuid-123',
         status: 'DRAFTING',
         driver: { id: 'driver-uuid', firstName: 'João' },
-        packages: [
+        collectionRequests: [
           { id: 'package-1', status: 'CREATED' },
           { id: 'package-2', status: 'CREATED' }
         ],

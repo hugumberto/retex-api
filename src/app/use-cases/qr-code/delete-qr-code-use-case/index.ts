@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Package } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequest } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
 import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -15,8 +15,8 @@ export class DeleteQrCodeUseCase implements IUseCase<string, QrCode> {
   constructor(
     @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
     private readonly qrCodeRepository: IQrCodeRepository,
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
   ) {}
 
   async call(qrCodeId: string): Promise<QrCode> {
@@ -25,15 +25,15 @@ export class DeleteQrCodeUseCase implements IUseCase<string, QrCode> {
       throw new NotFoundException('Volume não encontrado');
     }
 
-    const packageId = qr.packageId;
+    const collectionRequestId = qr.collectionRequestId;
 
     const deleted = await this.qrCodeRepository.delete({ id: qrCodeId });
 
-    if (packageId) {
-      const remaining = await this.qrCodeRepository.find({ packageId });
-      await this.packageRepository.update(
-        { id: packageId } as Partial<Package>,
-        { qrCodesGenerated: remaining.length } as Partial<Package>,
+    if (collectionRequestId) {
+      const remaining = await this.qrCodeRepository.find({ collectionRequestId });
+      await this.collectionRequestRepository.update(
+        { id: collectionRequestId } as Partial<CollectionRequest>,
+        { qrCodesGenerated: remaining.length } as Partial<CollectionRequest>,
       );
     }
 

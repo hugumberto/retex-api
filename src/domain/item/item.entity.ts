@@ -1,11 +1,11 @@
 import { Brand } from "../brand/brand.entity"
 import { Entity } from "../interfaces/entity.interface"
-import { Package } from "../package/package.entity"
+import { CollectionRequest } from "../collection-request/collection-request.entity"
 import { QrCode } from "../qr-code/qr-code.entity"
 import { StorageUnit } from "../storage-unit/storage-unit.entity"
 
 export interface Item extends Entity {
-  package: Package
+  collectionRequest: CollectionRequest
   quality: Quality
   type: Type
   storageUnit: StorageUnit
