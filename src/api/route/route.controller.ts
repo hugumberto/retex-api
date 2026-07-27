@@ -7,6 +7,7 @@ import { GetAllRoutesUseCase } from "../../app/use-cases/route/get-all-routes-us
 import { GetAllRoutesDto } from "../../app/use-cases/route/get-all-routes-use-case/get-all-routes.dto";
 import { GetRouteByIdUseCase } from "../../app/use-cases/route/get-route-by-id-use-case";
 import { GetRouteQrCodesUseCase } from "../../app/use-cases/qr-code/get-route-qr-codes-use-case";
+import { GetRoutePackageVolumesUseCase } from "../../app/use-cases/route/get-route-package-volumes-use-case";
 import { SendRouteSurveyUseCase } from "../../app/use-cases/route/send-route-survey-use-case";
 import { UpdateRouteUseCase } from "../../app/use-cases/route/update-route-use-case";
 import { UpdateRouteDto } from "../../app/use-cases/route/update-route-use-case/update-route.dto";
@@ -24,6 +25,7 @@ export class RouteController {
     private readonly updateRouteUseCase: UpdateRouteUseCase,
     private readonly processCollectionSchedulesUseCase: ProcessCollectionSchedulesUseCase,
     private readonly getRouteQrCodesUseCase: GetRouteQrCodesUseCase,
+    private readonly getRoutePackageVolumesUseCase: GetRoutePackageVolumesUseCase,
     private readonly sendRouteSurveyUseCase: SendRouteSurveyUseCase,
   ) { }
 
@@ -54,6 +56,12 @@ export class RouteController {
   @Get(':id/qr-codes')
   getRouteQrCodes(@Param('id') id: string) {
     return this.getRouteQrCodesUseCase.call(id);
+  }
+
+  // Pacotes da recolha com os volumes (QR codes) de cada um (modal de detalhe).
+  @Get(':id/package-volumes')
+  getRoutePackageVolumes(@Param('id') id: string) {
+    return this.getRoutePackageVolumesUseCase.call(id);
   }
 
   // Disparo manual do questionário de satisfação aos clientes da recolha.
