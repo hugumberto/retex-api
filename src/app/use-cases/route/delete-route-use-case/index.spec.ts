@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
@@ -34,5 +34,16 @@ describe('DeleteRouteUseCase', () => {
     routeRepo.delete.mockResolvedValue({ id: 'r1' } as Route);
     await useCase.call('r1');
     expect(routeRepo.delete).toHaveBeenCalledWith({ id: 'r1' });
+  });
+
+  it('does not delete a FINISHED route', async () => {
+    routeRepo.findOneWithAllRelations.mockResolvedValue({
+      id: 'r1',
+      status: 'FINISHED',
+      packages: [],
+    } as unknown as Route);
+
+    await expect(useCase.call('r1')).rejects.toThrow(BadRequestException);
+    expect(routeRepo.delete).not.toHaveBeenCalled();
   });
 });

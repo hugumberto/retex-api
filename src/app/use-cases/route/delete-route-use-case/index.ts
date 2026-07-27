@@ -1,7 +1,7 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PackageStatus } from '../../../../domain/package/package.entity';
 import { IPackageRepository } from '../../../../domain/package/package.repository';
-import { Route } from '../../../../domain/route/route.entity';
+import { Route, RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
@@ -20,6 +20,13 @@ export class DeleteRouteUseCase implements IUseCase<string, Route> {
     const existingRoute = await this.routeRepository.findOneWithAllRelations(id);
     if (!existingRoute) {
       throw new NotFoundException('Route não encontrada');
+    }
+
+    // 1.1. Recolha concluída não pode ser excluída.
+    if (existingRoute.status === RouteStatus.FINISHED) {
+      throw new BadRequestException(
+        'Não é possível excluir uma recolha concluída',
+      );
     }
 
     // 2. Liberar os packages: desassociar da rota e voltar a CREATED (elegíveis).
