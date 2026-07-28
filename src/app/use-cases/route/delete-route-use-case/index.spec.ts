@@ -1,7 +1,7 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { Route } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -9,7 +9,7 @@ import { DeleteRouteUseCase } from '.';
 
 describe('DeleteRouteUseCase', () => {
   const routeRepo = mock<IRouteRepository>();
-  const packageRepo = mock<IPackageRepository>();
+  const collectionRequestRepo = mock<ICollectionRequestRepository>();
   let useCase: DeleteRouteUseCase;
 
   beforeEach(async () => {
@@ -18,7 +18,7 @@ describe('DeleteRouteUseCase', () => {
       providers: [
         DeleteRouteUseCase,
         { provide: DOMAIN_TOKENS.ROUTE_REPOSITORY, useValue: routeRepo },
-        { provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY, useValue: packageRepo },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepo },
       ],
     }).compile();
     useCase = module.get(DeleteRouteUseCase);
@@ -30,9 +30,20 @@ describe('DeleteRouteUseCase', () => {
   });
 
   it('deletes an existing route', async () => {
-    routeRepo.findOneWithAllRelations.mockResolvedValue({ id: 'r1', packages: [] } as unknown as Route);
+    routeRepo.findOneWithAllRelations.mockResolvedValue({ id: 'r1', collectionRequests: [] } as unknown as Route);
     routeRepo.delete.mockResolvedValue({ id: 'r1' } as Route);
     await useCase.call('r1');
     expect(routeRepo.delete).toHaveBeenCalledWith({ id: 'r1' });
+  });
+
+  it('does not delete a FINISHED route', async () => {
+    routeRepo.findOneWithAllRelations.mockResolvedValue({
+      id: 'r1',
+      status: 'FINISHED',
+      collectionRequests: [],
+    } as unknown as Route);
+
+    await expect(useCase.call('r1')).rejects.toThrow(BadRequestException);
+    expect(routeRepo.delete).not.toHaveBeenCalled();
   });
 });

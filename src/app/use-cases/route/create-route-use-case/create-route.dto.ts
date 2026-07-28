@@ -9,7 +9,7 @@ export class CreateRouteDto {
   @IsArray()
   @ArrayNotEmpty()
   @IsUUID('4', { each: true })
-  packageIds: string[];
+  collectionRequestIds: string[];
 
   @IsDateString()
   startDate: string;

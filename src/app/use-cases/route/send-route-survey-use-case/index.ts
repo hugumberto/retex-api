@@ -5,7 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { PackageStatus } from '../../../../domain/package/package.entity';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { Route, RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -55,12 +55,12 @@ export class SendRouteSurveyUseCase
   // Envia o questionário aos clientes cujos pacotes foram efetivamente
   // recolhidos (COLLECTED), com dedupe por email. Reutilizado pelo disparo
   // automático quando a rota fica FINISHED. Recebe a rota já carregada com
-  // `packages[].user`.
+  // `collectionRequests[].user`.
   async sendForRoute(route: Route): Promise<SendRouteSurveyResult> {
-    const usersByEmail = new Map<string, (typeof route.packages)[number]['user']>();
-    for (const pkg of route.packages ?? []) {
+    const usersByEmail = new Map<string, (typeof route.collectionRequests)[number]['user']>();
+    for (const pkg of route.collectionRequests ?? []) {
       // Só clientes com recolha concluída — cancelados não recebem questionário.
-      if (pkg.status !== PackageStatus.COLLECTED) {
+      if (pkg.status !== CollectionRequestStatus.COLLECTED) {
         continue;
       }
       const user = pkg.user;

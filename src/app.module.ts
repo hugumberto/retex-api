@@ -18,8 +18,8 @@ import { FaqItemRepository } from './infrastructure/data/typeorm/faq/faq-item.re
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
 import { EmailLogRepository } from './infrastructure/data/typeorm/email-log/email-log.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
-import { PackageRepository } from './infrastructure/data/typeorm/package/package.repository';
-import { QrCodeRepository } from './infrastructure/data/typeorm/qr-code/qr-code.repository';
+import { CollectionRequestRepository } from './infrastructure/data/typeorm/collection-request/collection-request.repository';
+import { CollectionRequestBagRepository } from './infrastructure/data/typeorm/collection-request-bag/collection-request-bag.repository';
 import { RouteRepository } from './infrastructure/data/typeorm/route/route.repository';
 import { StorageUnitRepository } from './infrastructure/data/typeorm/storage-unit/storage-unit.repository';
 import { SystemParameterRepository } from './infrastructure/data/typeorm/system-parameter/system-parameter.repository';
@@ -49,10 +49,10 @@ export class AppModule {
         testZoneRepository: TestZoneRepository,
         brandRepository: BrandRepository,
         itemRepository: ItemRepository,
-        packageRepository: PackageRepository,
+        collectionRequestRepository: CollectionRequestRepository,
         routeRepository: RouteRepository,
         storageUnitRepository: StorageUnitRepository,
-        qrCodeRepository: QrCodeRepository,
+        collectionRequestBagRepository: CollectionRequestBagRepository,
         systemParameterRepository: SystemParameterRepository,
         userRoleRepository: UserRoleRepository,
         refreshTokenRepository: RefreshTokenRepository,

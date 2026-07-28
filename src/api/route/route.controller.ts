@@ -6,7 +6,8 @@ import { DeleteRouteUseCase } from "../../app/use-cases/route/delete-route-use-c
 import { GetAllRoutesUseCase } from "../../app/use-cases/route/get-all-routes-use-case";
 import { GetAllRoutesDto } from "../../app/use-cases/route/get-all-routes-use-case/get-all-routes.dto";
 import { GetRouteByIdUseCase } from "../../app/use-cases/route/get-route-by-id-use-case";
-import { GetRouteQrCodesUseCase } from "../../app/use-cases/qr-code/get-route-qr-codes-use-case";
+import { GetRouteBagsUseCase } from "../../app/use-cases/collection-request-bag/get-route-bags-use-case";
+import { GetRouteCollectionRequestBagsUseCase } from "../../app/use-cases/route/get-route-collection-request-bags-use-case";
 import { SendRouteSurveyUseCase } from "../../app/use-cases/route/send-route-survey-use-case";
 import { UpdateRouteUseCase } from "../../app/use-cases/route/update-route-use-case";
 import { UpdateRouteDto } from "../../app/use-cases/route/update-route-use-case/update-route.dto";
@@ -23,7 +24,8 @@ export class RouteController {
     private readonly getRouteByIdUseCase: GetRouteByIdUseCase,
     private readonly updateRouteUseCase: UpdateRouteUseCase,
     private readonly processCollectionSchedulesUseCase: ProcessCollectionSchedulesUseCase,
-    private readonly getRouteQrCodesUseCase: GetRouteQrCodesUseCase,
+    private readonly getRouteBagsUseCase: GetRouteBagsUseCase,
+    private readonly getRouteCollectionRequestBagsUseCase: GetRouteCollectionRequestBagsUseCase,
     private readonly sendRouteSurveyUseCase: SendRouteSurveyUseCase,
   ) { }
 
@@ -51,9 +53,15 @@ export class RouteController {
   }
 
   // QR codes gerados para a rota (para impressão).
-  @Get(':id/qr-codes')
-  getRouteQrCodes(@Param('id') id: string) {
-    return this.getRouteQrCodesUseCase.call(id);
+  @Get(':id/bags')
+  getRouteBags(@Param('id') id: string) {
+    return this.getRouteBagsUseCase.call(id);
+  }
+
+  // Pacotes da recolha com os volumes (QR codes) de cada um (modal de detalhe).
+  @Get(':id/collection-request-bags')
+  getRouteCollectionRequestBags(@Param('id') id: string) {
+    return this.getRouteCollectionRequestBagsUseCase.call(id);
   }
 
   // Disparo manual do questionário de satisfação aos clientes da recolha.

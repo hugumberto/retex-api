@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ENVIRONMENTAL_FACTORS } from '../../../../domain/dashboard/environmental-factors';
 import { IItemRepository } from '../../../../domain/item/item.repository';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IRefreshTokenRepository } from '../../../../domain/user/refresh-token.repository';
 import { UserStatus } from '../../../../domain/user/user-status.enum';
@@ -23,8 +23,8 @@ export class GetDashboardStatsUseCase
   implements IUseCase<void, DashboardStatsDto>
 {
   constructor(
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
     @Inject(DOMAIN_TOKENS.ITEM_REPOSITORY)
     private readonly itemRepository: IItemRepository,
     @Inject(DOMAIN_TOKENS.USER_REPOSITORY)
@@ -47,10 +47,10 @@ export class GetDashboardStatsUseCase
       usersStatusActive,
       usersActive,
     ] = await Promise.all([
-      this.packageRepository.getTotals(),
-      this.packageRepository.countByStatus(),
-      this.packageRepository.getWeightTrend(TREND_MONTHS),
-      this.packageRepository.countOutOfZoneByCity(OUT_OF_ZONE_TOP_CITIES),
+      this.collectionRequestRepository.getTotals(),
+      this.collectionRequestRepository.countByStatus(),
+      this.collectionRequestRepository.getWeightTrend(TREND_MONTHS),
+      this.collectionRequestRepository.countOutOfZoneByCity(OUT_OF_ZONE_TOP_CITIES),
       this.itemRepository.aggregateBy('quality'),
       this.itemRepository.aggregateBy('season'),
       this.itemRepository.aggregateBy('type'),
@@ -62,17 +62,17 @@ export class GetDashboardStatsUseCase
 
     const totalItems = byQuality.reduce((acc, row) => acc + row.count, 0);
     const outOfZoneTotal =
-      byStatus.find((row) => row.status === PackageStatus.OUT_OF_ZONE)?.count ??
+      byStatus.find((row) => row.status === CollectionRequestStatus.OUT_OF_ZONE)?.count ??
       0;
 
     const { CO2_KG_PER_KG, WATER_LITERS_PER_KG } = ENVIRONMENTAL_FACTORS;
     const landfillDivertedKg = totals.totalWeight;
 
     return {
-      packages: {
-        total: totals.totalPackages,
+      collectionRequests: {
+        total: totals.totalCollectionRequests,
         totalWeightKg: round(totals.totalWeight),
-        totalVolumes: totals.totalVolumes,
+        totalBags: totals.totalBags,
         byStatus,
         trend,
       },
@@ -98,7 +98,7 @@ export class GetDashboardStatsUseCase
         statusActive: usersStatusActive,
       },
       outOfZone: {
-        totalPackages: outOfZoneTotal,
+        totalCollectionRequests: outOfZoneTotal,
         topCities,
       },
     };

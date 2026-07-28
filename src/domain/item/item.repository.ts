@@ -17,7 +17,7 @@ export interface ItemBrandCount {
 
 export interface IItemRepository extends IRepository<Item> {
   findByIds(ids: string[]): Promise<Item[]>;
-  findByPackageId(packageId: string): Promise<Item[]>;
+  findByCollectionRequestId(collectionRequestId: string): Promise<Item[]>;
 
   // Agregações para o dashboard (somente leitura).
   aggregateBy(dimension: ItemDimension): Promise<ItemDimensionCount[]>;

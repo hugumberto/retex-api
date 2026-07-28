@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Brand } from '../../../../domain/brand/brand.entity';
 import { IBrandRepository } from '../../../../domain/brand/brand.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -24,13 +24,23 @@ export class UpdateBrandUseCase implements IUseCase<UpdateBrandParams, Brand> {
     const existingBrand = await this.brandRepository.findOne({ id: param.id });
 
     if (!existingBrand) {
-      throw new Error('Marca não encontrada');
+      throw new NotFoundException('Marca não encontrada');
+    }
+
+    // Ao mudar o nome, normalizar (trim) e não permitir colidir com outra marca.
+    const data = { ...param.data };
+    if (data.name !== undefined) {
+      data.name = data.name.trim();
+      const duplicate = await this.brandRepository.findByName(data.name);
+      if (duplicate && duplicate.id !== param.id) {
+        throw new ConflictException('Já existe uma marca com este nome');
+      }
     }
 
     // Atualizar a marca
     const updatedBrands = await this.brandRepository.update(
       { id: param.id },
-      param.data
+      data
     );
 
     return updatedBrands[0];

@@ -1,13 +1,13 @@
 import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { Route, RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
-import { generateFriendlyCode } from '../../qr-code/qr-code.util';
+import { generateFriendlyCode } from '../../collection-request-bag/bag.util';
 import { CreateRouteDto } from './create-route.dto';
 
 @Injectable()
@@ -17,8 +17,8 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
     private readonly routeRepository: IRouteRepository,
     @Inject(DOMAIN_TOKENS.USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
   ) { }
 
   async call(param: CreateRouteDto): Promise<Route> {
@@ -33,34 +33,34 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
       throw new BadRequestException('Usuário não possui role de driver');
     }
 
-    // 2. Buscar todos os packages pelos IDs (com relações para validar a rota)
-    const packages = [];
-    for (const packageId of param.packageIds) {
-      const packageEntity = await this.packageRepository.findOneWithAllRelations(packageId);
-      if (!packageEntity) {
-        throw new NotFoundException(`Package com ID ${packageId} não encontrado`);
+    // 2. Buscar todos os collectionRequests pelos IDs (com relações para validar a rota)
+    const collectionRequests = [];
+    for (const collectionRequestId of param.collectionRequestIds) {
+      const collectionRequestEntity = await this.collectionRequestRepository.findOneWithAllRelations(collectionRequestId);
+      if (!collectionRequestEntity) {
+        throw new NotFoundException(`CollectionRequest com ID ${collectionRequestId} não encontrado`);
       }
 
       // 3. Apenas solicitações no status CREATED podem ser adicionadas
-      if (packageEntity.status !== PackageStatus.CREATED) {
-        throw new BadRequestException(`Package ${packageId} não está no status CREATED`);
+      if (collectionRequestEntity.status !== CollectionRequestStatus.CREATED) {
+        throw new BadRequestException(`CollectionRequest ${collectionRequestId} não está no status CREATED`);
       }
 
       // 4. Uma solicitação existe em no máximo uma rota
-      if (packageEntity.route) {
-        throw new ConflictException(`Package ${packageId} já está associado a uma rota`);
+      if (collectionRequestEntity.route) {
+        throw new ConflictException(`CollectionRequest ${collectionRequestId} já está associado a uma rota`);
       }
 
-      packages.push(packageEntity);
+      collectionRequests.push(collectionRequestEntity);
     }
 
-    // 5. Criar a route no status DRAFTING (packages permanecem CREATED)
+    // 5. Criar a route no status DRAFTING (collectionRequests permanecem CREATED)
     const routeData: Partial<Route> = {
       status: RouteStatus.DRAFTING,
       friendlyCode: await this.generateUniqueFriendlyCode(),
       collectionInterval: param.collectionInterval,
       driver: driver,
-      packages: packages,
+      collectionRequests: collectionRequests,
       startDate: new Date(param.startDate),
     };
 

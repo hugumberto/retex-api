@@ -43,7 +43,7 @@ describe('ItemController', () => {
 
   describe('createItem', () => {
     it('should call CreateItemUseCase with correct body', async () => {
-      const body = { packageId: 'package-id' };
+      const body = { collectionRequestId: 'package-id' };
       const expectedResult = { id: 'item-id' };
 
       jest

@@ -3,9 +3,9 @@ import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
 import { Item } from '../../../../domain/item/item.entity';
 import { IItemRepository } from '../../../../domain/item/item.repository';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -17,8 +17,8 @@ describe('BindItemsStorageUnitsUseCase', () => {
   let useCase: BindItemsStorageUnitsUseCase;
   const itemRepositoryMock = mock<IItemRepository>();
   const storageUnitRepositoryMock = mock<IStorageUnitRepository>();
-  const packageRepositoryMock = mock<IPackageRepository>();
-  const qrCodeRepositoryMock = mock<IQrCodeRepository>();
+  const collectionRequestRepositoryMock = mock<ICollectionRequestRepository>();
+  const collectionRequestBagRepositoryMock = mock<ICollectionRequestBagRepository>();
   const emailServiceMock = mock<IEmailService>();
 
   beforeEach(async () => {
@@ -28,20 +28,20 @@ describe('BindItemsStorageUnitsUseCase', () => {
         BindItemsStorageUnitsUseCase,
         { provide: DOMAIN_TOKENS.ITEM_REPOSITORY, useValue: itemRepositoryMock },
         { provide: DOMAIN_TOKENS.STORAGE_UNIT_REPOSITORY, useValue: storageUnitRepositoryMock },
-        { provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY, useValue: packageRepositoryMock },
-        { provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY, useValue: qrCodeRepositoryMock },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepositoryMock },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY, useValue: collectionRequestBagRepositoryMock },
         { provide: SERVICE_TOKENS.EMAIL_SERVICE, useValue: emailServiceMock },
       ],
     }).compile();
     useCase = module.get(BindItemsStorageUnitsUseCase);
-    qrCodeRepositoryMock.find.mockResolvedValue([]);
-    itemRepositoryMock.findByPackageId.mockResolvedValue([]);
+    collectionRequestBagRepositoryMock.find.mockResolvedValue([]);
+    itemRepositoryMock.findByCollectionRequestId.mockResolvedValue([]);
   });
 
   const item = (over: Partial<Item> = {}) =>
     ({
       id: 'i1',
-      package: { id: 'p1' },
+      collectionRequest: { id: 'p1' },
       brand: { id: 'b1', name: 'Nike' },
       quality: 'GOOD',
       storageUnit: null,
@@ -64,11 +64,11 @@ describe('BindItemsStorageUnitsUseCase', () => {
     itemRepositoryMock.findByIds.mockResolvedValue([
       item({ storageUnit: { id: 's9' } as StorageUnit }),
     ]);
-    itemRepositoryMock.findByPackageId.mockResolvedValue([
+    itemRepositoryMock.findByCollectionRequestId.mockResolvedValue([
       item({ storageUnit: { id: 's9' } as StorageUnit }),
     ]);
     storageUnitRepositoryMock.findByIds.mockResolvedValue([su()]);
-    packageRepositoryMock.findOneWithAllRelations.mockResolvedValue({
+    collectionRequestRepositoryMock.findOneWithAllRelations.mockResolvedValue({
       id: 'p1',
       user: { email: 'c@x.com', firstName: 'A', lastName: 'B' },
     } as any);
@@ -76,16 +76,16 @@ describe('BindItemsStorageUnitsUseCase', () => {
     const result = await useCase.call({ items: ['i1'], storageUnits: ['s1'] });
 
     expect(itemRepositoryMock.update).not.toHaveBeenCalled();
-    expect(packageRepositoryMock.update).toHaveBeenCalledWith(
+    expect(collectionRequestRepositoryMock.update).toHaveBeenCalledWith(
       { id: 'p1' },
-      { status: PackageStatus.STOCKED },
+      { status: CollectionRequestStatus.STOCKED },
     );
     expect(result.success).toEqual([]);
   });
 
   it('persists bindings without STOCKED/survey when finalize=false', async () => {
     itemRepositoryMock.findByIds.mockResolvedValue([item()]);
-    itemRepositoryMock.findByPackageId.mockResolvedValue([item()]);
+    itemRepositoryMock.findByCollectionRequestId.mockResolvedValue([item()]);
     storageUnitRepositoryMock.findByIds.mockResolvedValue([su()]);
 
     const result = await useCase.call({
@@ -98,8 +98,8 @@ describe('BindItemsStorageUnitsUseCase', () => {
       { id: 'i1' },
       { storageUnit: expect.objectContaining({ id: 's1' }) },
     );
-    expect(packageRepositoryMock.update).not.toHaveBeenCalled();
-    expect(result.packageStatus).toBe(PackageStatus.SCREENING);
+    expect(collectionRequestRepositoryMock.update).not.toHaveBeenCalled();
+    expect(result.collectionRequestStatus).toBe(CollectionRequestStatus.SCREENING);
 
     await new Promise((resolve) => setImmediate(resolve));
     expect(emailServiceMock.send).not.toHaveBeenCalled();
@@ -115,14 +115,14 @@ describe('BindItemsStorageUnitsUseCase', () => {
       { id: 'i1' },
       { storageUnit: expect.objectContaining({ id: 's1' }) },
     );
-    expect(packageRepositoryMock.update).toHaveBeenCalledWith(
+    expect(collectionRequestRepositoryMock.update).toHaveBeenCalledWith(
       { id: 'p1' },
-      { status: PackageStatus.STOCKED },
+      { status: CollectionRequestStatus.STOCKED },
     );
     expect(result).toEqual({
       success: ['i1'],
-      packageId: 'p1',
-      packageStatus: PackageStatus.STOCKED,
+      collectionRequestId: 'p1',
+      collectionRequestStatus: CollectionRequestStatus.STOCKED,
     });
 
     // O survey deixou de ser enviado na triagem — passou para a finalização da rota.

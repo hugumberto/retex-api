@@ -28,15 +28,15 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
     const repository = await this.getRepository();
     return repository.find({
       where: { id: In(ids) },
-      relations: ['package', 'brand', 'storageUnit'],
+      relations: ['collectionRequest', 'brand', 'storageUnit'],
     });
   }
 
-  async findByPackageId(packageId: string): Promise<Item[]> {
+  async findByCollectionRequestId(collectionRequestId: string): Promise<Item[]> {
     const repository = await this.getRepository();
     return repository.find({
-      where: { package: { id: packageId } },
-      relations: ['package', 'brand', 'storageUnit'],
+      where: { collectionRequest: { id: collectionRequestId } },
+      relations: ['collectionRequest', 'brand', 'storageUnit'],
     });
   }
 

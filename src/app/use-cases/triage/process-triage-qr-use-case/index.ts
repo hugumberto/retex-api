@@ -4,15 +4,15 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
 export interface ProcessTriageQrParams {
-  qrCodeId: string;
+  bagId: string;
   weight: number;
 }
 
@@ -20,61 +20,61 @@ export interface ProcessTriageQrParams {
  * Processa um volume (QR code) na triagem: grava o peso do volume, marca-o como
  * processado e recalcula o peso do pacote como a soma dos pesos dos volumes.
  * A solicitação passa (ou permanece) em SCREENING. Os itens do volume são
- * criados/removidos pelos endpoints de item (com o qrCodeId).
+ * criados/removidos pelos endpoints de item (com o bagId).
  */
 @Injectable()
 export class ProcessTriageQrUseCase
-  implements IUseCase<ProcessTriageQrParams, QrCode>
+  implements IUseCase<ProcessTriageQrParams, CollectionRequestBag>
 {
   constructor(
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
   ) {}
 
-  async call({ qrCodeId, weight }: ProcessTriageQrParams): Promise<QrCode> {
-    const qrCode = await this.qrCodeRepository.findOne({ id: qrCodeId });
-    if (!qrCode) {
+  async call({ bagId, weight }: ProcessTriageQrParams): Promise<CollectionRequestBag> {
+    const bag = await this.collectionRequestBagRepository.findOne({ id: bagId });
+    if (!bag) {
       throw new NotFoundException('QR code não encontrado');
     }
-    if (!qrCode.packageId) {
+    if (!bag.collectionRequestId) {
       throw new BadRequestException(
         'O QR code não está vinculado a uma solicitação',
       );
     }
 
-    const packageEntity = await this.packageRepository.findOne({
-      id: qrCode.packageId,
+    const collectionRequestEntity = await this.collectionRequestRepository.findOne({
+      id: bag.collectionRequestId,
     });
-    if (!packageEntity) {
+    if (!collectionRequestEntity) {
       throw new NotFoundException('Solicitação não encontrada');
     }
     if (
-      packageEntity.status !== PackageStatus.COLLECTED &&
-      packageEntity.status !== PackageStatus.SCREENING
+      collectionRequestEntity.status !== CollectionRequestStatus.COLLECTED &&
+      collectionRequestEntity.status !== CollectionRequestStatus.SCREENING
     ) {
       throw new BadRequestException(
         'A solicitação não está em coleta/triagem',
       );
     }
 
-    const [updatedQr] = await this.qrCodeRepository.update(
-      { id: qrCodeId },
+    const [updatedQr] = await this.collectionRequestBagRepository.update(
+      { id: bagId },
       { weight, processedAt: new Date() },
     );
 
     // Peso do pacote = soma dos pesos dos volumes (decimais vêm como string).
-    const qrCodes = await this.qrCodeRepository.find({
-      packageId: qrCode.packageId,
+    const bags = await this.collectionRequestBagRepository.find({
+      collectionRequestId: bag.collectionRequestId,
     });
-    const totalWeight = qrCodes.reduce(
+    const totalWeight = bags.reduce(
       (sum, code) => sum + Number(code.weight ?? 0),
       0,
     );
-    await this.packageRepository.update(
-      { id: qrCode.packageId },
-      { weight: totalWeight, status: PackageStatus.SCREENING },
+    await this.collectionRequestRepository.update(
+      { id: bag.collectionRequestId },
+      { weight: totalWeight, status: CollectionRequestStatus.SCREENING },
     );
 
     return updatedQr;

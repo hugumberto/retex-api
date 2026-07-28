@@ -1,5 +1,5 @@
 import { Entity } from "../interfaces/entity.interface"
-import { AgeGroup, Quality, Season, Sex, Type } from "../item/item.entity"
+import { AgeGroup, Item, Quality, Season, Sex, Type } from "../item/item.entity"
 
 export enum StorageUnitStatus {
   ATIVO = "ATIVO",
@@ -16,4 +16,8 @@ export interface StorageUnit extends Entity {
   season: Season
   status: StorageUnitStatus
   weight: number
+  // Itens associados (relação inversa; usada para contar).
+  items?: Item[]
+  // Nº de itens associados a esta unidade de armazenamento (calculado).
+  itemsCount?: number
 }

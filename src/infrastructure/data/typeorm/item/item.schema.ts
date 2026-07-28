@@ -43,11 +43,11 @@ export const itemSchema = new EntitySchema<Item>({
     ...BaseTimestampColumns,
   },
   relations: {
-    package: {
+    collectionRequest: {
       type: 'many-to-one',
-      target: 'package',
+      target: 'collection_request',
       joinColumn: {
-        name: 'package_id',
+        name: 'collection_request_id',
       },
       inverseSide: 'items',
     },
@@ -57,6 +57,7 @@ export const itemSchema = new EntitySchema<Item>({
       joinColumn: {
         name: 'storage_unit_id',
       },
+      inverseSide: 'items',
     },
     brand: {
       type: 'many-to-one',
@@ -65,11 +66,11 @@ export const itemSchema = new EntitySchema<Item>({
         name: 'brand_id',
       },
     },
-    qrCode: {
+    bag: {
       type: 'many-to-one',
-      target: 'qr_code',
+      target: 'collection_request_bag',
       joinColumn: {
-        name: 'qr_code_id',
+        name: 'collection_request_bag_id',
       },
       nullable: true,
     },

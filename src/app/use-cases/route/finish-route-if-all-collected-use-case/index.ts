@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { PackageStatus } from '../../../../domain/package/package.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -19,8 +19,8 @@ export class FinishRouteIfAllCollectedUseCase implements IUseCase<string, void> 
   constructor(
     @Inject(DOMAIN_TOKENS.ROUTE_REPOSITORY)
     private readonly routeRepository: IRouteRepository,
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
     private readonly sendRouteSurveyUseCase: SendRouteSurveyUseCase,
   ) {}
 
@@ -30,13 +30,13 @@ export class FinishRouteIfAllCollectedUseCase implements IUseCase<string, void> 
     const route = await this.routeRepository.findOneWithAllRelations(routeId);
     if (!route || route.status === RouteStatus.FINISHED) return;
 
-    const packages = route.packages ?? [];
-    if (packages.length === 0) return;
+    const collectionRequests = route.collectionRequests ?? [];
+    if (collectionRequests.length === 0) return;
 
-    const allDone = packages.every(
+    const allDone = collectionRequests.every(
       (pkg) =>
-        pkg.status === PackageStatus.COLLECTED ||
-        pkg.status === PackageStatus.CANCELLED,
+        pkg.status === CollectionRequestStatus.COLLECTED ||
+        pkg.status === CollectionRequestStatus.CANCELLED,
     );
     if (!allDone) return;
 
@@ -44,7 +44,7 @@ export class FinishRouteIfAllCollectedUseCase implements IUseCase<string, void> 
       { id: routeId },
       { status: RouteStatus.FINISHED },
     );
-    await this.qrCodeRepository.deleteUnusedByRoute(routeId);
+    await this.collectionRequestBagRepository.deleteUnusedByRoute(routeId);
 
     // Rota finalizada → questionário de satisfação aos clientes (fire-and-forget).
     this.sendRouteSurveyUseCase.sendForRoute(route).catch((err) =>

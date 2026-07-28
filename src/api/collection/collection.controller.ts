@@ -20,29 +20,29 @@ export class CollectionController {
     private readonly cancelCollectionUseCase: CancelCollectionUseCase,
   ) { }
 
-  @Get(':packageId')
-  async get(@Param('packageId') packageId: string) {
-    return this.getCollectionUseCase.call(packageId);
+  @Get(':collectionRequestId')
+  async get(@Param('collectionRequestId') collectionRequestId: string) {
+    return this.getCollectionUseCase.call(collectionRequestId);
   }
 
-  @Post(':packageId/bind')
+  @Post(':collectionRequestId/bind')
   async bind(
-    @Param('packageId') packageId: string,
+    @Param('collectionRequestId') collectionRequestId: string,
     @Body() dto: BindQrCodeDto,
   ) {
-    return this.bindQrCodeUseCase.call({ packageId, code: dto.code });
+    return this.bindQrCodeUseCase.call({ collectionRequestId, code: dto.code });
   }
 
-  @Post(':packageId/finalize')
-  async finalize(@Param('packageId') packageId: string) {
-    return this.finalizeCollectionUseCase.call(packageId);
+  @Post(':collectionRequestId/finalize')
+  async finalize(@Param('collectionRequestId') collectionRequestId: string) {
+    return this.finalizeCollectionUseCase.call(collectionRequestId);
   }
 
-  @Post(':packageId/cancel')
+  @Post(':collectionRequestId/cancel')
   async cancel(
-    @Param('packageId') packageId: string,
+    @Param('collectionRequestId') collectionRequestId: string,
     @Body() dto: CancelCollectionDto,
   ) {
-    return this.cancelCollectionUseCase.call({ packageId, reason: dto.reason });
+    return this.cancelCollectionUseCase.call({ collectionRequestId, reason: dto.reason });
   }
 }

@@ -1,16 +1,16 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
-import { Package } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequest } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { ProcessTriageQrUseCase } from '.';
 
 describe('ProcessTriageQrUseCase', () => {
-  const qrCodeRepo = mock<IQrCodeRepository>();
-  const packageRepo = mock<IPackageRepository>();
+  const collectionRequestBagRepo = mock<ICollectionRequestBagRepository>();
+  const collectionRequestRepo = mock<ICollectionRequestRepository>();
   let useCase: ProcessTriageQrUseCase;
 
   beforeEach(async () => {
@@ -18,52 +18,52 @@ describe('ProcessTriageQrUseCase', () => {
     const module = await Test.createTestingModule({
       providers: [
         ProcessTriageQrUseCase,
-        { provide: DOMAIN_TOKENS.QR_CODE_REPOSITORY, useValue: qrCodeRepo },
-        { provide: DOMAIN_TOKENS.PACKAGE_REPOSITORY, useValue: packageRepo },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY, useValue: collectionRequestBagRepo },
+        { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepo },
       ],
     }).compile();
     useCase = module.get(ProcessTriageQrUseCase);
   });
 
   it('throws when the QR is not linked to a package', async () => {
-    qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', packageId: null } as QrCode);
-    await expect(useCase.call({ qrCodeId: 'q1', weight: 2 })).rejects.toThrow(
+    collectionRequestBagRepo.findOne.mockResolvedValue({ id: 'q1', collectionRequestId: null } as CollectionRequestBag);
+    await expect(useCase.call({ bagId: 'q1', weight: 2 })).rejects.toThrow(
       BadRequestException,
     );
   });
 
   it('throws when the package is not in collection/screening', async () => {
-    qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', packageId: 'p1' } as QrCode);
-    packageRepo.findOne.mockResolvedValue({ id: 'p1', status: 'STOCKED' } as Package);
-    await expect(useCase.call({ qrCodeId: 'q1', weight: 2 })).rejects.toThrow(
+    collectionRequestBagRepo.findOne.mockResolvedValue({ id: 'q1', collectionRequestId: 'p1' } as CollectionRequestBag);
+    collectionRequestRepo.findOne.mockResolvedValue({ id: 'p1', status: 'STOCKED' } as CollectionRequest);
+    await expect(useCase.call({ bagId: 'q1', weight: 2 })).rejects.toThrow(
       BadRequestException,
     );
   });
 
   it('sets weight+processedAt, recomputes the package weight and SCREENING', async () => {
-    qrCodeRepo.findOne.mockResolvedValue({ id: 'q1', packageId: 'p1' } as QrCode);
-    packageRepo.findOne.mockResolvedValue({ id: 'p1', status: 'COLLECTED' } as Package);
-    qrCodeRepo.update.mockResolvedValue([{ id: 'q1', weight: 4 } as QrCode]);
-    qrCodeRepo.find.mockResolvedValue([
-      { weight: '4.00' } as unknown as QrCode,
-      { weight: '3.00' } as unknown as QrCode,
+    collectionRequestBagRepo.findOne.mockResolvedValue({ id: 'q1', collectionRequestId: 'p1' } as CollectionRequestBag);
+    collectionRequestRepo.findOne.mockResolvedValue({ id: 'p1', status: 'COLLECTED' } as CollectionRequest);
+    collectionRequestBagRepo.update.mockResolvedValue([{ id: 'q1', weight: 4 } as CollectionRequestBag]);
+    collectionRequestBagRepo.find.mockResolvedValue([
+      { weight: '4.00' } as unknown as CollectionRequestBag,
+      { weight: '3.00' } as unknown as CollectionRequestBag,
     ]);
 
-    await useCase.call({ qrCodeId: 'q1', weight: 4 });
+    await useCase.call({ bagId: 'q1', weight: 4 });
 
-    expect(qrCodeRepo.update).toHaveBeenCalledWith(
+    expect(collectionRequestBagRepo.update).toHaveBeenCalledWith(
       { id: 'q1' },
       expect.objectContaining({ weight: 4, processedAt: expect.any(Date) }),
     );
-    expect(packageRepo.update).toHaveBeenCalledWith(
+    expect(collectionRequestRepo.update).toHaveBeenCalledWith(
       { id: 'p1' },
       { weight: 7, status: 'SCREENING' },
     );
   });
 
   it('throws NotFound when the QR does not exist', async () => {
-    qrCodeRepo.findOne.mockResolvedValue(undefined);
-    await expect(useCase.call({ qrCodeId: 'x', weight: 1 })).rejects.toThrow(
+    collectionRequestBagRepo.findOne.mockResolvedValue(undefined);
+    await expect(useCase.call({ bagId: 'x', weight: 1 })).rejects.toThrow(
       NotFoundException,
     );
   });

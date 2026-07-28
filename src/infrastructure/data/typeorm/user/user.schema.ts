@@ -103,9 +103,9 @@ export const userSchema = new EntitySchema<User>({
     ...BaseTimestampColumns,
   },
   relations: {
-    packages: {
+    collectionRequests: {
       type: 'one-to-many',
-      target: 'package',
+      target: 'collection_request',
       joinColumn: {
         name: 'user_id',
       },

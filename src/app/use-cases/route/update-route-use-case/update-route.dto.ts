@@ -19,7 +19,7 @@ export class UpdateRouteDto {
   @IsArray()
   @ArrayMinSize(1)
   @IsUUID('4', { each: true })
-  packageIds?: string[];
+  collectionRequestIds?: string[];
 
   @IsOptional()
   @IsDateString()

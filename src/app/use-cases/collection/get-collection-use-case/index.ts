@@ -1,14 +1,14 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Package } from '../../../../domain/package/package.entity';
-import { IPackageRepository } from '../../../../domain/package/package.repository';
-import { QrCode } from '../../../../domain/qr-code/qr-code.entity';
-import { IQrCodeRepository } from '../../../../domain/qr-code/qr-code.repository';
+import { CollectionRequest } from '../../../../domain/collection-request/collection-request.entity';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
+import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
+import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
 export interface CollectionResult {
-  package: Package;
-  qrCodes: QrCode[];
+  collectionRequest: CollectionRequest;
+  bags: CollectionRequestBag[];
 }
 
 // Deteta se o identificador recebido é um UUID (id do pacote) ou não — caso não
@@ -19,36 +19,36 @@ const UUID_REGEX =
 @Injectable()
 export class GetCollectionUseCase implements IUseCase<string, CollectionResult> {
   constructor(
-    @Inject(DOMAIN_TOKENS.PACKAGE_REPOSITORY)
-    private readonly packageRepository: IPackageRepository,
-    @Inject(DOMAIN_TOKENS.QR_CODE_REPOSITORY)
-    private readonly qrCodeRepository: IQrCodeRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
+    private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
   ) { }
 
   async call(identifier: string): Promise<CollectionResult> {
-    const packageId = await this.resolvePackageId(identifier);
+    const collectionRequestId = await this.resolveCollectionRequestId(identifier);
 
-    const packageEntity =
-      await this.packageRepository.findOneWithAllRelations(packageId);
-    if (!packageEntity) {
+    const collectionRequestEntity =
+      await this.collectionRequestRepository.findOneWithAllRelations(collectionRequestId);
+    if (!collectionRequestEntity) {
       throw new NotFoundException('Solicitação não encontrada');
     }
 
-    const qrCodes = await this.qrCodeRepository.find({ packageId });
-    return { package: packageEntity, qrCodes };
+    const bags = await this.collectionRequestBagRepository.find({ collectionRequestId });
+    return { collectionRequest: collectionRequestEntity, bags };
   }
 
   // Aceita o id (UUID) ou o código amigável do pacote e devolve o id.
-  private async resolvePackageId(identifier: string): Promise<string> {
+  private async resolveCollectionRequestId(identifier: string): Promise<string> {
     const value = identifier.trim();
 
     if (UUID_REGEX.test(value)) {
       return value;
     }
 
-    const byFriendlyCode = await this.packageRepository.findOne({
+    const byFriendlyCode = await this.collectionRequestRepository.findOne({
       friendlyCode: value,
-    } as Partial<Package>);
+    } as Partial<CollectionRequest>);
 
     if (!byFriendlyCode) {
       throw new NotFoundException('Solicitação não encontrada');

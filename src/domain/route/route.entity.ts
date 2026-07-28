@@ -1,5 +1,5 @@
 import { Entity } from "../interfaces/entity.interface";
-import { Package } from "../package/package.entity";
+import { CollectionRequest } from "../collection-request/collection-request.entity";
 import { User } from "../user/user.entity";
 
 export enum CollectionInterval {
@@ -15,11 +15,11 @@ export interface Route extends Entity {
   // Intervalo de horário da recolha (informado no email de confirmação).
   collectionInterval?: CollectionInterval | null
   driver: User
-  packages: Package[]
+  collectionRequests: CollectionRequest[]
   startDate: Date
   endDate?: Date
   // Campos computados na listagem (loadRelationCountAndMap), não são colunas.
-  packagesCount?: number
+  collectionRequestsCount?: number
   // Nº de pacotes cuja recolha já foi confirmada pelo cliente.
   confirmedCount?: number
 }

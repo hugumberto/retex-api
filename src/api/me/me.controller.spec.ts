@@ -5,7 +5,7 @@ import { CreateAddressUseCase } from '../../app/use-cases/address/create-address
 import { DeleteAddressUseCase } from '../../app/use-cases/address/delete-address-use-case';
 import { GetUserAddressesUseCase } from '../../app/use-cases/address/get-user-addresses-use-case';
 import { SetDefaultAddressUseCase } from '../../app/use-cases/address/set-default-address-use-case';
-import { GetUserPackagesUseCase } from '../../app/use-cases/package';
+import { GetUserCollectionRequestsUseCase } from '../../app/use-cases/collection-request';
 import { UpdateMePasswordUseCase, UpdateUserUseCase } from '../../app/use-cases/user';
 import { MeController } from './me.controller';
 
@@ -18,7 +18,7 @@ describe('MeController (uses JWT sub, never a client-supplied id)', () => {
     list: { call: jest.fn() },
     setDefault: { call: jest.fn() },
     del: { call: jest.fn() },
-    packages: { call: jest.fn() },
+    collectionRequests: { call: jest.fn() },
     updateUser: { call: jest.fn() },
     updatePwd: { call: jest.fn() },
   };
@@ -32,7 +32,7 @@ describe('MeController (uses JWT sub, never a client-supplied id)', () => {
         { provide: GetUserAddressesUseCase, useValue: mocks.list },
         { provide: SetDefaultAddressUseCase, useValue: mocks.setDefault },
         { provide: DeleteAddressUseCase, useValue: mocks.del },
-        { provide: GetUserPackagesUseCase, useValue: mocks.packages },
+        { provide: GetUserCollectionRequestsUseCase, useValue: mocks.collectionRequests },
         { provide: UpdateUserUseCase, useValue: mocks.updateUser },
         { provide: UpdateMePasswordUseCase, useValue: mocks.updatePwd },
         { provide: JwtService, useValue: {} },
@@ -41,9 +41,9 @@ describe('MeController (uses JWT sub, never a client-supplied id)', () => {
     controller = module.get(MeController);
   });
 
-  it('getMyPackages scopes to the authenticated user', () => {
-    controller.getMyPackages(reqAs('me-id'));
-    expect(mocks.packages.call).toHaveBeenCalledWith({ userId: 'me-id' });
+  it('getMyCollectionRequests scopes to the authenticated user', () => {
+    controller.getMyCollectionRequests(reqAs('me-id'));
+    expect(mocks.collectionRequests.call).toHaveBeenCalledWith({ userId: 'me-id' });
   });
 
   it('getAddresses scopes to the authenticated user', () => {
