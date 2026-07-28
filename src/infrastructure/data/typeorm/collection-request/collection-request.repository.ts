@@ -108,6 +108,22 @@ export class CollectionRequestRepository
       .getMany();
   }
 
+  async existsActiveByAddress(addressId: string): Promise<boolean> {
+    const repository = await this.getRepository();
+    // getCount aplica automaticamente o filtro de soft-delete (deleted_at IS NULL).
+    const count = await repository
+      .createQueryBuilder('collectionRequest')
+      .where('collectionRequest.addressId = :addressId', { addressId })
+      .andWhere('collectionRequest.status NOT IN (:...terminal)', {
+        terminal: [
+          CollectionRequestStatus.STOCKED,
+          CollectionRequestStatus.CANCELLED,
+        ],
+      })
+      .getCount();
+    return count > 0;
+  }
+
   async countByStatus(): Promise<CollectionRequestStatusCount[]> {
     const repository = await this.getRepository();
     const rows = await repository
@@ -131,18 +147,24 @@ export class CollectionRequestRepository
       .addSelect('COALESCE(SUM(collectionRequest.weight), 0)', 'totalWeight')
       .addSelect(
         'COALESCE(SUM(collectionRequest.estimatedBags), 0)',
-        'totalBags',
+        'totalEstimatedBags',
+      )
+      .addSelect(
+        'COALESCE(SUM(collectionRequest.bagsGenerated), 0)',
+        'totalCollectedBags',
       )
       .getRawOne<{
         totalCollectionRequests: string;
         totalWeight: string;
-        totalBags: string;
+        totalEstimatedBags: string;
+        totalCollectedBags: string;
       }>();
 
     return {
       totalCollectionRequests: Number(row?.totalCollectionRequests ?? 0),
       totalWeight: Number(row?.totalWeight ?? 0),
-      totalBags: Number(row?.totalBags ?? 0),
+      totalEstimatedBags: Number(row?.totalEstimatedBags ?? 0),
+      totalCollectedBags: Number(row?.totalCollectedBags ?? 0),
     };
   }
 

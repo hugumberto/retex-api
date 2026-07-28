@@ -48,3 +48,7 @@ lerna-debug.log*
 # Others
 
 /scripts/email-preview/*
+
+# Database dumps (contêm dados de produção — nunca versionar)
+backups/*
+!backups/.gitkeep

@@ -3,7 +3,9 @@ import { CollectionRequestStatus } from '../../../../domain/collection-request/c
 export interface CollectionRequestsStats {
   total: number;
   totalWeightKg: number;
-  totalBags: number;
+  // Sacos estimados pelos clientes vs. efetivamente recolhidos.
+  totalEstimatedBags: number;
+  totalCollectedBags: number;
   byStatus: { status: CollectionRequestStatus; count: number }[];
   trend: { period: string; weightKg: number; count: number }[];
 }

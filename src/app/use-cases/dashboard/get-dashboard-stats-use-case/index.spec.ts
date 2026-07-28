@@ -37,7 +37,8 @@ describe('GetDashboardStatsUseCase', () => {
     collectionRequestRepo.getTotals.mockResolvedValue({
       totalCollectionRequests: 5,
       totalWeight: 100,
-      totalBags: 12,
+      totalEstimatedBags: 12,
+      totalCollectedBags: 9,
     });
     collectionRequestRepo.countByStatus.mockResolvedValue([
       { status: CollectionRequestStatus.CREATED, count: 3 },
@@ -68,6 +69,8 @@ describe('GetDashboardStatsUseCase', () => {
 
     expect(result.collectionRequests.total).toBe(5);
     expect(result.collectionRequests.totalWeightKg).toBe(100);
+    expect(result.collectionRequests.totalEstimatedBags).toBe(12);
+    expect(result.collectionRequests.totalCollectedBags).toBe(9);
     expect(result.triage.totalItems).toBe(5);
     expect(result.environment.co2AvoidedKg).toBe(100 * 3.6);
     expect(result.environment.waterSavedLiters).toBe(100 * 10000);
