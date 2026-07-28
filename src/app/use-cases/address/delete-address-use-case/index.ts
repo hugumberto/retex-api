@@ -1,6 +1,12 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Address } from '../../../../domain/address/address.entity';
 import { IAddressRepository } from '../../../../domain/address/address.repository';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
@@ -14,12 +20,25 @@ export class DeleteAddressUseCase implements IUseCase<DeleteAddressParam, void> 
   constructor(
     @Inject(DOMAIN_TOKENS.ADDRESS_REPOSITORY)
     private readonly addressRepository: IAddressRepository,
+    @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
+    private readonly collectionRequestRepository: ICollectionRequestRepository,
   ) { }
 
   async call(param: DeleteAddressParam): Promise<void> {
     const address = await this.addressRepository.findOne({ id: param.addressId });
     if (!address || address.userId !== param.userId) {
       throw new NotFoundException('Endereço não encontrado');
+    }
+
+    // Impede eliminar uma morada ainda usada por uma solicitação ativa —
+    // evitaria referências pendentes (`address_id` a apontar para morada apagada).
+    const inUse = await this.collectionRequestRepository.existsActiveByAddress(
+      param.addressId,
+    );
+    if (inUse) {
+      throw new ConflictException(
+        'Não é possível eliminar esta morada: existe uma solicitação de recolha ativa que a utiliza.',
+      );
     }
 
     await this.addressRepository.delete({ id: param.addressId } as Partial<Address>);

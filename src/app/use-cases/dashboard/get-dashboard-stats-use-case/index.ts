@@ -72,7 +72,8 @@ export class GetDashboardStatsUseCase
       collectionRequests: {
         total: totals.totalCollectionRequests,
         totalWeightKg: round(totals.totalWeight),
-        totalBags: totals.totalBags,
+        totalEstimatedBags: totals.totalEstimatedBags,
+        totalCollectedBags: totals.totalCollectedBags,
         byStatus,
         trend,
       },

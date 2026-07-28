@@ -22,7 +22,10 @@ export interface CollectionRequestStatusCount {
 export interface CollectionRequestTotals {
   totalCollectionRequests: number;
   totalWeight: number;
-  totalBags: number;
+  // Nº de sacos estimados pelos clientes (SUM de estimated_bags).
+  totalEstimatedBags: number;
+  // Nº de sacos efetivamente recolhidos (SUM de bags_generated).
+  totalCollectedBags: number;
 }
 
 export interface CollectionRequestTrendPoint {
@@ -46,6 +49,10 @@ export interface ICollectionRequestRepository
   findOneWithAllRelations(id: string): Promise<CollectionRequest>;
   findByUser(userId: string): Promise<CollectionRequest[]>;
   findAll(): Promise<CollectionRequest[]>;
+
+  // True se existir alguma solicitação ativa (não STOCKED/CANCELLED) que ainda
+  // referencia esta morada — usado para bloquear a eliminação da morada.
+  existsActiveByAddress(addressId: string): Promise<boolean>;
 
   // Confirmação de coleta.
   findByCollectionConfirmationToken(token: string): Promise<CollectionRequest>;

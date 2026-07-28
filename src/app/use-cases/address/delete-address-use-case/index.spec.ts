@@ -1,14 +1,16 @@
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
 import { Address } from '../../../../domain/address/address.entity';
 import { IAddressRepository } from '../../../../domain/address/address.repository';
+import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { DeleteAddressUseCase } from '.';
 
 describe('DeleteAddressUseCase', () => {
   let useCase: DeleteAddressUseCase;
   const addressRepositoryMock = mock<IAddressRepository>();
+  const collectionRequestRepositoryMock = mock<ICollectionRequestRepository>();
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -19,9 +21,16 @@ describe('DeleteAddressUseCase', () => {
           provide: DOMAIN_TOKENS.ADDRESS_REPOSITORY,
           useValue: addressRepositoryMock,
         },
+        {
+          provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY,
+          useValue: collectionRequestRepositoryMock,
+        },
       ],
     }).compile();
     useCase = module.get(DeleteAddressUseCase);
+    collectionRequestRepositoryMock.existsActiveByAddress.mockResolvedValue(
+      false,
+    );
   });
 
   const param = { userId: 'me-id', addressId: 'addr-id' };
@@ -32,6 +41,20 @@ describe('DeleteAddressUseCase', () => {
       userId: 'someone-else',
     } as Address);
     await expect(useCase.call(param)).rejects.toThrow(NotFoundException);
+  });
+
+  it('throws Conflict when an active collection request still uses the address', async () => {
+    addressRepositoryMock.findOne.mockResolvedValue({
+      id: 'addr-id',
+      userId: 'me-id',
+      isDefault: false,
+    } as Address);
+    collectionRequestRepositoryMock.existsActiveByAddress.mockResolvedValue(
+      true,
+    );
+
+    await expect(useCase.call(param)).rejects.toThrow(ConflictException);
+    expect(addressRepositoryMock.delete).not.toHaveBeenCalled();
   });
 
   it('deletes a non-default address without reassigning', async () => {
