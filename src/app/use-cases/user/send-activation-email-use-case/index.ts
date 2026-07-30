@@ -29,7 +29,7 @@ export class SendActivationEmailUseCase
   async call({ email }: SendActivationEmailDto): Promise<{ ok: true }> {
     const user = await this.userRepository.findOne({ email } as Partial<User>);
     if (!user) {
-      throw new NotFoundException('Utilizador não encontrado');
+      throw new NotFoundException('errors.user.notFound');
     }
 
     const { token, expiresAt } = generateActivationToken();

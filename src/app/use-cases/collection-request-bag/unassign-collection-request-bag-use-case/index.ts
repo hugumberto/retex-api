@@ -22,7 +22,7 @@ export class UnassignCollectionRequestBagUseCase implements IUseCase<string, Col
   async call(bagId: string): Promise<CollectionRequestBag> {
     const qr = await this.collectionRequestBagRepository.findOne({ id: bagId });
     if (!qr) {
-      throw new NotFoundException('Saco não encontrado');
+      throw new NotFoundException('errors.bag.notFound');
     }
 
     const previousCollectionRequestId = qr.collectionRequestId;

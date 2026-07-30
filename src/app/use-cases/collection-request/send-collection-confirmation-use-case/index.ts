@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { DATE_LOCALE, normalizeLanguage } from '../../../../config/i18n.constants';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IEmailService } from '../../../services/interfaces/email.interface';
@@ -36,14 +37,17 @@ export class SendCollectionConfirmationUseCase implements IUseCase<string, void>
 
     const confirmUrl = `${process.env.PORTAL_URL}/confirmar-coleta?token=${token}`;
     const rejectUrl = `${process.env.PORTAL_URL}/confirmar-coleta?token=${token}&action=reject`;
+    // A data sai no formato do idioma do destinatário (13/05/2026, 13/05/2026,
+    // 5/13/2026, ...), coerente com o resto do email.
+    const language = normalizeLanguage(pkg.user.language);
     const collectionDate = new Date(pkg.route.startDate).toLocaleDateString(
-      'pt-PT',
+      DATE_LOCALE[language],
     );
 
     await this.emailService.send({
       to: pkg.user.email,
-      subject: 'Confirme o dia da sua recolha Retex',
       template: 'collection-confirmation',
+      locale: language,
       context: {
         firstName: pkg.user.firstName,
         lastName: pkg.user.lastName,

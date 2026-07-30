@@ -42,7 +42,7 @@ export class GetCollectionRequestBagsUseCase
         } as Partial<CollectionRequest>);
 
     if (!pkg) {
-      throw new NotFoundException('Solicitação não encontrada');
+      throw new NotFoundException('errors.collection.requestNotFound');
     }
 
     const bags = await this.collectionRequestBagRepository.find({ collectionRequestId: pkg.id });

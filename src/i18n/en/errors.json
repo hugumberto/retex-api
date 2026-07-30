@@ -1,0 +1,103 @@
+{
+  "auth": {
+    "tokenMissing": "Token not provided",
+    "tokenInvalid": "Invalid token",
+    "notAuthenticated": "User not authenticated",
+    "accessDenied": "Access denied: insufficient roles",
+    "invalidCredentials": "Invalid email or password",
+    "accountInactive": "Inactive account",
+    "accountAlreadyActive": "Account already activated",
+    "activationTokenInvalid": "Invalid activation token",
+    "activationTokenExpired": "Activation token expired",
+    "resetTokenInvalid": "Invalid or expired reset token",
+    "confirmationTokenInvalid": "Invalid confirmation token",
+    "currentPasswordIncorrect": "Current password is incorrect",
+    "refreshTokenNotFound": "Refresh token not found",
+    "refreshTokenInvalid": "Invalid refresh token",
+    "refreshTokenExpired": "Refresh token expired",
+    "refreshTokenRevoked": "Refresh token revoked"
+  },
+  "user": {
+    "notFound": "User not found",
+    "emailAlreadyExists": "A user with this email already exists",
+    "emailInUse": "Email already in use by another user",
+    "notDriver": "The user does not have the driver role",
+    "driverNotFound": "Driver not found"
+  },
+  "address": {
+    "notFound": "Address not found",
+    "duplicate": "An address with these details already exists",
+    "outOfServiceZone": "Address outside the service area",
+    "deleteBlockedByActiveRequest": "This address cannot be deleted: an active collection request is using it."
+  },
+  "collection": {
+    "requestNotFound": "Request not found",
+    "notFound": "Collection not found",
+    "notAwaitingPickup": "The request is not awaiting collection",
+    "cannotCancel": "This request cannot be cancelled",
+    "cancelOnlyOwn": "You may only cancel your own request",
+    "cancellationReasonRequired": "Please provide a cancellation reason",
+    "bagRequiredToFinalize": "Link at least one bag before finalising the collection",
+    "confirmationDeadlineExpired": "The deadline to confirm the collection has passed"
+  },
+  "collectionRequest": {
+    "notFound": "Collection request not found",
+    "notFoundWithId": "Collection request {id} not found",
+    "notInCreatedStatus": "Collection request {id} is not in the CREATED status",
+    "alreadyLinkedToRoute": "Collection request {id} is already linked to a route",
+    "alreadyLinkedToAnotherRoute": "Collection request {id} is already linked to another route"
+  },
+  "bag": {
+    "notFound": "Bag not found",
+    "notAllProcessed": "Not all bags have been processed"
+  },
+  "qrCode": {
+    "notFound": "QR code not found",
+    "alreadyUsed": "QR code already used",
+    "wrongRoute": "The QR code does not belong to this route",
+    "uniqueCodeGenerationFailed": "Could not generate a unique code for the QR code"
+  },
+  "route": {
+    "notFound": "Route not found",
+    "alreadyConfirmed": "The route has already been confirmed and its driver, requests, date or time slot can no longer be changed",
+    "cannotDeleteCompleted": "A completed collection cannot be deleted",
+    "surveyOnlyWhenFinished": "The survey can only be sent for a finished collection"
+  },
+  "item": {
+    "notFound": "Item not found",
+    "someNotFound": "Items not found: {items}",
+    "sameCollectionRequestRequired": "All items must belong to the same collection request",
+    "bindFailed": "Error linking item {id}: {error}",
+    "bulkOperationCancelled": "Operation cancelled due to errors: {errors}"
+  },
+  "storageUnit": {
+    "notFound": "Storage unit not found",
+    "someNotFound": "Storage units not found: {units}"
+  },
+  "brand": {
+    "notFound": "Brand not found",
+    "duplicateName": "A brand with this name already exists"
+  },
+  "category": {
+    "notFound": "Category not found",
+    "someNotFound": "One or more categories were not found",
+    "duplicateName": "A category with this name already exists"
+  },
+  "blogPost": {
+    "notFound": "Article not found",
+    "duplicateSlug": "An article with this slug already exists"
+  },
+  "faq": {
+    "categoryNotFound": "FAQ category not found",
+    "itemNotFound": "FAQ item not found"
+  },
+  "testZone": {
+    "notFound": "Zone not found",
+    "alreadyExistsForCity": "A zone already exists for this city"
+  },
+  "triage": {
+    "requestNotFoundForCode": "No request found for the given code",
+    "qrCodeNotLinked": "The QR code is not linked to a request",
+    "requestNotInTriage": "The request is not in collection/triage"
+  }
+}

@@ -27,16 +27,15 @@ export class FinalizeCollectionUseCase implements IUseCase<string, CollectionReq
   async call(collectionRequestId: string): Promise<CollectionRequest> {
     const collectionRequestEntity = await this.collectionRequestRepository.findOne({ id: collectionRequestId });
     if (!collectionRequestEntity) {
-      throw new NotFoundException('Solicitação não encontrada');
+      throw new NotFoundException('errors.collection.requestNotFound');
     }
     if (collectionRequestEntity.status !== CollectionRequestStatus.WAITING_FOR_COLLECTION) {
-      throw new BadRequestException('A solicitação não está aguardando recolha');
+      throw new BadRequestException('errors.collection.notAwaitingPickup');
     }
 
     const bags = await this.collectionRequestBagRepository.find({ collectionRequestId });
     if (bags.length === 0) {
-      throw new BadRequestException(
-        'Vincule ao menos um saco antes de finalizar a recolha',
+      throw new BadRequestException('errors.collection.bagRequiredToFinalize',
       );
     }
 

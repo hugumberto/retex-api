@@ -18,7 +18,7 @@ export class LoginUseCase implements IUseCase<LoginDto, LoginResult> {
     const user = await this.validateUserUseCase.call(param);
 
     if (!user) {
-      throw new UnauthorizedException('Email ou senha inválidos');
+      throw new UnauthorizedException('errors.auth.invalidCredentials');
     }
 
     // Gerar JWT access token

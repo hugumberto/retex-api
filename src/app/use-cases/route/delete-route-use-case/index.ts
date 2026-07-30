@@ -19,13 +19,12 @@ export class DeleteRouteUseCase implements IUseCase<string, Route> {
     // 1. Verificar se a route existe
     const existingRoute = await this.routeRepository.findOneWithAllRelations(id);
     if (!existingRoute) {
-      throw new NotFoundException('Route não encontrada');
+      throw new NotFoundException('errors.route.notFound');
     }
 
     // 1.1. Recolha concluída não pode ser excluída.
     if (existingRoute.status === RouteStatus.FINISHED) {
-      throw new BadRequestException(
-        'Não é possível excluir uma recolha concluída',
+      throw new BadRequestException('errors.route.cannotDeleteCompleted',
       );
     }
 

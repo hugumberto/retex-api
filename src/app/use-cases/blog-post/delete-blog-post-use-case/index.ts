@@ -15,7 +15,7 @@ export class DeleteBlogPostUseCase implements IUseCase<DeleteBlogPostDto, BlogPo
   async call(param: DeleteBlogPostDto): Promise<BlogPost> {
     const existingPost = await this.blogPostRepository.findOne({ id: param.id });
     if (!existingPost) {
-      throw new NotFoundException('Post não encontrado');
+      throw new NotFoundException('errors.blogPost.notFound');
     }
 
     return this.blogPostRepository.delete({ id: param.id });

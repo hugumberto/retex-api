@@ -22,7 +22,7 @@ export class AddRoleToUserUseCase implements IUseCase<AddRoleToUserParamDto, Omi
     // Verificar se usuário existe com roles
     const user = await this.userRepository.findOneWithRelations({ id: userId });
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('errors.user.notFound');
     }
 
     const currentRoles = user.roles?.map((ur) => ur.role) ?? [];

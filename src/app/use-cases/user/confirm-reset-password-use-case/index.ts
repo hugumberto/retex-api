@@ -21,7 +21,7 @@ export class ConfirmResetPasswordUseCase
   async call(param: ConfirmResetPasswordDto): Promise<Omit<User, 'password'>> {
     const user = await this.userRepository.findByResetToken(param.token);
     if (!user || isTokenExpired(user.resetTokenExpiresAt)) {
-      throw new BadRequestException('Token de reset inválido ou expirado');
+      throw new BadRequestException('errors.auth.resetTokenInvalid');
     }
 
     const hashedPassword = await this.cryptoService.hashPassword(param.password);

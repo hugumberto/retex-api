@@ -25,14 +25,14 @@ export class JwtAuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('Token não fornecido');
+      throw new UnauthorizedException('errors.auth.tokenMissing');
     }
 
     try {
       const payload: JwtPayload = this.jwtService.verify(token);
       request['user'] = payload;
     } catch (error) {
-      throw new UnauthorizedException('Token inválido');
+      throw new UnauthorizedException('errors.auth.tokenInvalid');
     }
 
     return true;

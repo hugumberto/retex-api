@@ -54,15 +54,15 @@ export class CancelCollectionUseCase
   async call({ collectionRequestId, reason }: CancelCollectionParams): Promise<CollectionRequest> {
     const trimmed = (reason ?? '').trim();
     if (!trimmed) {
-      throw new BadRequestException('Informe o motivo do cancelamento');
+      throw new BadRequestException('errors.collection.cancellationReasonRequired');
     }
 
     const pkg = await this.collectionRequestRepository.findOneWithAllRelations(collectionRequestId);
     if (!pkg) {
-      throw new NotFoundException('Solicitação não encontrada');
+      throw new NotFoundException('errors.collection.requestNotFound');
     }
     if (NON_CANCELLABLE.has(pkg.status)) {
-      throw new BadRequestException('Esta solicitação não pode ser cancelada');
+      throw new BadRequestException('errors.collection.cannotCancel');
     }
 
     const [updated] = await this.collectionRequestRepository.update(

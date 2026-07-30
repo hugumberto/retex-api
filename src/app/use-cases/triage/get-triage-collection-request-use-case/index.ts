@@ -48,15 +48,14 @@ export class GetTriageCollectionRequestUseCase
     }
 
     if (!collectionRequestId) {
-      throw new NotFoundException(
-        'Nenhuma solicitação encontrada para o código informado',
+      throw new NotFoundException('errors.triage.requestNotFoundForCode',
       );
     }
 
     const collectionRequestEntity =
       await this.collectionRequestRepository.findOneWithAllRelations(collectionRequestId);
     if (!collectionRequestEntity) {
-      throw new NotFoundException('Solicitação não encontrada');
+      throw new NotFoundException('errors.collection.requestNotFound');
     }
 
     const bags = await this.collectionRequestBagRepository.find({ collectionRequestId });

@@ -28,7 +28,7 @@ export class CreateAddressUseCase implements IUseCase<CreateAddressDto, Address>
   async call(param: CreateAddressDto): Promise<Address> {
     const user = await this.userRepository.findOne({ id: param.userId });
     if (!user) {
-      throw new NotFoundException('Utilizador não encontrado');
+      throw new NotFoundException('errors.user.notFound');
     }
 
     const existingAddresses = await this.addressRepository.findByUser(param.userId);
@@ -40,7 +40,7 @@ export class CreateAddressUseCase implements IUseCase<CreateAddressDto, Address>
         a.zipCode === normalizedZip,
     );
     if (isDuplicate) {
-      throw new ConflictException('Já existe um endereço com esta morada');
+      throw new ConflictException('errors.address.duplicate');
     }
 
     if (param.isDefault) {

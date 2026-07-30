@@ -1,5 +1,8 @@
 import { DynamicModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
+import { I18nModule } from 'nestjs-i18n';
+import { I18nExceptionFilter } from './api/filters/i18n-exception.filter';
 import { LoggerModule } from 'nestjs-pino/LoggerModule';
 import { ApiModule } from './api/api.module';
 import { SchedulerModule } from './app/services/scheduler/scheduler.module';
@@ -7,6 +10,7 @@ import { SeedModule } from './app/services/seed/seed.module';
 import { ServicesModule } from './app/services/services.module';
 import { UseCasesModule } from './app/use-cases/use-cases.module';
 import { getConfigValidation } from './config/config.schema';
+import { getI18nConfig } from './config/i18n.config';
 import { getLoggerConfig } from './config/logger.config';
 import { DomainModule } from './domain/domain.module';
 import { TypeORMUnitOfWork } from './infrastructure/data/typeorm/abstraction/unit-of-work';
@@ -42,6 +46,7 @@ export class AppModule {
         validate: getConfigValidation,
         ignoreEnvVars: process.env.NODE_ENV === 'development',
       }),
+      I18nModule.forRoot(getI18nConfig()),
       UseCasesModule.register(),
       DomainModule.register({
         userRepository: UserRepository,
@@ -94,6 +99,12 @@ export class AppModule {
     return {
       module: AppModule,
       imports: imports,
+      providers: [
+        // Traduz as chaves lançadas pelos use-cases para o idioma do pedido.
+        // Registado aqui (e não no main.ts) para valer também nos testes e2e,
+        // que constroem a app a partir deste módulo.
+        { provide: APP_FILTER, useClass: I18nExceptionFilter },
+      ],
     };
   }
 }

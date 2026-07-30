@@ -16,7 +16,7 @@ export class PublishBlogPostUseCase implements IUseCase<PublishBlogPostDto, Blog
   async call(param: PublishBlogPostDto): Promise<BlogPost> {
     const existingPost = await this.blogPostRepository.findOne({ id: param.id });
     if (!existingPost) {
-      throw new NotFoundException('Post não encontrado');
+      throw new NotFoundException('errors.blogPost.notFound');
     }
 
     // Atualizar status para PUBLISHED e definir publishDate

@@ -30,7 +30,7 @@ export class NotifyZoneInactiveUsersUseCase
   async call({ zoneId }: { zoneId: string }): Promise<{ notified: number }> {
     const zone = await this.testZoneRepository.findOne({ id: zoneId } as Partial<TestZone>);
     if (!zone) {
-      throw new NotFoundException('Zona não encontrada');
+      throw new NotFoundException('errors.testZone.notFound');
     }
 
     const city = this.sanitizationService.sanitizeString(zone.city);

@@ -42,11 +42,11 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
     const missingStorageUnits = param.storageUnits.filter(id => !foundStorageUnitIds.includes(id));
 
     if (missingItems.length > 0) {
-      throw new BadRequestException(`Itens não encontrados: ${missingItems.join(', ')}`);
+      throw new BadRequestException({ key: 'errors.item.someNotFound', args: { items: missingItems.join(', ') } });
     }
 
     if (missingStorageUnits.length > 0) {
-      throw new BadRequestException(`Storage Units não encontrados: ${missingStorageUnits.join(', ')}`);
+      throw new BadRequestException({ key: 'errors.storageUnit.someNotFound', args: { units: missingStorageUnits.join(', ') } });
     }
 
     // Verificar se todos os itens pertencem à mesma solicitação de recolha
@@ -54,8 +54,7 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
       ...new Set(items.map((item) => item.collectionRequest.id)),
     ];
     if (collectionRequestIds.length !== 1) {
-      throw new BadRequestException(
-        'Todos os itens devem pertencer à mesma solicitação de recolha',
+      throw new BadRequestException('errors.item.sameCollectionRequestRequired',
       );
     }
     const collectionRequestId = collectionRequestIds[0];
@@ -69,7 +68,7 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
     if (finalize) {
       const bags = await this.collectionRequestBagRepository.find({ collectionRequestId });
       if (bags.some((qr) => qr.processedAt == null)) {
-        throw new BadRequestException('Nem todos os sacos foram processados');
+        throw new BadRequestException('errors.bag.notAllProcessed');
       }
     }
 
@@ -105,7 +104,7 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
     }
 
     if (finalize && errors.length > 0) {
-      throw new BadRequestException(`Operação cancelada devido a erros: ${errors.join('; ')}`);
+      throw new BadRequestException({ key: 'errors.item.bulkOperationCancelled', args: { errors: errors.join('; ') } });
     }
 
     const successfulBinds: string[] = [];
@@ -117,7 +116,7 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
         });
         successfulBinds.push(item.id);
       } catch (error) {
-        throw new BadRequestException(`Erro ao fazer bind do item ${item.id}: ${error.message}`);
+        throw new BadRequestException({ key: 'errors.item.bindFailed', args: { id: item.id, error: error.message } });
       }
     }
 

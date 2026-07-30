@@ -42,14 +42,14 @@ export class CreateCollectionRequestUseCase
   async call(param: CreateCollectionRequestDto): Promise<CollectionRequest> {
     const user = await this.userRepository.findOne({ id: param.userId });
     if (!user) {
-      throw new NotFoundException('Utilizador não encontrado');
+      throw new NotFoundException('errors.user.notFound');
     }
 
     const address = await this.addressRepository.findOne({
       id: param.addressId,
     });
     if (!address || address.userId !== param.userId) {
-      throw new NotFoundException('Endereço não encontrado');
+      throw new NotFoundException('errors.address.notFound');
     }
 
     const friendlyCode = await this.generateUniqueFriendlyCode();
@@ -84,21 +84,29 @@ export class CreateCollectionRequestUseCase
   }
 
   private async sendConfirmationEmail(
-    user: { id: string; firstName: string; lastName: string; email: string },
+    user: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      language?: string;
+    },
     address: { street: string; number: string; city: string; zipCode: string },
     pkg: CollectionRequest,
   ): Promise<void> {
     await this.emailService.send({
       to: user.email,
-      subject: 'O seu pacote foi registado!',
       template: 'package-confirmation',
+      locale: user.language,
       context: {
         firstName: user.firstName,
         lastName: user.lastName,
         fullName: `${user.firstName} ${user.lastName}`,
         collectionRequestId: pkg.id,
         friendlyCode: pkg.friendlyCode,
-        status: this.formatStatus(pkg.status),
+        // O template resolve a etiqueta do estado com `{{t statusKey}}`, para
+        // que ela saia no idioma do destinatário.
+        statusKey: `status.${pkg.status}`,
         address,
         year: new Date().getFullYear(),
       },
@@ -123,19 +131,4 @@ export class CreateCollectionRequestUseCase
     return `${generateFriendlyCode(year)}${Date.now().toString(36).slice(-2).toUpperCase()}`;
   }
 
-  private formatStatus(status: CollectionRequestStatus): string {
-    const labels: Record<CollectionRequestStatus, string> = {
-      [CollectionRequestStatus.CREATED]: 'Criado',
-      [CollectionRequestStatus.CONFIRMED]: 'Confirmado',
-      [CollectionRequestStatus.OUT_OF_ZONE]: 'Fora de zona',
-      [CollectionRequestStatus.WAITING_FOR_COLLECTION]: 'A aguardar recolha',
-      [CollectionRequestStatus.COLLECTED]: 'Recolhido',
-      [CollectionRequestStatus.IN_TRANSIT]: 'Em trânsito',
-      [CollectionRequestStatus.IN_HOUSE]: 'Em armazém',
-      [CollectionRequestStatus.CANCELLED]: 'Cancelado',
-      [CollectionRequestStatus.SCREENING]: 'Em triagem',
-      [CollectionRequestStatus.STOCKED]: 'Armazenado',
-    };
-    return labels[status] ?? status;
-  }
 }

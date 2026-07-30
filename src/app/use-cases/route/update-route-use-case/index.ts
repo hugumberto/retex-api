@@ -47,7 +47,7 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     // 1. Verificar se a route existe (com collectionRequests, para reverter os removidos)
     const existingRoute = await this.routeRepository.findOneWithAllRelations(id);
     if (!existingRoute) {
-      throw new NotFoundException('Route não encontrada');
+      throw new NotFoundException('errors.route.notFound');
     }
 
     // 2. Rota já confirmada trava a composição — só o status/endDate avançam.
@@ -58,8 +58,7 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
         data.startDate ||
         data.collectionInterval
       ) {
-        throw new BadRequestException(
-          'A rota já foi confirmada e não permite alterar motorista, solicitações, data ou intervalo',
+        throw new BadRequestException('errors.route.alreadyConfirmed',
         );
       }
     }
@@ -71,12 +70,12 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     if (data.driverId) {
       const driver = await this.userRepository.findOneWithRelations({ id: data.driverId });
       if (!driver) {
-        throw new NotFoundException('Driver não encontrado');
+        throw new NotFoundException('errors.user.driverNotFound');
       }
 
       const hasDriverRole = driver.roles?.some(role => role.role === Role.DRIVER);
       if (!hasDriverRole) {
-        throw new BadRequestException('Usuário não possui role de driver');
+        throw new BadRequestException('errors.user.notDriver');
       }
 
       updateData.driver = driver;
@@ -88,7 +87,7 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
       for (const collectionRequestId of data.collectionRequestIds) {
         const collectionRequestEntity = await this.collectionRequestRepository.findOneWithAllRelations(collectionRequestId);
         if (!collectionRequestEntity) {
-          throw new NotFoundException(`CollectionRequest com ID ${collectionRequestId} não encontrado`);
+          throw new NotFoundException({ key: 'errors.collectionRequest.notFoundWithId', args: { id: collectionRequestId } });
         }
 
         // Apenas solicitações no status CREATED podem estar numa rota.
@@ -100,7 +99,7 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
 
         // Uma solicitação existe em no máximo uma rota (exceto a atual).
         if (collectionRequestEntity.route && collectionRequestEntity.route.id !== id) {
-          throw new ConflictException(`CollectionRequest ${collectionRequestId} já está associado a outra rota`);
+          throw new ConflictException({ key: 'errors.collectionRequest.alreadyLinkedToAnotherRoute', args: { id: collectionRequestId } });
         }
 
         collectionRequests.push(collectionRequestEntity);

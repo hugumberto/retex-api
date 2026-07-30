@@ -1,4 +1,5 @@
 import { EntitySchema } from 'typeorm';
+import { DEFAULT_LANGUAGE } from '../../../../config/i18n.constants';
 import { Gender } from '../../../../domain/user/gender.enum';
 import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { UserType } from '../../../../domain/user/user-type.enum';
@@ -66,6 +67,13 @@ export const userSchema = new EntitySchema<User>({
       type: 'date',
       nullable: true,
       name: 'date_of_birth',
+    },
+    language: {
+      type: 'varchar',
+      nullable: false,
+      length: 5,
+      name: 'language',
+      default: DEFAULT_LANGUAGE,
     },
     activationToken: {
       type: 'varchar',

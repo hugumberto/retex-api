@@ -13,7 +13,7 @@ export class DeleteFaqItemUseCase implements IUseCase<{ id: string }, void> {
 
   async call({ id }: { id: string }): Promise<void> {
     const item = await this.faqItemRepository.findOne({ id } as Partial<FaqItem>);
-    if (!item) throw new NotFoundException('Item FAQ não encontrado');
+    if (!item) throw new NotFoundException('errors.faq.itemNotFound');
     await this.faqItemRepository.delete({ id } as Partial<FaqItem>);
   }
 }

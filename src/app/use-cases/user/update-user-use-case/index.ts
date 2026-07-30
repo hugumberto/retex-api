@@ -18,7 +18,7 @@ export class UpdateUserUseCase implements IUseCase<UpdateUserParamDto, Omit<User
     // Verificar se usuário existe
     const existingUser = await this.userRepository.findOne({ id });
     if (!existingUser) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('errors.user.notFound');
     }
 
     // Preparar dados para atualização
@@ -28,7 +28,7 @@ export class UpdateUserUseCase implements IUseCase<UpdateUserParamDto, Omit<User
     if (data.email) {
       const userWithEmail = await this.userRepository.findOne({ email: data.email });
       if (userWithEmail && userWithEmail.id !== id) {
-        throw new ConflictException('Email já está em uso por outro usuário');
+        throw new ConflictException('errors.user.emailInUse');
       }
     }
 

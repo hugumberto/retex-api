@@ -24,7 +24,7 @@ export class CreateUserUseCase implements IUseCase<CreateUserDto, User> {
   async call(param: CreateUserDto): Promise<User> {
     const existingUserByEmail = await this.userRepository.findOne({ email: param.email });
     if (existingUserByEmail) {
-      throw new ConflictException('Usuário com este email já existe');
+      throw new ConflictException('errors.user.emailAlreadyExists');
     }
 
     // Hash da senha

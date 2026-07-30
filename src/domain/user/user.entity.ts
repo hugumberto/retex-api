@@ -17,6 +17,8 @@ export interface User extends Entity {
   userType: UserType;
   gender?: Gender;
   dateOfBirth?: Date;
+  /** Idioma preferido do utilizador; usado nos emails que lhe enviamos. */
+  language: string;
   activationToken?: string | null;
   activationTokenExpiresAt?: Date | null;
   activationBypassZone?: boolean;

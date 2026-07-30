@@ -17,7 +17,7 @@ export class DeleteFaqCategoryUseCase implements IUseCase<{ id: string }, void> 
 
   async call({ id }: { id: string }): Promise<void> {
     const category = await this.faqCategoryRepository.findOne({ id } as Partial<FaqCategory>);
-    if (!category) throw new NotFoundException('Categoria FAQ não encontrada');
+    if (!category) throw new NotFoundException('errors.faq.categoryNotFound');
     const items = await this.faqItemRepository.findByCategory(id);
     for (const item of items) {
       await this.faqItemRepository.delete({ id: item.id } as Partial<FaqItem>);

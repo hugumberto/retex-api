@@ -30,7 +30,7 @@ export class RejectCollectionUseCase
       token,
     );
     if (!pkg) {
-      throw new NotFoundException('Token de confirmação inválido');
+      throw new NotFoundException('errors.auth.confirmationTokenInvalid');
     }
 
     const routeId = pkg.route?.id;

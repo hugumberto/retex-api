@@ -22,7 +22,7 @@ export class GetRouteByIdUseCase implements IUseCase<string, Route> {
     const route = await this.routeRepository.findOneWithAllRelations(routeId);
 
     if (!route) {
-      throw new NotFoundException('Route não encontrada');
+      throw new NotFoundException('errors.route.notFound');
     }
 
     return route;
@@ -41,7 +41,7 @@ export class GetRouteByIdUseCase implements IUseCase<string, Route> {
     } as Partial<Route>);
 
     if (!byFriendlyCode) {
-      throw new NotFoundException('Route não encontrada');
+      throw new NotFoundException('errors.route.notFound');
     }
 
     return byFriendlyCode.id;

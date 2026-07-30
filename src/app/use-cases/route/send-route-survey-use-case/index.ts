@@ -40,12 +40,11 @@ export class SendRouteSurveyUseCase
     const route = await this.routeRepository.findOneWithAllRelations(routeId);
 
     if (!route) {
-      throw new NotFoundException('Recolha não encontrada');
+      throw new NotFoundException('errors.collection.notFound');
     }
 
     if (route.status !== RouteStatus.FINISHED) {
-      throw new BadRequestException(
-        'O questionário só pode ser enviado para uma recolha finalizada',
+      throw new BadRequestException('errors.route.surveyOnlyWhenFinished',
       );
     }
 

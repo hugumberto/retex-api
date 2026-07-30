@@ -6,14 +6,14 @@ import { User } from '../../../domain/user/user.entity';
  * pelo motorista, com o motivo (comentário).
  */
 export function buildCollectionCancelledEmail(
-  user: Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>,
+  user: Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'language'>,
   reason: string,
   friendlyCode?: string | null,
 ): SendEmailOptions {
   return {
     to: user.email,
-    subject: 'A sua recolha Retex foi cancelada',
     template: 'collection-cancelled',
+    locale: user.language,
     context: {
       firstName: user.firstName,
       lastName: user.lastName,

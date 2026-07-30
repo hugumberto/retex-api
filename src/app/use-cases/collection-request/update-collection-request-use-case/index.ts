@@ -30,17 +30,16 @@ export class UpdateCollectionRequestUseCase
 
     const existingCollectionRequest = await this.collectionRequestRepository.findOneWithAllRelations(id);
     if (!existingCollectionRequest) {
-      throw new NotFoundException('CollectionRequest não encontrado');
+      throw new NotFoundException('errors.collectionRequest.notFound');
     }
 
     // USER só pode mexer nos próprios pacotes e apenas para CANCELAR.
     if (!isPrivileged) {
       if (existingCollectionRequest.user?.id !== requesterId) {
-        throw new NotFoundException('CollectionRequest não encontrado');
+        throw new NotFoundException('errors.collectionRequest.notFound');
       }
       if (data.status !== CollectionRequestStatus.CANCELLED) {
-        throw new ForbiddenException(
-          'Apenas é permitido cancelar a própria solicitação',
+        throw new ForbiddenException('errors.collection.cancelOnlyOwn',
         );
       }
     }

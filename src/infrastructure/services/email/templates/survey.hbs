@@ -1,42 +1,37 @@
-{{#> layout title="A tua opinião é importante"}}
+{{#> layout title=(t "title")}}
 
-  {{> eyebrow text="QUESTIONÁRIO DE SATISFAÇÃO"}}
+  {{> eyebrow text=(t "eyebrow")}}
 
   <!-- Body -->
   <tr>
     <td style="padding:20px 40px 8px;">
       <p style="margin:0 0 12px;font-size:15px;color:#333333;">
-        Olá,
+        {{t "greeting"}}
       </p>
       <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
-        Obrigado por utilizares a nossa plataforma.
+        {{t "thanks"}}
       </p>
       <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
-        Gostaríamos de conhecer a tua opinião sobre a experiência de utilização.
-        O teu feedback é essencial para nos ajudar a identificar oportunidades de
-        melhoria e a aperfeiçoar continuamente a solução.
+        {{t "intro"}}
       </p>
       <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
-        O questionário é totalmente confidencial e demora cerca de 5 minutos a
-        preencher. Agradecemos, desde já, a tua disponibilidade e sinceridade nas
-        respostas.
+        {{t "confidential"}}
       </p>
     </td>
   </tr>
 
-  {{> cta url=surveyUrl label="Responder"}}
+  {{> cta url=surveyUrl label=(t "ctaLabel")}}
 
   <tr>
     <td style="padding:8px 40px 32px;">
       <p style="margin:0 0 12px;font-size:13px;color:#7F7F7F;line-height:1.6;">
-        Se o botão não funcionar, copie e cole o seguinte endereço no seu navegador:
+        {{t "linkNotice"}}
       </p>
       <p style="margin:0 0 20px;font-size:13px;color:#02748E;word-break:break-all;">
         {{surveyUrl}}
       </p>
       <p style="margin:0;font-size:15px;color:#333333;">
-        Muito obrigado pela tua colaboração.<br />
-        A tua equipa <strong>RETEX Portugal</strong>
+        {{t "signature"}}
       </p>
     </td>
   </tr>

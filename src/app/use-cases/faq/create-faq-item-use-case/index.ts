@@ -23,7 +23,7 @@ export class CreateFaqItemUseCase implements IUseCase<CreateFaqItemParam, FaqIte
 
   async call(param: CreateFaqItemParam): Promise<FaqItem> {
     const category = await this.faqCategoryRepository.findOne({ id: param.categoryId } as Partial<FaqCategory>);
-    if (!category) throw new NotFoundException('Categoria FAQ não encontrada');
+    if (!category) throw new NotFoundException('errors.faq.categoryNotFound');
     return this.faqItemRepository.create({
       categoryId: param.categoryId,
       title: param.title,

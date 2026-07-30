@@ -1,4 +1,5 @@
-import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsIn, IsOptional, IsString } from 'class-validator';
+import { SUPPORTED_LANGUAGES } from '../../../../config/i18n.constants';
 import { UserStatus } from '../../../../domain/user/user-status.enum';
 import { UserType } from '../../../../domain/user/user-type.enum';
 
@@ -26,4 +27,9 @@ export class UpdateUserDto {
   @IsOptional()
   @IsEnum(UserType, { message: 'userType deve ser PERSON ou COMPANY' })
   userType?: UserType;
+
+  /** Idioma em que o utilizador quer receber os emails (pt, en, es, fr). */
+  @IsOptional()
+  @IsIn(SUPPORTED_LANGUAGES as unknown as string[])
+  language?: string;
 } 

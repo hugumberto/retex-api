@@ -17,7 +17,7 @@ export class DeleteTestZoneUseCase implements IUseCase<{ id: string }, void> {
   async call(param: { id: string }): Promise<void> {
     const zone = await this.testZoneRepository.findOne({ id: param.id } as Partial<TestZone>);
     if (!zone) {
-      throw new NotFoundException('Zona não encontrada');
+      throw new NotFoundException('errors.testZone.notFound');
     }
 
     await this.testZoneRepository.delete({ id: param.id } as Partial<TestZone>);

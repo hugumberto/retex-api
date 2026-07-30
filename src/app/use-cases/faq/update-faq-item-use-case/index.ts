@@ -19,7 +19,7 @@ export class UpdateFaqItemUseCase implements IUseCase<UpdateFaqItemParam, FaqIte
 
   async call({ id, ...data }: UpdateFaqItemParam): Promise<FaqItem> {
     const existing = await this.faqItemRepository.findOne({ id } as Partial<FaqItem>);
-    if (!existing) throw new NotFoundException('Item FAQ não encontrado');
+    if (!existing) throw new NotFoundException('errors.faq.itemNotFound');
     const [updated] = await this.faqItemRepository.update({ id } as Partial<FaqItem>, data);
     return updated;
   }

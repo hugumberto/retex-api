@@ -15,7 +15,7 @@ export class DeleteBlogCategoryUseCase implements IUseCase<{ id: string }, void>
     const existing = await this.blogCategoryRepository.findOne({
       id,
     } as Partial<BlogCategory>);
-    if (!existing) throw new NotFoundException('Categoria não encontrada');
+    if (!existing) throw new NotFoundException('errors.category.notFound');
     // O vínculo na tabela blog_post_categories é removido em cascata (ON DELETE CASCADE).
     await this.blogCategoryRepository.delete({ id } as Partial<BlogCategory>);
   }

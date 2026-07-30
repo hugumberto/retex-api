@@ -36,11 +36,10 @@ export class ProcessTriageQrUseCase
   async call({ bagId, weight }: ProcessTriageQrParams): Promise<CollectionRequestBag> {
     const bag = await this.collectionRequestBagRepository.findOne({ id: bagId });
     if (!bag) {
-      throw new NotFoundException('QR code não encontrado');
+      throw new NotFoundException('errors.qrCode.notFound');
     }
     if (!bag.collectionRequestId) {
-      throw new BadRequestException(
-        'O QR code não está vinculado a uma solicitação',
+      throw new BadRequestException('errors.triage.qrCodeNotLinked',
       );
     }
 
@@ -48,14 +47,13 @@ export class ProcessTriageQrUseCase
       id: bag.collectionRequestId,
     });
     if (!collectionRequestEntity) {
-      throw new NotFoundException('Solicitação não encontrada');
+      throw new NotFoundException('errors.collection.requestNotFound');
     }
     if (
       collectionRequestEntity.status !== CollectionRequestStatus.COLLECTED &&
       collectionRequestEntity.status !== CollectionRequestStatus.SCREENING
     ) {
-      throw new BadRequestException(
-        'A solicitação não está em coleta/triagem',
+      throw new BadRequestException('errors.triage.requestNotInTriage',
       );
     }
 

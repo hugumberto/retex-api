@@ -21,13 +21,13 @@ export class GetCollectionRequestByIdUseCase implements IUseCase<GetCollectionRe
     const pkg = await this.collectionRequestRepository.findOneWithAllRelations(param.id);
 
     if (!pkg) {
-      throw new NotFoundException('CollectionRequest não encontrado');
+      throw new NotFoundException('errors.collectionRequest.notFound');
     }
 
     // USER só pode ver os próprios pacotes; ADMIN/OPS veem todos.
     // Devolvemos 404 (e não 403) para não revelar a existência a terceiros.
     if (!param.isPrivileged && pkg.user?.id !== param.requesterId) {
-      throw new NotFoundException('CollectionRequest não encontrado');
+      throw new NotFoundException('errors.collectionRequest.notFound');
     }
 
     return pkg;

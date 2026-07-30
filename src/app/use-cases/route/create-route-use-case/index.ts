@@ -25,12 +25,12 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
     // 1. Verificar se o usuário existe e tem role DRIVER
     const driver = await this.userRepository.findOneWithRelations({ id: param.driverId });
     if (!driver) {
-      throw new NotFoundException('Driver não encontrado');
+      throw new NotFoundException('errors.user.driverNotFound');
     }
 
     const hasDriverRole = driver.roles?.some(role => role.role === Role.DRIVER);
     if (!hasDriverRole) {
-      throw new BadRequestException('Usuário não possui role de driver');
+      throw new BadRequestException('errors.user.notDriver');
     }
 
     // 2. Buscar todos os collectionRequests pelos IDs (com relações para validar a rota)
@@ -38,17 +38,17 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
     for (const collectionRequestId of param.collectionRequestIds) {
       const collectionRequestEntity = await this.collectionRequestRepository.findOneWithAllRelations(collectionRequestId);
       if (!collectionRequestEntity) {
-        throw new NotFoundException(`CollectionRequest com ID ${collectionRequestId} não encontrado`);
+        throw new NotFoundException({ key: 'errors.collectionRequest.notFoundWithId', args: { id: collectionRequestId } });
       }
 
       // 3. Apenas solicitações no status CREATED podem ser adicionadas
       if (collectionRequestEntity.status !== CollectionRequestStatus.CREATED) {
-        throw new BadRequestException(`CollectionRequest ${collectionRequestId} não está no status CREATED`);
+        throw new BadRequestException({ key: 'errors.collectionRequest.notInCreatedStatus', args: { id: collectionRequestId } });
       }
 
       // 4. Uma solicitação existe em no máximo uma rota
       if (collectionRequestEntity.route) {
-        throw new ConflictException(`CollectionRequest ${collectionRequestId} já está associado a uma rota`);
+        throw new ConflictException({ key: 'errors.collectionRequest.alreadyLinkedToRoute', args: { id: collectionRequestId } });
       }
 
       collectionRequests.push(collectionRequestEntity);

@@ -15,7 +15,7 @@ export class GetPublicBlogPostBySlugUseCase
   async call({ slug }: { slug: string }): Promise<BlogPost> {
     const post = await this.blogPostRepository.findPublishedBySlug(slug);
     if (!post) {
-      throw new NotFoundException('Post não encontrado');
+      throw new NotFoundException('errors.blogPost.notFound');
     }
     return post;
   }
