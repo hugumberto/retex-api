@@ -8,6 +8,45 @@ import { IEmailLogRepository } from '../../../domain/email-log/email-log.reposit
 import { DOMAIN_TOKENS } from '../../../domain/tokens';
 import { TemplateEngine } from './template.engine';
 
+const HTML_ESCAPES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+};
+
+/**
+ * Escapa os valores interpolados nas traduções.
+ *
+ * O helper `{{t}}` devolve SafeString porque as próprias traduções contêm
+ * markup nosso (<strong>, <br/>). Os valores que lá entram, esses, vêm de dados
+ * de utilizador (nome, cidade, motivo de cancelamento) e sem escape poderiam
+ * injetar HTML — por exemplo um link de phishing dentro de um email legítimo
+ * da Retex. Escapamos só os valores, preservando o markup das traduções.
+ *
+ * Não afeta o `{{campo}}` direto nos templates: esse usa `options.context` e já
+ * é escapado pelo handlebars.
+ */
+function escapeArgs(value: unknown): unknown {
+  if (typeof value === 'string') {
+    return value.replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
+  }
+  if (Array.isArray(value)) {
+    return value.map(escapeArgs);
+  }
+  // Só objetos simples — Date e afins passam intactos para o i18n os formatar.
+  if (value?.constructor === Object) {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([key, item]) => [
+        key,
+        escapeArgs(item),
+      ]),
+    );
+  }
+  return value;
+}
+
 @Injectable()
 export class EmailService implements IEmailService {
   private readonly logger = new Logger(EmailService.name);
@@ -36,7 +75,10 @@ export class EmailService implements IEmailService {
     const translate = (key: string, args?: Record<string, unknown>): string =>
       this.i18n.translate(`email.${options.template}.${key}`, {
         lang,
-        args: { ...options.context, ...args },
+        args: escapeArgs({ ...options.context, ...args }) as Record<
+          string,
+          unknown
+        >,
       }) as unknown as string;
 
     const subject = options.subject ?? translate('subject');
