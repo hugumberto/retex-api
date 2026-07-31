@@ -1,4 +1,8 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, IsUUID, Matches, MaxLength } from 'class-validator';
+
+// Aceita vazio ou um decimal com sinal — as coordenadas chegam como string do
+// geocoder do frontend.
+const DECIMAL_OR_EMPTY = /^(-?\d+(\.\d+)?)?$/;
 
 export class CreateAddressDto {
   @IsUUID()
@@ -47,10 +51,12 @@ export class CreateAddressDto {
 
   @IsString()
   @IsOptional()
+  @Matches(DECIMAL_OR_EMPTY, { message: 'lat deve ser um número' })
   lat?: string;
 
   @IsString()
   @IsOptional()
+  @Matches(DECIMAL_OR_EMPTY, { message: 'long deve ser um número' })
   long?: string;
 
   @IsBoolean()

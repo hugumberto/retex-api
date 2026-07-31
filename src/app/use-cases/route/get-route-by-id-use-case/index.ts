@@ -3,11 +3,7 @@ import { Route } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
-
-// Deteta se o identificador é um UUID (id da rota) — caso contrário, assume-se
-// o código amigável da rota (`ano-XXXXXX`).
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+import { resolveEntityId } from '../../shared/identifier.util';
 
 @Injectable()
 export class GetRouteByIdUseCase implements IUseCase<string, Route> {
@@ -29,21 +25,12 @@ export class GetRouteByIdUseCase implements IUseCase<string, Route> {
   }
 
   // Aceita o id (UUID) ou o código amigável da rota e devolve o id.
-  private async resolveRouteId(identifier: string): Promise<string> {
-    const value = identifier.trim();
-
-    if (UUID_REGEX.test(value)) {
-      return value;
-    }
-
-    const byFriendlyCode = await this.routeRepository.findOne({
-      friendlyCode: value,
-    } as Partial<Route>);
-
-    if (!byFriendlyCode) {
-      throw new NotFoundException('errors.route.notFound');
-    }
-
-    return byFriendlyCode.id;
+  private resolveRouteId(identifier: string): Promise<string> {
+    return resolveEntityId(
+      identifier,
+      (friendlyCode) =>
+        this.routeRepository.findOne({ friendlyCode } as Partial<Route>),
+      'errors.route.notFound',
+    );
   }
 }

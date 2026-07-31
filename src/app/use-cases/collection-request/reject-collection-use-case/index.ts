@@ -1,10 +1,10 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CollectionRequest, CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { advanceRouteIfAllConfirmed } from '../../shared/advance-route.util';
 import { RejectCollectionDto } from './reject-collection.dto';
 
 export { RejectCollectionDto };
@@ -50,23 +50,7 @@ export class RejectCollectionUseCase
     return updated;
   }
 
-  private async advanceRouteIfAllConfirmed(routeId?: string): Promise<void> {
-    if (!routeId) return;
-
-    const route = await this.routeRepository.findOneWithAllRelations(routeId);
-    if (!route || route.status !== RouteStatus.CREATED) return;
-
-    const collectionRequests = route.collectionRequests ?? [];
-    if (collectionRequests.length === 0) return;
-
-    const allConfirmed = collectionRequests.every(
-      (pkg) => pkg.collectionConfirmedAt != null,
-    );
-    if (!allConfirmed) return;
-
-    await this.routeRepository.update(
-      { id: route.id },
-      { status: RouteStatus.WAITING_TO_START },
-    );
+  private advanceRouteIfAllConfirmed(routeId?: string): Promise<void> {
+    return advanceRouteIfAllConfirmed(this.routeRepository, routeId);
   }
 }

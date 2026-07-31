@@ -2,6 +2,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import { DeleteBlogPostUseCase } from '../../app/use-cases/blog-post/delete-blog-post-use-case';
 import { GetAllBlogPostsUseCase } from '../../app/use-cases/blog-post/get-all-blog-posts-use-case';
+import { GetBlogPostByIdUseCase } from '../../app/use-cases/blog-post/get-blog-post-by-id-use-case';
 import { GetPublicBlogPostBySlugUseCase } from '../../app/use-cases/blog-post/get-public-blog-post-by-slug-use-case';
 import { GetPublicBlogPostsUseCase } from '../../app/use-cases/blog-post/get-public-blog-posts-use-case';
 import { PublishBlogPostUseCase } from '../../app/use-cases/blog-post/publish-blog-post-use-case';
@@ -16,6 +17,7 @@ describe('BlogPostController', () => {
   const getPublic = { call: jest.fn() };
   const getBySlug = { call: jest.fn() };
   const getAll = { call: jest.fn() };
+  const getById = { call: jest.fn() };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -28,6 +30,7 @@ describe('BlogPostController', () => {
         { provide: GetPublicBlogPostsUseCase, useValue: getPublic },
         { provide: GetPublicBlogPostBySlugUseCase, useValue: getBySlug },
         { provide: GetAllBlogPostsUseCase, useValue: getAll },
+        { provide: GetBlogPostByIdUseCase, useValue: getById },
         { provide: JwtService, useValue: {} },
       ],
     }).compile();

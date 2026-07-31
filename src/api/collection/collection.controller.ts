@@ -4,9 +4,9 @@ import {
   BindQrCodeUseCase,
   CancelCollectionUseCase,
   FinalizeCollectionUseCase,
-  GetCollectionUseCase,
 } from '../../app/use-cases/collection';
 import { CancelCollectionDto } from '../../app/use-cases/collection/cancel-collection-use-case/cancel-collection.dto';
+import { GetCollectionRequestDetailUseCase } from '../../app/use-cases/collection-request/get-collection-request-detail-use-case';
 import { Role } from '../../domain/user/user-roles.entity';
 import { Roles } from '../auth/decorators/roles.decorator';
 
@@ -14,7 +14,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 @Roles(Role.ADMIN, Role.DRIVER)
 export class CollectionController {
   constructor(
-    private readonly getCollectionUseCase: GetCollectionUseCase,
+    private readonly getCollectionRequestDetailUseCase: GetCollectionRequestDetailUseCase,
     private readonly bindQrCodeUseCase: BindQrCodeUseCase,
     private readonly finalizeCollectionUseCase: FinalizeCollectionUseCase,
     private readonly cancelCollectionUseCase: CancelCollectionUseCase,
@@ -22,7 +22,7 @@ export class CollectionController {
 
   @Get(':collectionRequestId')
   async get(@Param('collectionRequestId') collectionRequestId: string) {
-    return this.getCollectionUseCase.call(collectionRequestId);
+    return this.getCollectionRequestDetailUseCase.call(collectionRequestId);
   }
 
   @Post(':collectionRequestId/bind')

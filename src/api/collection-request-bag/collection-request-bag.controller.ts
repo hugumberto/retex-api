@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 import { DeleteCollectionRequestBagUseCase } from '../../app/use-cases/collection-request-bag/delete-collection-request-bag-use-case';
-import { GetCollectionRequestBagsUseCase } from '../../app/use-cases/collection-request-bag/get-collection-request-bags-use-case';
+import { GetCollectionRequestDetailUseCase } from '../../app/use-cases/collection-request/get-collection-request-detail-use-case';
 import { UnassignCollectionRequestBagUseCase } from '../../app/use-cases/collection-request-bag/unassign-collection-request-bag-use-case';
 import { Role } from '../../domain/user/user-roles.entity';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -9,7 +9,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 @Roles(Role.ADMIN)
 export class CollectionRequestBagController {
   constructor(
-    private readonly getCollectionRequestBagsUseCase: GetCollectionRequestBagsUseCase,
+    private readonly getCollectionRequestDetailUseCase: GetCollectionRequestDetailUseCase,
     private readonly unassignCollectionRequestBagUseCase: UnassignCollectionRequestBagUseCase,
     private readonly deleteCollectionRequestBagUseCase: DeleteCollectionRequestBagUseCase,
   ) {}
@@ -17,7 +17,7 @@ export class CollectionRequestBagController {
   // Lista os sacos de uma solicitação de recolha (por código amigável ou UUID).
   @Get('collection-request/:code')
   getCollectionRequestBags(@Param('code') code: string) {
-    return this.getCollectionRequestBagsUseCase.call(code);
+    return this.getCollectionRequestDetailUseCase.call(code);
   }
 
   // Desassocia o saco da solicitação (volta ao pool da rota).

@@ -13,7 +13,7 @@ import { IEmailService } from '../../../services/interfaces/email.interface';
 import { ISanitizationService } from '../../../services/interfaces/sanitization.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
-import { generateFriendlyCode } from '../../collection-request-bag/bag.util';
+import { generateUniqueFriendlyCode } from '../../shared/friendly-code.util';
 import { CreateCollectionRequestDto } from './create-collection-request.dto';
 
 @Injectable()
@@ -118,17 +118,12 @@ export class CreateCollectionRequestUseCase
    * Gera um código amigável (`ano-XXXXXX`) garantindo unicidade contra os já
    * existentes. O índice único na coluna é a rede de segurança final.
    */
-  private async generateUniqueFriendlyCode(): Promise<string> {
-    const year = new Date().getFullYear();
-    for (let attempt = 0; attempt < 5; attempt++) {
-      const code = generateFriendlyCode(year);
-      const existing = await this.collectionRequestRepository.findOne({
-        friendlyCode: code,
-      } as Partial<CollectionRequest>);
-      if (!existing) return code;
-    }
-    // Fallback improvável: sufixo extra para reduzir a chance de colisão.
-    return `${generateFriendlyCode(year)}${Date.now().toString(36).slice(-2).toUpperCase()}`;
+  private generateUniqueFriendlyCode(): Promise<string> {
+    return generateUniqueFriendlyCode((friendlyCode) =>
+      this.collectionRequestRepository.findOne({
+        friendlyCode,
+      } as Partial<CollectionRequest>),
+    );
   }
 
 }

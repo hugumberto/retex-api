@@ -10,10 +10,11 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, OmitType } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { Request } from 'express';
 import { CreateAddressUseCase } from '../../app/use-cases/address/create-address-use-case';
+import { CreateAddressDto } from '../../app/use-cases/address/create-address-use-case/create-address.dto';
 import { DeleteAddressUseCase } from '../../app/use-cases/address/delete-address-use-case';
 import { GetUserAddressesUseCase } from '../../app/use-cases/address/get-user-addresses-use-case';
 import { SetDefaultAddressUseCase } from '../../app/use-cases/address/set-default-address-use-case';
@@ -25,19 +26,8 @@ import { User } from '../../domain/user/user.entity';
 import { JwtPayload } from '../../app/services/interfaces/auth.interface';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-class CreateMeAddressDto {
-  @IsString() @IsNotEmpty() @MaxLength(255) street: string;
-  @IsString() @IsNotEmpty() @MaxLength(20) number: string;
-  @IsString() @IsOptional() @MaxLength(255) complement?: string;
-  @IsString() @IsNotEmpty() @MaxLength(255) city: string;
-  @IsString() @IsOptional() @MaxLength(255) cityDivision?: string;
-  @IsString() @IsOptional() @MaxLength(255) country?: string;
-  @IsString() @IsOptional() @MaxLength(255) countryDivision?: string;
-  @IsString() @IsNotEmpty() @MaxLength(20) zipCode: string;
-  @IsString() @IsOptional() @Matches(/^(-?\d+(\.\d+)?)?$/, { message: 'lat deve ser um número' }) lat?: string;
-  @IsString() @IsOptional() @Matches(/^(-?\d+(\.\d+)?)?$/, { message: 'long deve ser um número' }) long?: string;
-  @IsBoolean() @IsOptional() isDefault?: boolean;
-}
+// Mesma morada do fluxo de admin, menos o `userId` — aqui vem do JWT.
+class CreateMeAddressDto extends OmitType(CreateAddressDto, ['userId'] as const) {}
 
 class UpdateMeDto {
   @IsString() @IsNotEmpty() contactPhone: string;

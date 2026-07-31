@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { GetTriageCollectionRequestUseCase } from '../../app/use-cases/triage/get-triage-collection-request-use-case';
+import { GetCollectionRequestDetailUseCase } from '../../app/use-cases/collection-request/get-collection-request-detail-use-case';
 import { ProcessTriageQrUseCase } from '../../app/use-cases/triage/process-triage-qr-use-case';
 import { ProcessTriageQrDto } from '../../app/use-cases/triage/process-triage-qr-use-case/process-triage-qr.dto';
 import { Role } from '../../domain/user/user-roles.entity';
@@ -9,14 +9,14 @@ import { Roles } from '../auth/decorators/roles.decorator';
 @Roles(Role.ADMIN, Role.OPS)
 export class TriageController {
   constructor(
-    private readonly getTriageCollectionRequestUseCase: GetTriageCollectionRequestUseCase,
+    private readonly getCollectionRequestDetailUseCase: GetCollectionRequestDetailUseCase,
     private readonly processTriageQrUseCase: ProcessTriageQrUseCase,
   ) {}
 
   // Consulta por código da solicitação OU de um QR (token/código amigável).
   @Get(':code')
   getByCode(@Param('code') code: string) {
-    return this.getTriageCollectionRequestUseCase.call(code);
+    return this.getCollectionRequestDetailUseCase.call(code);
   }
 
   // Processa um volume (peso + marca como processado).
