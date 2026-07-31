@@ -33,14 +33,13 @@ export class ConfirmCollectionUseCase implements IUseCase<ConfirmCollectionDto, 
       param.token,
     );
     if (!pkg) {
-      throw new NotFoundException('Token de confirmação inválido');
+      throw new NotFoundException('errors.auth.confirmationTokenInvalid');
     }
 
     if (pkg.route?.startDate) {
       const days = await this.getDeadlineDays();
       if (this.isPastDeadline(pkg.route.startDate, days)) {
-        throw new BadRequestException(
-          'O prazo para confirmar a recolha já expirou',
+        throw new BadRequestException('errors.collection.confirmationDeadlineExpired',
         );
       }
     }

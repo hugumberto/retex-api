@@ -19,6 +19,7 @@ import {
   CollectionRequestTotals,
   CollectionRequestTrendPoint,
 } from '../../../../domain/collection-request/collection-request.repository';
+import { RouteStatus } from '../../../../domain/route/route.entity';
 import { BaseRepository } from '../abstraction/base.repository';
 import { collectionRequestSchema } from './collection-request.schema';
 
@@ -267,6 +268,31 @@ export class CollectionRequestRepository
       })
       .andWhere('collectionRequest.collectionConfirmedAt IS NOT NULL')
       .andWhere('route.start_date::date <= CURRENT_DATE')
+      .getMany();
+  }
+
+  async findPendingCollectionReminders(): Promise<CollectionRequest[]> {
+    const repository = await this.getRepository();
+    return repository
+      .createQueryBuilder('collectionRequest')
+      .innerJoinAndSelect('collectionRequest.route', 'route')
+      // innerJoin: sem utilizador não há destinatário para o lembrete.
+      .innerJoinAndSelect('collectionRequest.user', 'user')
+      .leftJoinAndSelect('collectionRequest.address', 'address')
+      .where('route.status IN (:...routeStatuses)', {
+        routeStatuses: [RouteStatus.WAITING_TO_START, RouteStatus.IN_TRANSIT],
+      })
+      // A confirmação do cliente é o critério canónico, não o status: numa rota
+      // já IN_TRANSIT os pedidos foram movidos para WAITING_FOR_COLLECTION.
+      .andWhere('collectionRequest.collectionConfirmedAt IS NOT NULL')
+      .andWhere('collectionRequest.collectionReminderSentAt IS NULL')
+      .andWhere('collectionRequest.status NOT IN (:...excludedStatuses)', {
+        excludedStatuses: [
+          CollectionRequestStatus.CANCELLED,
+          CollectionRequestStatus.COLLECTED,
+        ],
+      })
+      .andWhere("route.start_date::date = CURRENT_DATE + INTERVAL '1 day'")
       .getMany();
   }
 }

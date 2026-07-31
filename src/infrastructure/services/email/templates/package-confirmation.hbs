@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="{{lang}}">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registo efetuado com sucesso</title>
+  <title>{{t "title"}}</title>
 </head>
 
 <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
@@ -45,7 +45,7 @@
                   </td>
                   <td valign="middle"
                     style="font-size:12px;font-weight:bold;letter-spacing:1px;color:#02748E;text-transform:uppercase;">
-                    O SEU REGISTO FOI EFETUADO COM SUCESSO
+                    {{t "badge"}}
                   </td>
                 </tr>
               </table>
@@ -56,28 +56,22 @@
           <tr>
             <td style="padding:20px 40px 32px;">
               <p style="margin:0 0 12px;font-size:15px;color:#333333;">
-                Olá, <a href="#" style="color:#02748E;text-decoration:none;font-weight:bold;">{{firstName}}
-                  {{lastName}}</a>!
+                {{t "greeting"}}
               </p>
               <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
-                Informamos que o registo do processo <strong>nº{{friendlyCode}}</strong>, foi efetuado com sucesso.
+                {{t "intro"}}
               </p>
               <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
-                Em breve receberá um email com o <strong>dia</strong> e o
-                <strong>intervalo de horário</strong> em que a recolha será agendada.
+                {{t "nextStep"}}
               </p>
               <p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.6;">
-                Encontre no final deste email, os detalhes da sua encomenda.
+                {{t "detailsNote"}}
               </p>
               <p style="margin:0 0 20px;font-size:15px;color:#333333;line-height:1.6;">
-                Caso necessite de mais informações sobre o seu processo, não hesite em contactar-nos através do
-                <a href="https://www.retex.pt/#form"
-                  style="color:#02748E;text-decoration:none;font-weight:bold;">formulário de contacto</a>,
-                disponível <a href="https://www.retex.pt/#form"
-                  style="color:#02748E;text-decoration:none;font-weight:bold;">aqui</a>.
+                {{t "contactNote"}}
               </p>
               <p style="margin:0;font-size:15px;color:#333333;">
-                A sua equipa <strong>RETEX Portugal</strong>
+                {{t "signature"}}
               </p>
             </td>
           </tr>
@@ -87,7 +81,7 @@
             <td align="center" style="padding:0 40px 20px;">
               <p
                 style="margin:0;font-size:12px;font-weight:bold;letter-spacing:1px;color:#02748E;text-transform:uppercase;">
-                DETALHES DO PROCESSO DE REGISTO
+                {{t "detailsHeader"}}
               </p>
             </td>
           </tr>
@@ -101,7 +95,7 @@
                 <!-- Código -->
                 <tr>
                   <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;width:45%;border-bottom:1px solid #f0f0f0;">
-                    Código</td>
+                    {{t "codeLabel"}}</td>
                   <td
                     style="padding:14px 20px;font-size:14px;color:#013364;font-weight:700;letter-spacing:0.5px;border-bottom:1px solid #f0f0f0;">
                     {{friendlyCode}}</td>
@@ -110,7 +104,7 @@
                 <!-- Nome -->
                 <tr>
                   <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;width:45%;border-bottom:1px solid #f0f0f0;">
-                    Nome</td>
+                    {{t "nameLabel"}}</td>
                   <td
                     style="padding:14px 20px;font-size:14px;color:#013364;font-weight:500;border-bottom:1px solid #f0f0f0;">
                     {{fullName}}</td>
@@ -118,19 +112,19 @@
 
                 <!-- Status -->
                 <tr>
-                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;border-bottom:1px solid #f0f0f0;">Status
+                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;border-bottom:1px solid #f0f0f0;">{{t "statusLabel"}}
                   </td>
                   <td style="padding:14px 8px;border-bottom:1px solid #f0f0f0;">
                     <span
                       style="display:inline-block;background-color:#CFECDA;color:#59C35F;font-size:12px;font-weight:bold;padding:4px 12px;border-radius:20px;letter-spacing:0.5px;">
-                      {{status}}
+                      {{t statusKey}}
                     </span>
                   </td>
                 </tr>
 
                 <!-- Endereço -->
                 <tr>
-                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;border-bottom:1px solid #f0f0f0;">Endereço
+                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;border-bottom:1px solid #f0f0f0;">{{t "addressLabel"}}
                   </td>
                   <td style="padding:14px 20px;font-size:14px;color:#013364;border-bottom:1px solid #f0f0f0;">
                     {{address.street}}, {{address.number}}{{#if address.complement}} — {{address.complement}}{{/if}}
@@ -139,7 +133,7 @@
 
                 <!-- Cidade -->
                 <tr>
-                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;border-bottom:1px solid #f0f0f0;">Cidade
+                  <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;border-bottom:1px solid #f0f0f0;">{{t "cityLabel"}}
                   </td>
                   <td style="padding:14px 20px;font-size:14px;color:#013364;border-bottom:1px solid #f0f0f0;">
                     {{address.city}}, {{address.countryDivision}}
@@ -149,7 +143,7 @@
                 <!-- Código-Postal -->
                 <tr>
                   <td style="padding:14px 20px;font-size:14px;color:#7F7F7F;">
-                    Código-Postal</td>
+                    {{t "zipLabel"}}</td>
                   <td style="padding:14px 20px;font-size:14px;color:#013364;">
                     {{address.zipCode}}</td>
                 </tr>
@@ -168,8 +162,8 @@
           <!-- Como funciona -->
           <tr>
             <td align="center" style="padding:40px 40px 48px;">
-              <p style="margin:0 0 4px;font-size:13px;color:#7F7F7F;">O nosso serviço</p>
-              <p style="margin:0 0 32px;font-size:26px;font-weight:bold;color:#013364;">Como funciona?</p>
+              <p style="margin:0 0 4px;font-size:13px;color:#7F7F7F;">{{t "serviceKicker"}}</p>
+              <p style="margin:0 0 32px;font-size:26px;font-weight:bold;color:#013364;">{{t "howItWorks"}}</p>
 
               <table width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
@@ -186,7 +180,7 @@
                       <tr>
                         <td align="center"
                           style="font-size:11px;font-weight:bold;letter-spacing:1px;color:#013364;text-transform:uppercase;">
-                          EFETUAR REGISTO</td>
+                          {{t "step1"}}</td>
                       </tr>
                     </table>
                   </td>
@@ -204,7 +198,7 @@
                       <tr>
                         <td align="center"
                           style="font-size:11px;font-weight:bold;letter-spacing:1px;color:#013364;text-transform:uppercase;">
-                          AGENDAR RECOLHA</td>
+                          {{t "step2"}}</td>
                       </tr>
                     </table>
                   </td>
@@ -222,7 +216,7 @@
                       <tr>
                         <td align="center"
                           style="font-size:11px;font-weight:bold;letter-spacing:1px;color:#013364;text-transform:uppercase;">
-                          AGORA É CONNOSCO</td>
+                          {{t "step3"}}</td>
                       </tr>
                     </table>
                   </td>

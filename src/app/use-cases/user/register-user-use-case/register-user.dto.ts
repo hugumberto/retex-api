@@ -3,6 +3,7 @@ import {
   IsDateString,
   IsEmail,
   IsEnum,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -11,6 +12,7 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
+import { SUPPORTED_LANGUAGES } from '../../../../config/i18n.constants';
 import { Gender } from '../../../../domain/user/gender.enum';
 
 export class RegisterAddressDto {
@@ -94,6 +96,11 @@ export class RegisterUserDto {
   @IsOptional()
   @IsDateString()
   dateOfBirth?: string;
+
+  /** Idioma em que o utilizador quer receber os emails (pt, en, es, fr). */
+  @IsOptional()
+  @IsIn(SUPPORTED_LANGUAGES as unknown as string[])
+  language?: string;
 
   @IsNotEmpty()
   @ValidateNested()

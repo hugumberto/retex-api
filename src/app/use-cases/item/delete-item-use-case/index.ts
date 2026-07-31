@@ -19,7 +19,7 @@ export class DeleteItemUseCase implements IUseCase<string, Item> {
     const [existingItem] = await this.itemRepository.findByIds([id]);
 
     if (!existingItem) {
-      throw new NotFoundException('Item não encontrado');
+      throw new NotFoundException('errors.item.notFound');
     }
 
     const deleted = await this.itemRepository.delete({ id });

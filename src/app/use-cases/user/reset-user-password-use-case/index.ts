@@ -23,7 +23,7 @@ export class ResetUserPasswordUseCase
 
     const existingUser = await this.userRepository.findOne({ email });
     if (!existingUser) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('errors.user.notFound');
     }
 
     const hashedPassword = await this.cryptoService.hashPassword(newPassword);

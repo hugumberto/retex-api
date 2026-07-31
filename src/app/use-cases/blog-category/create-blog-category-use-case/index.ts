@@ -26,7 +26,7 @@ export class CreateBlogCategoryUseCase
 
     const existing = await this.blogCategoryRepository.findBySlug(slug);
     if (existing) {
-      throw new ConflictException('Já existe uma categoria com este nome');
+      throw new ConflictException('errors.category.duplicateName');
     }
 
     return this.blogCategoryRepository.create({

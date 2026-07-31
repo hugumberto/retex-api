@@ -20,7 +20,7 @@ export class CreateBrandUseCase implements IUseCase<CreateBrandDto, Brand> {
     // Não permitir marcas com o mesmo nome (ignorando maiúsculas/espaços).
     const existing = await this.brandRepository.findByName(name);
     if (existing) {
-      throw new ConflictException('Já existe uma marca com este nome');
+      throw new ConflictException('errors.brand.duplicateName');
     }
 
     // Criar a marca com manual = true (como especificado)

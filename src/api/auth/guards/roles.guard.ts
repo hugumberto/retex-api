@@ -23,13 +23,13 @@ export class RolesGuard implements CanActivate {
     const user: JwtPayload = request.user;
 
     if (!user) {
-      throw new ForbiddenException('Usuário não autenticado');
+      throw new ForbiddenException('errors.auth.notAuthenticated');
     }
 
     const hasRole = requiredRoles.some((role) => user.roles?.includes(role));
 
     if (!hasRole) {
-      throw new ForbiddenException('Acesso negado: roles insuficientes');
+      throw new ForbiddenException('errors.auth.accessDenied');
     }
 
     return true;

@@ -16,7 +16,7 @@ export class LogoutUseCase implements IUseCase<LogoutDto, void> {
     const refreshToken = await this.refreshTokenRepository.findByToken(param.refresh_token);
 
     if (!refreshToken) {
-      throw new NotFoundException('Refresh token não encontrado');
+      throw new NotFoundException('errors.auth.refreshTokenNotFound');
     }
 
     // Revogar o token

@@ -25,13 +25,13 @@ export class UpsertBlogPostUseCase implements IUseCase<UpsertBlogPostDto, BlogPo
     if (param.id) {
       const existingPost = await this.blogPostRepository.findOne({ id: param.id });
       if (!existingPost) {
-        throw new NotFoundException('Post não encontrado');
+        throw new NotFoundException('errors.blogPost.notFound');
       }
 
       // Verificar se slug já existe em outro post
       const postWithSameSlug = await this.blogPostRepository.findBySlug(param.slug);
       if (postWithSameSlug && postWithSameSlug.id !== param.id) {
-        throw new ConflictException('Já existe um post com este slug');
+        throw new ConflictException('errors.blogPost.duplicateSlug');
       }
 
       // Atualizar post existente — preservar o estado atual: editar (ex.: corrigir
@@ -61,7 +61,7 @@ export class UpsertBlogPostUseCase implements IUseCase<UpsertBlogPostDto, BlogPo
     // Verificar se slug já existe
     const existingPostBySlug = await this.blogPostRepository.findBySlug(param.slug);
     if (existingPostBySlug) {
-      throw new ConflictException('Já existe um post com este slug');
+      throw new ConflictException('errors.blogPost.duplicateSlug');
     }
 
     // Criar novo post
@@ -91,7 +91,7 @@ export class UpsertBlogPostUseCase implements IUseCase<UpsertBlogPostDto, BlogPo
 
     const categories = await this.blogCategoryRepository.findByIds(uniqueIds);
     if (categories.length !== uniqueIds.length) {
-      throw new NotFoundException('Uma ou mais categorias não foram encontradas');
+      throw new NotFoundException('errors.category.someNotFound');
     }
     return categories;
   }

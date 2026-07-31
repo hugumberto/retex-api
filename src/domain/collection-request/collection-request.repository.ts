@@ -60,6 +60,9 @@ export interface ICollectionRequestRepository
   findExpiredUnconfirmed(days: number): Promise<CollectionRequest[]>;
   // Cron: roteadas + CREATED + confirmadas cujo dia da coleta chegou.
   findDueConfirmed(): Promise<CollectionRequest[]>;
+  // Cron: confirmadas, em rota a aguardar início ou em trânsito, cuja coleta é
+  // amanhã e que ainda não receberam o lembrete. Traz `user` e `address`.
+  findPendingCollectionReminders(): Promise<CollectionRequest[]>;
 
   // Agregações para o dashboard (somente leitura).
   countByStatus(): Promise<CollectionRequestStatusCount[]>;

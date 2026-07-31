@@ -84,8 +84,7 @@ export class GenerateCollectionBagsUseCase
       if (await isFree(code)) return code;
     }
 
-    throw new ConflictException(
-      'Não foi possível gerar um código único para o QR code',
+    throw new ConflictException('errors.qrCode.uniqueCodeGenerationFailed',
     );
   }
 }

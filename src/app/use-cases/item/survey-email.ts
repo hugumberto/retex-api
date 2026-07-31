@@ -10,14 +10,14 @@ const DEFAULT_SURVEY_URL =
  * sua solicitação de recolha é finalizada.
  */
 export function buildSurveyEmail(
-  user: Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>,
+  user: Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'language'>,
 ): SendEmailOptions {
   const surveyUrl = process.env.SURVEY_FORM_URL ?? DEFAULT_SURVEY_URL;
 
   return {
     to: user.email,
-    subject: 'A tua opinião é importante',
     template: 'survey',
+    locale: user.language,
     context: {
       firstName: user.firstName,
       lastName: user.lastName,

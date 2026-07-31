@@ -1,0 +1,103 @@
+{
+  "auth": {
+    "tokenMissing": "Token no proporcionado",
+    "tokenInvalid": "Token no válido",
+    "notAuthenticated": "Usuario no autenticado",
+    "accessDenied": "Acceso denegado: roles insuficientes",
+    "invalidCredentials": "Email o contraseña no válidos",
+    "accountInactive": "Cuenta inactiva",
+    "accountAlreadyActive": "La cuenta ya está activada",
+    "activationTokenInvalid": "Token de activación no válido",
+    "activationTokenExpired": "Token de activación caducado",
+    "resetTokenInvalid": "Token de restablecimiento no válido o caducado",
+    "confirmationTokenInvalid": "Token de confirmación no válido",
+    "currentPasswordIncorrect": "La contraseña actual es incorrecta",
+    "refreshTokenNotFound": "Refresh token no encontrado",
+    "refreshTokenInvalid": "Refresh token no válido",
+    "refreshTokenExpired": "Refresh token caducado",
+    "refreshTokenRevoked": "Refresh token revocado"
+  },
+  "user": {
+    "notFound": "Usuario no encontrado",
+    "emailAlreadyExists": "Ya existe un usuario con este email",
+    "emailInUse": "El email ya está en uso por otro usuario",
+    "notDriver": "El usuario no tiene el perfil de transportista",
+    "driverNotFound": "Transportista no encontrado"
+  },
+  "address": {
+    "notFound": "Dirección no encontrada",
+    "duplicate": "Ya existe una dirección con estos datos",
+    "outOfServiceZone": "Dirección fuera de la zona de servicio",
+    "deleteBlockedByActiveRequest": "No se puede eliminar esta dirección: hay una solicitud de recogida activa que la utiliza."
+  },
+  "collection": {
+    "requestNotFound": "Solicitud no encontrada",
+    "notFound": "Recogida no encontrada",
+    "notAwaitingPickup": "La solicitud no está pendiente de recogida",
+    "cannotCancel": "Esta solicitud no se puede cancelar",
+    "cancelOnlyOwn": "Solo se permite cancelar la propia solicitud",
+    "cancellationReasonRequired": "Indica el motivo de la cancelación",
+    "bagRequiredToFinalize": "Vincula al menos una bolsa antes de finalizar la recogida",
+    "confirmationDeadlineExpired": "El plazo para confirmar la recogida ha caducado"
+  },
+  "collectionRequest": {
+    "notFound": "Solicitud de recogida no encontrada",
+    "notFoundWithId": "Solicitud de recogida {id} no encontrada",
+    "notInCreatedStatus": "La solicitud de recogida {id} no está en el estado CREATED",
+    "alreadyLinkedToRoute": "La solicitud de recogida {id} ya está asociada a una ruta",
+    "alreadyLinkedToAnotherRoute": "La solicitud de recogida {id} ya está asociada a otra ruta"
+  },
+  "bag": {
+    "notFound": "Bolsa no encontrada",
+    "notAllProcessed": "No se han procesado todas las bolsas"
+  },
+  "qrCode": {
+    "notFound": "Código QR no encontrado",
+    "alreadyUsed": "Código QR ya utilizado",
+    "wrongRoute": "El código QR no pertenece a esta ruta",
+    "uniqueCodeGenerationFailed": "No se ha podido generar un código único para el código QR"
+  },
+  "route": {
+    "notFound": "Ruta no encontrada",
+    "alreadyConfirmed": "La ruta ya ha sido confirmada y no permite cambiar transportista, solicitudes, fecha ni franja horaria",
+    "cannotDeleteCompleted": "No se puede eliminar una recogida completada",
+    "surveyOnlyWhenFinished": "El cuestionario solo se puede enviar para una recogida finalizada"
+  },
+  "item": {
+    "notFound": "Artículo no encontrado",
+    "someNotFound": "Artículos no encontrados: {items}",
+    "sameCollectionRequestRequired": "Todos los artículos deben pertenecer a la misma solicitud de recogida",
+    "bindFailed": "Error al asociar el artículo {id}: {error}",
+    "bulkOperationCancelled": "Operación cancelada debido a errores: {errors}"
+  },
+  "storageUnit": {
+    "notFound": "Unidad de almacenamiento no encontrada",
+    "someNotFound": "Unidades de almacenamiento no encontradas: {units}"
+  },
+  "brand": {
+    "notFound": "Marca no encontrada",
+    "duplicateName": "Ya existe una marca con este nombre"
+  },
+  "category": {
+    "notFound": "Categoría no encontrada",
+    "someNotFound": "No se han encontrado una o más categorías",
+    "duplicateName": "Ya existe una categoría con este nombre"
+  },
+  "blogPost": {
+    "notFound": "Artículo no encontrado",
+    "duplicateSlug": "Ya existe un artículo con este slug"
+  },
+  "faq": {
+    "categoryNotFound": "Categoría de FAQ no encontrada",
+    "itemNotFound": "Elemento de FAQ no encontrado"
+  },
+  "testZone": {
+    "notFound": "Zona no encontrada",
+    "alreadyExistsForCity": "Ya existe una zona para esta ciudad"
+  },
+  "triage": {
+    "requestNotFoundForCode": "No se ha encontrado ninguna solicitud para el código indicado",
+    "qrCodeNotLinked": "El código QR no está asociado a una solicitud",
+    "requestNotInTriage": "La solicitud no está en recogida/triaje"
+  }
+}

@@ -5,6 +5,7 @@ import { GetAllRoutesUseCase } from '../../app/use-cases/route/get-all-routes-us
 import { GetRouteByIdUseCase } from '../../app/use-cases/route/get-route-by-id-use-case';
 import { UpdateRouteUseCase } from '../../app/use-cases/route/update-route-use-case';
 import { ProcessCollectionSchedulesUseCase } from '../../app/use-cases/collection/process-collection-schedules-use-case';
+import { SendCollectionRemindersUseCase } from '../../app/use-cases/collection/send-collection-reminders-use-case';
 import { GetRouteBagsUseCase } from '../../app/use-cases/collection-request-bag/get-route-bags-use-case';
 import { SendRouteSurveyUseCase } from '../../app/use-cases/route/send-route-survey-use-case';
 import { GetRouteCollectionRequestBagsUseCase } from '../../app/use-cases/route/get-route-collection-request-bags-use-case';
@@ -54,6 +55,12 @@ describe('RouteController', () => {
         },
         {
           provide: ProcessCollectionSchedulesUseCase,
+          useValue: {
+            call: jest.fn(),
+          },
+        },
+        {
+          provide: SendCollectionRemindersUseCase,
           useValue: {
             call: jest.fn(),
           },

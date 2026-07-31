@@ -24,7 +24,7 @@ describe('UpdateBrandUseCase', () => {
     repo.findOne.mockResolvedValue(undefined);
     await expect(
       useCase.call({ id: 'b1', data: { name: 'X' } } as any),
-    ).rejects.toThrow('Marca não encontrada');
+    ).rejects.toThrow('errors.brand.notFound');
   });
 
   it('updates an existing brand', async () => {

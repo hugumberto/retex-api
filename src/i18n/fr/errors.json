@@ -1,0 +1,103 @@
+{
+  "auth": {
+    "tokenMissing": "Jeton non fourni",
+    "tokenInvalid": "Jeton invalide",
+    "notAuthenticated": "Utilisateur non authentifié",
+    "accessDenied": "Accès refusé : rôles insuffisants",
+    "invalidCredentials": "E-mail ou mot de passe invalide",
+    "accountInactive": "Compte inactif",
+    "accountAlreadyActive": "Compte déjà activé",
+    "activationTokenInvalid": "Jeton d'activation invalide",
+    "activationTokenExpired": "Jeton d'activation expiré",
+    "resetTokenInvalid": "Jeton de réinitialisation invalide ou expiré",
+    "confirmationTokenInvalid": "Jeton de confirmation invalide",
+    "currentPasswordIncorrect": "Le mot de passe actuel est incorrect",
+    "refreshTokenNotFound": "Refresh token introuvable",
+    "refreshTokenInvalid": "Refresh token invalide",
+    "refreshTokenExpired": "Refresh token expiré",
+    "refreshTokenRevoked": "Refresh token révoqué"
+  },
+  "user": {
+    "notFound": "Utilisateur introuvable",
+    "emailAlreadyExists": "Un utilisateur avec cet e-mail existe déjà",
+    "emailInUse": "E-mail déjà utilisé par un autre utilisateur",
+    "notDriver": "L'utilisateur n'a pas le rôle de transporteur",
+    "driverNotFound": "Transporteur introuvable"
+  },
+  "address": {
+    "notFound": "Adresse introuvable",
+    "duplicate": "Une adresse avec ces informations existe déjà",
+    "outOfServiceZone": "Adresse hors de la zone de service",
+    "deleteBlockedByActiveRequest": "Impossible de supprimer cette adresse : une demande de collecte active l'utilise."
+  },
+  "collection": {
+    "requestNotFound": "Demande introuvable",
+    "notFound": "Collecte introuvable",
+    "notAwaitingPickup": "La demande n'est pas en attente de collecte",
+    "cannotCancel": "Cette demande ne peut pas être annulée",
+    "cancelOnlyOwn": "Vous ne pouvez annuler que votre propre demande",
+    "cancellationReasonRequired": "Indiquez le motif de l'annulation",
+    "bagRequiredToFinalize": "Associez au moins un sac avant de finaliser la collecte",
+    "confirmationDeadlineExpired": "Le délai pour confirmer la collecte est dépassé"
+  },
+  "collectionRequest": {
+    "notFound": "Demande de collecte introuvable",
+    "notFoundWithId": "Demande de collecte {id} introuvable",
+    "notInCreatedStatus": "La demande de collecte {id} n'est pas au statut CREATED",
+    "alreadyLinkedToRoute": "La demande de collecte {id} est déjà associée à une tournée",
+    "alreadyLinkedToAnotherRoute": "La demande de collecte {id} est déjà associée à une autre tournée"
+  },
+  "bag": {
+    "notFound": "Sac introuvable",
+    "notAllProcessed": "Tous les sacs n'ont pas été traités"
+  },
+  "qrCode": {
+    "notFound": "QR code introuvable",
+    "alreadyUsed": "QR code déjà utilisé",
+    "wrongRoute": "Le QR code n'appartient pas à cette tournée",
+    "uniqueCodeGenerationFailed": "Impossible de générer un code unique pour le QR code"
+  },
+  "route": {
+    "notFound": "Tournée introuvable",
+    "alreadyConfirmed": "La tournée a déjà été confirmée : le transporteur, les demandes, la date et le créneau ne peuvent plus être modifiés",
+    "cannotDeleteCompleted": "Impossible de supprimer une collecte terminée",
+    "surveyOnlyWhenFinished": "Le questionnaire ne peut être envoyé que pour une collecte terminée"
+  },
+  "item": {
+    "notFound": "Article introuvable",
+    "someNotFound": "Articles introuvables : {items}",
+    "sameCollectionRequestRequired": "Tous les articles doivent appartenir à la même demande de collecte",
+    "bindFailed": "Erreur lors de l'association de l'article {id} : {error}",
+    "bulkOperationCancelled": "Opération annulée en raison d'erreurs : {errors}"
+  },
+  "storageUnit": {
+    "notFound": "Unité de stockage introuvable",
+    "someNotFound": "Unités de stockage introuvables : {units}"
+  },
+  "brand": {
+    "notFound": "Marque introuvable",
+    "duplicateName": "Une marque portant ce nom existe déjà"
+  },
+  "category": {
+    "notFound": "Catégorie introuvable",
+    "someNotFound": "Une ou plusieurs catégories sont introuvables",
+    "duplicateName": "Une catégorie portant ce nom existe déjà"
+  },
+  "blogPost": {
+    "notFound": "Article introuvable",
+    "duplicateSlug": "Un article avec ce slug existe déjà"
+  },
+  "faq": {
+    "categoryNotFound": "Catégorie de FAQ introuvable",
+    "itemNotFound": "Élément de FAQ introuvable"
+  },
+  "testZone": {
+    "notFound": "Zone introuvable",
+    "alreadyExistsForCity": "Une zone existe déjà pour cette ville"
+  },
+  "triage": {
+    "requestNotFoundForCode": "Aucune demande trouvée pour le code indiqué",
+    "qrCodeNotLinked": "Le QR code n'est pas associé à une demande",
+    "requestNotInTriage": "La demande n'est pas en collecte/tri"
+  }
+}

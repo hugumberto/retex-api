@@ -26,13 +26,13 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
     // Validar se o package existe
     const collectionRequestEntity = await this.collectionRequestRepository.findOne({ id: param.collectionRequestId });
     if (!collectionRequestEntity) {
-      throw new BadRequestException('CollectionRequest não encontrado');
+      throw new BadRequestException('errors.collectionRequest.notFound');
     }
 
     // Validar se a brand existe
     const brand = await this.brandRepository.findOne({ id: param.brandId });
     if (!brand) {
-      throw new BadRequestException('Brand não encontrada');
+      throw new BadRequestException('errors.brand.notFound');
     }
 
     // Validar o volume (QR code) quando informado (triagem por volume)
@@ -40,7 +40,7 @@ export class CreateItemUseCase implements IUseCase<CreateItemDto, Item> {
     if (param.bagId) {
       bag = await this.collectionRequestBagRepository.findOne({ id: param.bagId });
       if (!bag) {
-        throw new BadRequestException('QR code não encontrado');
+        throw new BadRequestException('errors.qrCode.notFound');
       }
     }
 

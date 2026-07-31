@@ -31,7 +31,7 @@ export class UpdateBlogCategoryUseCase
     const existing = await this.blogCategoryRepository.findOne({
       id,
     } as Partial<BlogCategory>);
-    if (!existing) throw new NotFoundException('Categoria não encontrada');
+    if (!existing) throw new NotFoundException('errors.category.notFound');
 
     const data: Partial<BlogCategory> = {};
 
@@ -39,7 +39,7 @@ export class UpdateBlogCategoryUseCase
       const slug = slugify(title);
       const sameSlug = await this.blogCategoryRepository.findBySlug(slug);
       if (sameSlug && sameSlug.id !== id) {
-        throw new ConflictException('Já existe uma categoria com este nome');
+        throw new ConflictException('errors.category.duplicateName');
       }
       data.title = title;
       data.slug = slug;

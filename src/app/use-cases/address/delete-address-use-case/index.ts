@@ -27,7 +27,7 @@ export class DeleteAddressUseCase implements IUseCase<DeleteAddressParam, void> 
   async call(param: DeleteAddressParam): Promise<void> {
     const address = await this.addressRepository.findOne({ id: param.addressId });
     if (!address || address.userId !== param.userId) {
-      throw new NotFoundException('Endereço não encontrado');
+      throw new NotFoundException('errors.address.notFound');
     }
 
     // Impede eliminar uma morada ainda usada por uma solicitação ativa —
@@ -36,8 +36,7 @@ export class DeleteAddressUseCase implements IUseCase<DeleteAddressParam, void> 
       param.addressId,
     );
     if (inUse) {
-      throw new ConflictException(
-        'Não é possível eliminar esta morada: existe uma solicitação de recolha ativa que a utiliza.',
+      throw new ConflictException('errors.address.deleteBlockedByActiveRequest',
       );
     }
 

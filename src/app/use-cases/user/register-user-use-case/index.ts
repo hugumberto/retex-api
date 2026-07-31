@@ -1,5 +1,6 @@
 import { randomBytes } from 'crypto';
 import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
+import { normalizeLanguage } from '../../../../config/i18n.constants';
 import { IAddressRepository } from '../../../../domain/address/address.repository';
 import { IUnitOfWork } from '../../../../domain/interfaces/unit-of-work.interface';
 import { ITestZoneRepository } from '../../../../domain/test-zone/test-zone.repository';
@@ -47,7 +48,7 @@ export class RegisterUserUseCase implements IUseCase<RegisterUserDto, RegisterUs
   async call(param: RegisterUserDto): Promise<RegisterUserResult> {
     const existing = await this.userRepository.findOne({ email: param.email });
     if (existing) {
-      throw new ConflictException('Usuário com este email já existe');
+      throw new ConflictException('errors.user.emailAlreadyExists');
     }
 
     const rawPassword = param.password ?? randomBytes(32).toString('hex');
@@ -73,6 +74,7 @@ export class RegisterUserUseCase implements IUseCase<RegisterUserDto, RegisterUs
         userType: UserType.PERSON,
         gender: param.gender,
         dateOfBirth: param.dateOfBirth ? new Date(param.dateOfBirth) : undefined,
+        language: normalizeLanguage(param.language),
         activationToken: activation?.token ?? null,
         activationTokenExpiresAt: activation?.expiresAt ?? null,
       };
@@ -118,8 +120,8 @@ export class RegisterUserUseCase implements IUseCase<RegisterUserDto, RegisterUs
       this.emailService
         .send({
           to: result.email,
-          subject: 'Registo Retex — fora da zona de atuação',
           template: 'out-of-service-zone',
+          locale: result.language,
           context: {
             firstName: result.firstName,
             lastName: result.lastName,

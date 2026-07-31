@@ -22,7 +22,7 @@ export class DeleteCollectionRequestBagUseCase implements IUseCase<string, Colle
   async call(bagId: string): Promise<CollectionRequestBag> {
     const qr = await this.collectionRequestBagRepository.findOne({ id: bagId });
     if (!qr) {
-      throw new NotFoundException('Saco não encontrado');
+      throw new NotFoundException('errors.bag.notFound');
     }
 
     const collectionRequestId = qr.collectionRequestId;

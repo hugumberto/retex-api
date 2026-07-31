@@ -31,7 +31,7 @@ export class GetCollectionUseCase implements IUseCase<string, CollectionResult> 
     const collectionRequestEntity =
       await this.collectionRequestRepository.findOneWithAllRelations(collectionRequestId);
     if (!collectionRequestEntity) {
-      throw new NotFoundException('Solicitação não encontrada');
+      throw new NotFoundException('errors.collection.requestNotFound');
     }
 
     const bags = await this.collectionRequestBagRepository.find({ collectionRequestId });
@@ -51,7 +51,7 @@ export class GetCollectionUseCase implements IUseCase<string, CollectionResult> 
     } as Partial<CollectionRequest>);
 
     if (!byFriendlyCode) {
-      throw new NotFoundException('Solicitação não encontrada');
+      throw new NotFoundException('errors.collection.requestNotFound');
     }
 
     return byFriendlyCode.id;

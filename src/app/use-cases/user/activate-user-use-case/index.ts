@@ -32,15 +32,15 @@ export class ActivateUserUseCase
   async call(param: ActivateUserDto): Promise<Omit<User, 'password'>> {
     const user = await this.userRepository.findByActivationToken(param.token);
     if (!user) {
-      throw new NotFoundException('Token de ativação inválido');
+      throw new NotFoundException('errors.auth.activationTokenInvalid');
     }
 
     if (user.status === UserStatus.ACTIVE) {
-      throw new ConflictException('Conta já ativada');
+      throw new ConflictException('errors.auth.accountAlreadyActive');
     }
 
     if (!isActivationTokenValid(user)) {
-      throw new BadRequestException('Token de ativação expirado');
+      throw new BadRequestException('errors.auth.activationTokenExpired');
     }
 
     // Defesa: garantir que o utilizador continua elegível (zona pode ter mudado).
@@ -53,7 +53,7 @@ export class ActivateUserUseCase
       } as Partial<Address>);
       const defaultAddress = addresses[0];
       if (!defaultAddress?.isInServiceZone) {
-        throw new BadRequestException('Endereço fora da zona de atuação');
+        throw new BadRequestException('errors.address.outOfServiceZone');
       }
     }
 

@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { DEFAULT_LANGUAGE } from '../../../../config/i18n.constants';
 import { IEmailService } from '../../../services/interfaces/email.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
@@ -18,7 +19,10 @@ export class SendContactFormUseCase
 
     await this.emailService.send({
       to,
+      // Email interno para a equipa Retex: o assunto traz os dados do
+      // remetente e o corpo sai sempre em português.
       subject: `Contacto: ${dto.title} — ${dto.name}`,
+      locale: DEFAULT_LANGUAGE,
       template: 'contact-form',
       context: {
         name: dto.name,

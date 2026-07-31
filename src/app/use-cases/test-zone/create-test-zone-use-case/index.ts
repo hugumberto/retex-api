@@ -24,7 +24,7 @@ export class CreateTestZoneUseCase implements IUseCase<CreateTestZoneDto, TestZo
 
     const existing = await this.testZoneRepository.findByCity(sanitizedCity);
     if (existing) {
-      throw new ConflictException('Zona já existe para esta cidade');
+      throw new ConflictException('errors.testZone.alreadyExistsForCity');
     }
 
     const zone = await this.testZoneRepository.create({ city: sanitizedCity });

@@ -24,7 +24,7 @@ export class UpdateBrandUseCase implements IUseCase<UpdateBrandParams, Brand> {
     const existingBrand = await this.brandRepository.findOne({ id: param.id });
 
     if (!existingBrand) {
-      throw new NotFoundException('Marca não encontrada');
+      throw new NotFoundException('errors.brand.notFound');
     }
 
     // Ao mudar o nome, normalizar (trim) e não permitir colidir com outra marca.
@@ -33,7 +33,7 @@ export class UpdateBrandUseCase implements IUseCase<UpdateBrandParams, Brand> {
       data.name = data.name.trim();
       const duplicate = await this.brandRepository.findByName(data.name);
       if (duplicate && duplicate.id !== param.id) {
-        throw new ConflictException('Já existe uma marca com este nome');
+        throw new ConflictException('errors.brand.duplicateName');
       }
     }
 

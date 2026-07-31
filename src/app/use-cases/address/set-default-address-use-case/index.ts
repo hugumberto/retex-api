@@ -19,7 +19,7 @@ export class SetDefaultAddressUseCase implements IUseCase<SetDefaultAddressParam
   async call(param: SetDefaultAddressParam): Promise<Address> {
     const address = await this.addressRepository.findOne({ id: param.addressId });
     if (!address || address.userId !== param.userId) {
-      throw new NotFoundException('Endereço não encontrado');
+      throw new NotFoundException('errors.address.notFound');
     }
 
     await this.addressRepository.unsetDefault(param.userId);

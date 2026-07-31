@@ -22,17 +22,17 @@ export class RefreshTokenUseCase implements IUseCase<RefreshTokenDto, RefreshTok
     const refreshToken = await this.refreshTokenRepository.findByToken(param.refresh_token);
 
     if (!refreshToken) {
-      throw new UnauthorizedException('Refresh token inválido');
+      throw new UnauthorizedException('errors.auth.refreshTokenInvalid');
     }
 
     // Verificar se não está expirado
     if (refreshToken.expiresAt < new Date()) {
-      throw new UnauthorizedException('Refresh token expirado');
+      throw new UnauthorizedException('errors.auth.refreshTokenExpired');
     }
 
     // Verificar se não foi revogado
     if (refreshToken.isRevoked) {
-      throw new UnauthorizedException('Refresh token revogado');
+      throw new UnauthorizedException('errors.auth.refreshTokenRevoked');
     }
 
     // Re-validar o estado do utilizador: contas desativadas/por ativar não
@@ -43,7 +43,7 @@ export class RefreshTokenUseCase implements IUseCase<RefreshTokenDto, RefreshTok
         { id: refreshToken.id },
         { isRevoked: true }
       );
-      throw new UnauthorizedException('Conta inativa');
+      throw new UnauthorizedException('errors.auth.accountInactive');
     }
 
     // Revogar o token atual

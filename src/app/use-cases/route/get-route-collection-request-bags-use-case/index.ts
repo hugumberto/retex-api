@@ -34,7 +34,7 @@ export class GetRouteCollectionRequestBagsUseCase
   async call(routeId: string): Promise<RouteCollectionRequestBags[]> {
     const route = await this.routeRepository.findOneWithAllRelations(routeId);
     if (!route) {
-      throw new NotFoundException('Recolha não encontrada');
+      throw new NotFoundException('errors.collection.notFound');
     }
 
     // Todos os QR codes da rota, agrupados por pacote.

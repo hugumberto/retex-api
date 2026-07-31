@@ -34,7 +34,7 @@ export class GetStorageUnitByIdUseCase implements IUseCase<string, StorageUnit> 
     } as Partial<StorageUnit>);
 
     if (!byFriendlyCode) {
-      throw new NotFoundException('Unidade de armazenamento não encontrada');
+      throw new NotFoundException('errors.storageUnit.notFound');
     }
 
     return byFriendlyCode.id;

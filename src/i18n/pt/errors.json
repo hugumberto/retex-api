@@ -1,0 +1,103 @@
+{
+  "auth": {
+    "tokenMissing": "Token não fornecido",
+    "tokenInvalid": "Token inválido",
+    "notAuthenticated": "Utilizador não autenticado",
+    "accessDenied": "Acesso negado: roles insuficientes",
+    "invalidCredentials": "Email ou senha inválidos",
+    "accountInactive": "Conta inativa",
+    "accountAlreadyActive": "Conta já ativada",
+    "activationTokenInvalid": "Token de ativação inválido",
+    "activationTokenExpired": "Token de ativação expirado",
+    "resetTokenInvalid": "Token de reset inválido ou expirado",
+    "confirmationTokenInvalid": "Token de confirmação inválido",
+    "currentPasswordIncorrect": "Senha atual incorreta",
+    "refreshTokenNotFound": "Refresh token não encontrado",
+    "refreshTokenInvalid": "Refresh token inválido",
+    "refreshTokenExpired": "Refresh token expirado",
+    "refreshTokenRevoked": "Refresh token revogado"
+  },
+  "user": {
+    "notFound": "Utilizador não encontrado",
+    "emailAlreadyExists": "Já existe um utilizador com este email",
+    "emailInUse": "Email já está em uso por outro utilizador",
+    "notDriver": "O utilizador não tem o perfil de motorista",
+    "driverNotFound": "Motorista não encontrado"
+  },
+  "address": {
+    "notFound": "Endereço não encontrado",
+    "duplicate": "Já existe um endereço com esta morada",
+    "outOfServiceZone": "Endereço fora da zona de atuação",
+    "deleteBlockedByActiveRequest": "Não é possível eliminar esta morada: existe uma solicitação de recolha ativa que a utiliza."
+  },
+  "collection": {
+    "requestNotFound": "Solicitação não encontrada",
+    "notFound": "Recolha não encontrada",
+    "notAwaitingPickup": "A solicitação não está aguardando recolha",
+    "cannotCancel": "Esta solicitação não pode ser cancelada",
+    "cancelOnlyOwn": "Apenas é permitido cancelar a própria solicitação",
+    "cancellationReasonRequired": "Informe o motivo do cancelamento",
+    "bagRequiredToFinalize": "Vincule ao menos um saco antes de finalizar a recolha",
+    "confirmationDeadlineExpired": "O prazo para confirmar a recolha já expirou"
+  },
+  "collectionRequest": {
+    "notFound": "Solicitação de recolha não encontrada",
+    "notFoundWithId": "Solicitação de recolha {id} não encontrada",
+    "notInCreatedStatus": "A solicitação de recolha {id} não está no estado CREATED",
+    "alreadyLinkedToRoute": "A solicitação de recolha {id} já está associada a uma rota",
+    "alreadyLinkedToAnotherRoute": "A solicitação de recolha {id} já está associada a outra rota"
+  },
+  "bag": {
+    "notFound": "Saco não encontrado",
+    "notAllProcessed": "Nem todos os sacos foram processados"
+  },
+  "qrCode": {
+    "notFound": "QR code não encontrado",
+    "alreadyUsed": "QR code já utilizado",
+    "wrongRoute": "O QR code não pertence a esta rota",
+    "uniqueCodeGenerationFailed": "Não foi possível gerar um código único para o QR code"
+  },
+  "route": {
+    "notFound": "Rota não encontrada",
+    "alreadyConfirmed": "A rota já foi confirmada e não permite alterar motorista, solicitações, data ou intervalo",
+    "cannotDeleteCompleted": "Não é possível excluir uma recolha concluída",
+    "surveyOnlyWhenFinished": "O questionário só pode ser enviado para uma recolha finalizada"
+  },
+  "item": {
+    "notFound": "Item não encontrado",
+    "someNotFound": "Itens não encontrados: {items}",
+    "sameCollectionRequestRequired": "Todos os itens devem pertencer à mesma solicitação de recolha",
+    "bindFailed": "Erro ao associar o item {id}: {error}",
+    "bulkOperationCancelled": "Operação cancelada devido a erros: {errors}"
+  },
+  "storageUnit": {
+    "notFound": "Unidade de armazenamento não encontrada",
+    "someNotFound": "Unidades de armazenamento não encontradas: {units}"
+  },
+  "brand": {
+    "notFound": "Marca não encontrada",
+    "duplicateName": "Já existe uma marca com este nome"
+  },
+  "category": {
+    "notFound": "Categoria não encontrada",
+    "someNotFound": "Uma ou mais categorias não foram encontradas",
+    "duplicateName": "Já existe uma categoria com este nome"
+  },
+  "blogPost": {
+    "notFound": "Artigo não encontrado",
+    "duplicateSlug": "Já existe um artigo com este slug"
+  },
+  "faq": {
+    "categoryNotFound": "Categoria de FAQ não encontrada",
+    "itemNotFound": "Item de FAQ não encontrado"
+  },
+  "testZone": {
+    "notFound": "Zona não encontrada",
+    "alreadyExistsForCity": "Já existe uma zona para esta cidade"
+  },
+  "triage": {
+    "requestNotFoundForCode": "Nenhuma solicitação encontrada para o código indicado",
+    "qrCodeNotLinked": "O QR code não está associado a uma solicitação",
+    "requestNotInTriage": "A solicitação não está em recolha/triagem"
+  }
+}

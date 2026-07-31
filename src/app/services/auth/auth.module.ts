@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -9,11 +9,16 @@ import { JwtModule } from '@nestjs/jwt';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') },
+        // O @nestjs/jwt tipa `expiresIn` como número de segundos ou string no
+        // formato do `ms` ("1d", "15m") — um template literal type. O valor vem
+        // do .env como string simples, daí a asserção.
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN'),
+        } as JwtSignOptions,
       }),
       inject: [ConfigService],
     }),
   ],
   exports: [JwtModule],
 })
-export class AuthModule { } 
+export class AuthModule {}

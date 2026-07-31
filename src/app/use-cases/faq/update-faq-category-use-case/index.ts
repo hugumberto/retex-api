@@ -20,7 +20,7 @@ export class UpdateFaqCategoryUseCase implements IUseCase<UpdateFaqCategoryParam
 
   async call({ id, ...data }: UpdateFaqCategoryParam): Promise<FaqCategory> {
     const existing = await this.faqCategoryRepository.findOne({ id } as Partial<FaqCategory>);
-    if (!existing) throw new NotFoundException('Categoria FAQ não encontrada');
+    if (!existing) throw new NotFoundException('errors.faq.categoryNotFound');
     const [updated] = await this.faqCategoryRepository.update({ id } as Partial<FaqCategory>, data);
     return updated;
   }

@@ -33,10 +33,10 @@ export class BindQrCodeUseCase implements IUseCase<BindQrCodeParams, CollectionR
     const collectionRequestEntity =
       await this.collectionRequestRepository.findOneWithAllRelations(collectionRequestId);
     if (!collectionRequestEntity) {
-      throw new NotFoundException('Solicitação não encontrada');
+      throw new NotFoundException('errors.collection.requestNotFound');
     }
     if (collectionRequestEntity.status !== CollectionRequestStatus.WAITING_FOR_COLLECTION) {
-      throw new BadRequestException('A solicitação não está aguardando recolha');
+      throw new BadRequestException('errors.collection.notAwaitingPickup');
     }
 
     // Aceita o token (escaneado) ou o código amigável (digitado).
@@ -45,10 +45,10 @@ export class BindQrCodeUseCase implements IUseCase<BindQrCodeParams, CollectionR
       bag = await this.collectionRequestBagRepository.findOne({ friendlyCode: code });
     }
     if (!bag) {
-      throw new NotFoundException('QR code não encontrado');
+      throw new NotFoundException('errors.qrCode.notFound');
     }
     if (bag.usedAt || bag.collectionRequestId) {
-      throw new ConflictException('QR code já utilizado');
+      throw new ConflictException('errors.qrCode.alreadyUsed');
     }
     // O QR pertence à rota do pacote (os códigos são gerados por rota) — evita
     // vincular um QR de outra rota.
@@ -57,7 +57,7 @@ export class BindQrCodeUseCase implements IUseCase<BindQrCodeParams, CollectionR
       collectionRequestEntity.route?.id &&
       bag.routeId !== collectionRequestEntity.route.id
     ) {
-      throw new BadRequestException('O QR code não pertence a esta rota');
+      throw new BadRequestException('errors.qrCode.wrongRoute');
     }
 
     const [updated] = await this.collectionRequestBagRepository.update(

@@ -7,6 +7,10 @@
       {
         "include": "infrastructure/services/email/templates/**/*.hbs",
         "watchAssets": true
+      },
+      {
+        "include": "i18n/**/*.json",
+        "watchAssets": true
       }
     ],
     "plugins": [

@@ -1,24 +1,24 @@
-{{#> layout title="Mensagem de Contacto"}}
+{{#> layout title=(t "title")}}
 
-  {{> eyebrow text="NOVA MENSAGEM DE CONTACTO"}}
+  {{> eyebrow text=(t "eyebrow")}}
 
   <!-- Body -->
   <tr>
     <td style="padding:20px 40px 32px;">
       <p style="margin:0 0 12px;font-size:15px;color:#333333;">
-        <strong style="color:#02748E;">Nome:</strong> {{name}}
+        <strong style="color:#02748E;">{{t "nameLabel"}}</strong> {{name}}
       </p>
       <p style="margin:0 0 12px;font-size:15px;color:#333333;">
-        <strong style="color:#02748E;">Email:</strong> {{email}}
+        <strong style="color:#02748E;">{{t "emailLabel"}}</strong> {{email}}
       </p>
       <p style="margin:0 0 12px;font-size:15px;color:#333333;">
-        <strong style="color:#02748E;">Telemóvel:</strong> {{phone}}
+        <strong style="color:#02748E;">{{t "phoneLabel"}}</strong> {{phone}}
       </p>
       <p style="margin:0 0 12px;font-size:15px;color:#333333;">
-        <strong style="color:#02748E;">Título:</strong> {{contactTitle}}
+        <strong style="color:#02748E;">{{t "subjectLabel"}}</strong> {{contactTitle}}
       </p>
       <p style="margin:0;font-size:15px;color:#333333;line-height:1.6;">
-        <strong style="color:#02748E;">Mensagem:</strong><br />{{message}}
+        <strong style="color:#02748E;">{{t "messageLabel"}}</strong><br />{{message}}
       </p>
     </td>
   </tr>
