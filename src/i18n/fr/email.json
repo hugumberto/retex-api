@@ -76,6 +76,22 @@
     "linkNotice": "Si les boutons ne fonctionnent pas, copiez et collez l'adresse suivante dans votre navigateur :",
     "signature": "Votre équipe <strong>RETEX Portugal</strong>"
   },
+  "collection-reminder": {
+    "subject": "Votre collecte Retex a lieu demain",
+    "title": "Votre collecte a lieu demain",
+    "eyebrow": "VOTRE COLLECTE A LIEU DEMAIN",
+    "greeting": "Bonjour, <strong style=\"color:#02748E;\">{firstName} {lastName}</strong> !",
+    "intro": "Nous vous rappelons que la collecte de vos colis (code <strong style=\"color:#02748E;\">{friendlyCode}</strong>) est prévue demain, <strong style=\"color:#02748E;\">{collectionDate}</strong>.",
+    "introWithInterval": "Nous vous rappelons que la collecte de vos colis (code <strong style=\"color:#02748E;\">{friendlyCode}</strong>) est prévue demain, <strong style=\"color:#02748E;\">{collectionDate}</strong>, sur le créneau <strong style=\"color:#02748E;\">{collectionInterval}</strong>.",
+    "codeLabel": "Code",
+    "dateLabel": "Date de collecte",
+    "intervalLabel": "Créneau",
+    "addressLabel": "Adresse",
+    "cityLabel": "Ville",
+    "zipLabel": "Code postal",
+    "prepNotice": "Préparez vos colis et rendez-les accessibles afin que notre chauffeur puisse les collecter sans attendre.",
+    "signature": "Votre équipe <strong>RETEX Portugal</strong>"
+  },
   "package-confirmation": {
     "subject": "Votre colis a bien été enregistré !",
     "title": "Enregistrement effectué avec succès",

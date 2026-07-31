@@ -150,6 +150,18 @@ describe('TemplateEngine (shared partials)', () => {
         confirmUrl: 'https://x.pt/c',
         rejectUrl: 'https://x.pt/j',
       },
+      'collection-reminder': {
+        friendlyCode: '2026-000001',
+        collectionDate: '13/05/2026',
+        collectionInterval: '09:00 - 13:00',
+        address: {
+          street: 'Rua A',
+          number: '1',
+          city: 'Porto',
+          countryDivision: 'Porto',
+          zipCode: '4000-000',
+        },
+      },
       'package-confirmation': {
         fullName: 'Ana Silva',
         friendlyCode: '2026-000001',

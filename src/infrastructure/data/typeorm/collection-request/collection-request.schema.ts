@@ -54,6 +54,11 @@ export const collectionRequestSchema = new EntitySchema<CollectionRequest>({
       nullable: true,
       name: 'collection_confirmed_at',
     },
+    collectionReminderSentAt: {
+      type: 'timestamp with time zone',
+      nullable: true,
+      name: 'collection_reminder_sent_at',
+    },
     bagsGenerated: {
       type: 'integer',
       nullable: false,

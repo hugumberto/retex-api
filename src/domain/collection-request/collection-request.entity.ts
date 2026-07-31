@@ -18,6 +18,9 @@ export interface CollectionRequest extends Entity {
   items?: Item[];
   collectionConfirmationToken?: string | null;
   collectionConfirmedAt?: Date | null;
+  // Momento em que o lembrete da véspera foi enviado. NULL = ainda não enviado;
+  // limpar o campo permite reenviar o lembrete.
+  collectionReminderSentAt?: Date | null;
   // Nº de sacos gerados para esta solicitação na entrada da rota em IN_TRANSIT.
   bagsGenerated?: number;
   // Motivo do cancelamento (comentário do motorista na recolha).

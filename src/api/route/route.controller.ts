@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { ProcessCollectionSchedulesUseCase } from "../../app/use-cases/collection/process-collection-schedules-use-case";
+import { SendCollectionRemindersUseCase } from "../../app/use-cases/collection/send-collection-reminders-use-case";
 import { CreateRouteUseCase } from "../../app/use-cases/route/create-route-use-case";
 import { CreateRouteDto } from "../../app/use-cases/route/create-route-use-case/create-route.dto";
 import { DeleteRouteUseCase } from "../../app/use-cases/route/delete-route-use-case";
@@ -27,6 +28,7 @@ export class RouteController {
     private readonly getRouteBagsUseCase: GetRouteBagsUseCase,
     private readonly getRouteCollectionRequestBagsUseCase: GetRouteCollectionRequestBagsUseCase,
     private readonly sendRouteSurveyUseCase: SendRouteSurveyUseCase,
+    private readonly sendCollectionRemindersUseCase: SendCollectionRemindersUseCase,
   ) { }
 
   @Post()
@@ -40,6 +42,14 @@ export class RouteController {
   @Roles(Role.ADMIN)
   processSchedules() {
     return this.processCollectionSchedulesUseCase.call();
+  }
+
+  // Disparo manual (ADMIN) dos lembretes da véspera — o mesmo que o cron das
+  // 09:00. Só envia a quem ainda não recebeu, portanto é seguro repetir.
+  @Post('send-collection-reminders')
+  @Roles(Role.ADMIN)
+  sendCollectionReminders() {
+    return this.sendCollectionRemindersUseCase.call();
   }
 
   @Get()

@@ -76,6 +76,22 @@
     "linkNotice": "Se os botões não funcionarem, copie e cole o seguinte endereço no seu navegador:",
     "signature": "A sua equipa <strong>RETEX Portugal</strong>"
   },
+  "collection-reminder": {
+    "subject": "A sua recolha Retex é amanhã",
+    "title": "A sua recolha é amanhã",
+    "eyebrow": "A SUA RECOLHA É AMANHÃ",
+    "greeting": "Olá, <strong style=\"color:#02748E;\">{firstName} {lastName}</strong>!",
+    "intro": "Lembramos que a recolha dos seus volumes (código <strong style=\"color:#02748E;\">{friendlyCode}</strong>) está agendada para amanhã, <strong style=\"color:#02748E;\">{collectionDate}</strong>.",
+    "introWithInterval": "Lembramos que a recolha dos seus volumes (código <strong style=\"color:#02748E;\">{friendlyCode}</strong>) está agendada para amanhã, <strong style=\"color:#02748E;\">{collectionDate}</strong>, no intervalo <strong style=\"color:#02748E;\">{collectionInterval}</strong>.",
+    "codeLabel": "Código",
+    "dateLabel": "Data da recolha",
+    "intervalLabel": "Intervalo",
+    "addressLabel": "Endereço",
+    "cityLabel": "Cidade",
+    "zipLabel": "Código-Postal",
+    "prepNotice": "Deixe os seus volumes prontos e acessíveis para que o nosso motorista os possa recolher sem demora.",
+    "signature": "A sua equipa <strong>RETEX Portugal</strong>"
+  },
   "package-confirmation": {
     "subject": "O seu pacote foi registado!",
     "title": "Registo efetuado com sucesso",

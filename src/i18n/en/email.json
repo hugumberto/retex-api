@@ -76,6 +76,22 @@
     "linkNotice": "If the buttons do not work, copy and paste the following address into your browser:",
     "signature": "Your <strong>RETEX Portugal</strong> team"
   },
+  "collection-reminder": {
+    "subject": "Your Retex collection is tomorrow",
+    "title": "Your collection is tomorrow",
+    "eyebrow": "YOUR COLLECTION IS TOMORROW",
+    "greeting": "Hello, <strong style=\"color:#02748E;\">{firstName} {lastName}</strong>!",
+    "intro": "This is a reminder that the collection of your items (code <strong style=\"color:#02748E;\">{friendlyCode}</strong>) is scheduled for tomorrow, <strong style=\"color:#02748E;\">{collectionDate}</strong>.",
+    "introWithInterval": "This is a reminder that the collection of your items (code <strong style=\"color:#02748E;\">{friendlyCode}</strong>) is scheduled for tomorrow, <strong style=\"color:#02748E;\">{collectionDate}</strong>, between <strong style=\"color:#02748E;\">{collectionInterval}</strong>.",
+    "codeLabel": "Code",
+    "dateLabel": "Collection date",
+    "intervalLabel": "Time slot",
+    "addressLabel": "Address",
+    "cityLabel": "City",
+    "zipLabel": "Postcode",
+    "prepNotice": "Please have your items ready and accessible so our driver can collect them without delay.",
+    "signature": "Your <strong>RETEX Portugal</strong> team"
+  },
   "package-confirmation": {
     "subject": "Your package has been registered!",
     "title": "Registration completed successfully",
