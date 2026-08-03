@@ -1,9 +1,14 @@
 import { Entity } from '../interfaces/entity.interface';
+import { Company } from '../company/company.entity';
 import { User } from '../user/user.entity';
 
 export interface Address extends Entity {
-  userId: string;
+  // Dono da morada: OU um utilizador OU uma empresa, nunca ambos (CHECK na BD).
+  // As moradas de empresa são os locais de recolha partilhados pelos membros.
+  userId?: string | null;
   user?: User;
+  companyId?: string | null;
+  company?: Company | null;
   street: string;
   number: string;
   complement?: string;

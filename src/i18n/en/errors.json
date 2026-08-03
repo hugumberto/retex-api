@@ -40,6 +40,13 @@
     "bagRequiredToFinalize": "Link at least one bag before finalising the collection",
     "confirmationDeadlineExpired": "The deadline to confirm the collection has passed"
   },
+  "company": {
+    "notFound": "Company not found",
+    "taxIdAlreadyExists": "A company with this tax ID already exists",
+    "profileNotFound": "Profile not found",
+    "profileNotAvailable": "This profile is not available for this company",
+    "memberNotFound": "Member not found"
+  },
   "collectionRequest": {
     "notFound": "Collection request not found",
     "notFoundWithId": "Collection request {id} not found",

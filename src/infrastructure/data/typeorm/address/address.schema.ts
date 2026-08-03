@@ -12,8 +12,13 @@ export const addressSchema = new EntitySchema<Address>({
     },
     userId: {
       type: 'uuid',
-      nullable: false,
+      nullable: true,
       name: 'user_id',
+    },
+    companyId: {
+      type: 'uuid',
+      nullable: true,
+      name: 'company_id',
     },
     street: {
       type: 'varchar',
@@ -107,6 +112,15 @@ export const addressSchema = new EntitySchema<Address>({
       },
       inverseSide: 'addresses',
       onDelete: 'CASCADE',
+      nullable: true,
+    },
+    company: {
+      type: 'many-to-one',
+      target: 'company',
+      joinColumn: {
+        name: 'company_id',
+      },
+      nullable: true,
     },
   },
   indices: [

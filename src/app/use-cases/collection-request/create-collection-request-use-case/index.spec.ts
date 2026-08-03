@@ -6,6 +6,7 @@ import { IAddressRepository } from '../../../../domain/address/address.repositor
 import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { ITestZoneRepository } from '../../../../domain/test-zone/test-zone.repository';
+import { CompanyContextService } from '../../../services/company-context/company-context.service';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
@@ -24,11 +25,16 @@ describe('CreateCollectionRequestUseCase', () => {
   const emailServiceMock = mock<IEmailService>();
   const unitOfWork = { runInTransaction: (work: () => unknown) => work() };
 
+  // Por omissão o utilizador não é membro de empresa — preserva o comportamento
+  // dos particulares, que é o que estes testes cobrem.
+  const companyContextMock = { resolve: jest.fn().mockResolvedValue(null) };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     const module = await Test.createTestingModule({
       providers: [
         CreateCollectionRequestUseCase,
+        { provide: CompanyContextService, useValue: companyContextMock },
         { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepositoryMock },
         { provide: DOMAIN_TOKENS.TEST_ZONE_REPOSITORY, useValue: testZoneRepositoryMock },
         { provide: DOMAIN_TOKENS.UNIT_OF_WORK, useValue: unitOfWork },

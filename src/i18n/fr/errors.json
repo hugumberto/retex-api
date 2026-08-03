@@ -40,6 +40,13 @@
     "bagRequiredToFinalize": "Associez au moins un sac avant de finaliser la collecte",
     "confirmationDeadlineExpired": "Le délai pour confirmer la collecte est dépassé"
   },
+  "company": {
+    "notFound": "Entreprise introuvable",
+    "taxIdAlreadyExists": "Une entreprise avec ce numéro fiscal existe déjà",
+    "profileNotFound": "Profil introuvable",
+    "profileNotAvailable": "Ce profil n'est pas disponible pour cette entreprise",
+    "memberNotFound": "Membre introuvable"
+  },
   "collectionRequest": {
     "notFound": "Demande de collecte introuvable",
     "notFoundWithId": "Demande de collecte {id} introuvable",

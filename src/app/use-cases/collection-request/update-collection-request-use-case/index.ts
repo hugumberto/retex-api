@@ -2,7 +2,9 @@ import { ForbiddenException, Inject, Injectable, Logger, NotFoundException } fro
 import { CollectionRequest, CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
+import { CompanyContextService } from '../../../services/company-context/company-context.service';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { canCancelCollectionRequest } from '../../shared/collection-request-access.util';
 import { FinishRouteIfAllCollectedUseCase } from '../../route/finish-route-if-all-collected-use-case';
 import { UpdateCollectionRequestDto } from './update-collection-request.dto';
 
@@ -23,6 +25,7 @@ export class UpdateCollectionRequestUseCase
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
     private readonly finishRouteIfAllCollectedUseCase: FinishRouteIfAllCollectedUseCase,
+    private readonly companyContextService: CompanyContextService,
   ) {}
 
   async call(param: UpdateCollectionRequestParamDto): Promise<CollectionRequest> {
@@ -33,9 +36,20 @@ export class UpdateCollectionRequestUseCase
       throw new NotFoundException('errors.collectionRequest.notFound');
     }
 
-    // USER só pode mexer nos próprios pacotes e apenas para CANCELAR.
+    // USER só pode mexer nos próprios pacotes e apenas para CANCELAR. O gestor
+    // de empresa alcança também os dos colaboradores, mas com o mesmo limite:
+    // cancelar, nada mais.
     if (!isPrivileged) {
-      if (existingCollectionRequest.user?.id !== requesterId) {
+      const companyContext = await this.companyContextService.resolve(requesterId);
+
+      if (
+        !canCancelCollectionRequest(
+          existingCollectionRequest,
+          requesterId,
+          isPrivileged,
+          companyContext,
+        )
+      ) {
         throw new NotFoundException('errors.collectionRequest.notFound');
       }
       if (data.status !== CollectionRequestStatus.CANCELLED) {

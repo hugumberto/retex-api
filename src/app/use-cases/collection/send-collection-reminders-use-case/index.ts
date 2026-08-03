@@ -4,6 +4,8 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IEmailService } from '../../../services/interfaces/email.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { ICompanyMemberRepository } from '../../../../domain/company/company.repository';
+import { findCompanyManagerEmails } from '../../shared/company-managers.util';
 import { buildCollectionReminderEmail } from '../collection-reminder-email';
 
 export interface SendCollectionRemindersResult {
@@ -31,6 +33,8 @@ export class SendCollectionRemindersUseCase
     private readonly collectionRequestRepository: ICollectionRequestRepository,
     @Inject(SERVICE_TOKENS.EMAIL_SERVICE)
     private readonly emailService: IEmailService,
+    @Inject(DOMAIN_TOKENS.COMPANY_MEMBER_REPOSITORY)
+    private readonly companyMemberRepository: ICompanyMemberRepository,
   ) { }
 
   async call(): Promise<SendCollectionRemindersResult> {
@@ -46,7 +50,12 @@ export class SendCollectionRemindersUseCase
       }
 
       try {
-        await this.emailService.send(buildCollectionReminderEmail(pkg));
+        const cc = await findCompanyManagerEmails(
+          this.companyMemberRepository,
+          pkg.companyId,
+          pkg.user.email,
+        );
+        await this.emailService.send(buildCollectionReminderEmail(pkg, cc));
         // Só marcamos depois do envio: se o SMTP falhar, o registo fica por
         // enviar e a falha fica visível no email_log.
         await this.collectionRequestRepository.update(

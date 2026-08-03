@@ -9,6 +9,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
 import { BlogCategoryController } from './blog-category/blog-category.controller';
 import { BlogPostController } from './blog-post/blog-post.controller';
 import { CollectionController } from './collection/collection.controller';
+import { CompanyController } from './company/company.controller';
 import { ContactController } from './contact/contact.controller';
 import { DashboardController } from './dashboard/dashboard.controller';
 import { EmailLogController } from './email-log/email-log.controller';
@@ -44,6 +45,7 @@ import { WelcomeController } from './welcome/welcome.controller';
     RouteController,
     StorageUnitController,
     CollectionController,
+    CompanyController,
     SystemParameterController,
     TriageController,
     BrandController,

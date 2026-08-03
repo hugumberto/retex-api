@@ -1,4 +1,5 @@
 import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
+import { CompanyContextService } from './company-context/company-context.service';
 import { CryptoService } from './crypto/crypto.service';
 import { IEmailService } from './interfaces/email.interface';
 import { IGeocodingService } from './interfaces/geocoding.interface';
@@ -43,8 +44,11 @@ export class ServicesModule {
           provide: SERVICE_TOKENS.GEOCODING_SERVICE,
           useClass: options.geocodingService,
         },
+        // Classe concreta (não token): depende só do repositório de membros,
+        // que vem do DomainModule global.
+        CompanyContextService,
       ],
-      exports: [...Object.values(SERVICE_TOKENS)],
+      exports: [...Object.values(SERVICE_TOKENS), CompanyContextService],
     };
   }
 } 

@@ -20,6 +20,11 @@ import { BlogPostRepository } from './infrastructure/data/typeorm/blog-post/blog
 import { FaqCategoryRepository } from './infrastructure/data/typeorm/faq/faq-category.repository';
 import { FaqItemRepository } from './infrastructure/data/typeorm/faq/faq-item.repository';
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
+import {
+  CompanyMemberRepository,
+  CompanyProfileRepository,
+  CompanyRepository,
+} from './infrastructure/data/typeorm/company/company.repository';
 import { EmailLogRepository } from './infrastructure/data/typeorm/email-log/email-log.repository';
 import { ItemRepository } from './infrastructure/data/typeorm/item/item.repository';
 import { CollectionRequestRepository } from './infrastructure/data/typeorm/collection-request/collection-request.repository';
@@ -66,6 +71,9 @@ export class AppModule {
         faqCategoryRepository: FaqCategoryRepository,
         faqItemRepository: FaqItemRepository,
         emailLogRepository: EmailLogRepository,
+        companyRepository: CompanyRepository,
+        companyProfileRepository: CompanyProfileRepository,
+        companyMemberRepository: CompanyMemberRepository,
         unitOfWork: TypeORMUnitOfWork,
         imports: [AppTypeORMModule],
       }),

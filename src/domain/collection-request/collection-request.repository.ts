@@ -12,6 +12,11 @@ export interface CollectionRequestFilters {
   status?: CollectionRequestStatus;
   // Quando true, retorna apenas solicitações ainda não vinculadas a uma rota.
   unrouted?: boolean;
+  // Solicitações de uma empresa. Usado na listagem do gestor.
+  companyId?: string;
+  // Solicitações criadas por um utilizador. Usado quando o membro não tem
+  // permissão para ver as de toda a empresa.
+  userId?: string;
 }
 
 export interface CollectionRequestStatusCount {

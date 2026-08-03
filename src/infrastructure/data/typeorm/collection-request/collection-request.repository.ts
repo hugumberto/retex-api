@@ -58,6 +58,18 @@ export class CollectionRequestRepository
       .leftJoinAndSelect('collectionRequest.route', 'route')
       .leftJoinAndSelect('collectionRequest.items', 'items');
 
+    if (filters.companyId) {
+      queryBuilder.andWhere('collectionRequest.company_id = :companyId', {
+        companyId: filters.companyId,
+      });
+    }
+
+    if (filters.userId) {
+      queryBuilder.andWhere('user.id = :filterUserId', {
+        filterUserId: filters.userId,
+      });
+    }
+
     // Apenas solicitações ainda não vinculadas a uma rota
     if (filters.unrouted) {
       queryBuilder.andWhere('route.id IS NULL');
