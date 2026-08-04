@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common';
 import { CollectionRequest, CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
-import { RouteStatus } from '../../../../domain/route/route.entity';
 import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { ISystemParameterRepository } from '../../../../domain/system-parameter/system-parameter.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { advanceRouteIfAllConfirmed } from '../../shared/advance-route.util';
 import { ConfirmCollectionDto } from './confirm-collection.dto';
 
 export { ConfirmCollectionDto };
@@ -60,29 +60,8 @@ export class ConfirmCollectionUseCase implements IUseCase<ConfirmCollectionDto, 
     return updated;
   }
 
-  /**
-   * Avança a rota de CREATED para WAITING_TO_START quando todas as suas
-   * solicitações têm a recolha confirmada pelo cliente. Só atua em rotas CREATED
-   * (as demais já avançaram ou ainda não foram confirmadas).
-   */
-  private async advanceRouteIfAllConfirmed(routeId?: string): Promise<void> {
-    if (!routeId) return;
-
-    const route = await this.routeRepository.findOneWithAllRelations(routeId);
-    if (!route || route.status !== RouteStatus.CREATED) return;
-
-    const collectionRequests = route.collectionRequests ?? [];
-    if (collectionRequests.length === 0) return;
-
-    const allConfirmed = collectionRequests.every(
-      (pkg) => pkg.collectionConfirmedAt != null,
-    );
-    if (!allConfirmed) return;
-
-    await this.routeRepository.update(
-      { id: route.id },
-      { status: RouteStatus.WAITING_TO_START },
-    );
+  private advanceRouteIfAllConfirmed(routeId?: string): Promise<void> {
+    return advanceRouteIfAllConfirmed(this.routeRepository, routeId);
   }
 
   private async getDeadlineDays(): Promise<number> {

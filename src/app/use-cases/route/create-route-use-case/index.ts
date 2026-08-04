@@ -7,7 +7,7 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
-import { generateFriendlyCode } from '../../collection-request-bag/bag.util';
+import { generateUniqueFriendlyCode } from '../../shared/friendly-code.util';
 import { CreateRouteDto } from './create-route.dto';
 
 @Injectable()
@@ -73,15 +73,9 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
    * Gera um código amigável (`ano-XXXXXX`) único contra as rotas existentes. O
    * índice único na coluna é a rede de segurança final.
    */
-  private async generateUniqueFriendlyCode(): Promise<string> {
-    const year = new Date().getFullYear();
-    for (let attempt = 0; attempt < 5; attempt++) {
-      const code = generateFriendlyCode(year);
-      const existing = await this.routeRepository.findOne({
-        friendlyCode: code,
-      } as Partial<Route>);
-      if (!existing) return code;
-    }
-    return `${generateFriendlyCode(year)}${Date.now().toString(36).slice(-2).toUpperCase()}`;
+  private generateUniqueFriendlyCode(): Promise<string> {
+    return generateUniqueFriendlyCode((friendlyCode) =>
+      this.routeRepository.findOne({ friendlyCode } as Partial<Route>),
+    );
   }
 }

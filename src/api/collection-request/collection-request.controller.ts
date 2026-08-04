@@ -9,6 +9,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
+import { CollectionRequestStatus } from '../../domain/collection-request/collection-request.entity';
 import { JwtPayload } from '../../app/services/interfaces/auth.interface';
 import { ConfirmCollectionUseCase } from '../../app/use-cases/collection-request/confirm-collection-use-case';
 import { ConfirmCollectionDto } from '../../app/use-cases/collection-request/confirm-collection-use-case/confirm-collection.dto';
@@ -17,8 +18,7 @@ import { RejectCollectionDto } from '../../app/use-cases/collection-request/reje
 import { CreateCollectionRequestUseCase } from '../../app/use-cases/collection-request/create-collection-request-use-case';
 import { CreateCollectionRequestDto } from '../../app/use-cases/collection-request/create-collection-request-use-case/create-collection-request.dto';
 import { GetAllCollectionRequestsUseCase } from '../../app/use-cases/collection-request/get-all-collection-requests-use-case';
-import { GetCreatedCollectionRequestsUseCase } from '../../app/use-cases/collection-request/get-created-collection-requests-use-case';
-import { GetCreatedCollectionRequestsDto } from '../../app/use-cases/collection-request/get-created-collection-requests-use-case/get-created-collection-requests.dto';
+import { GetCollectionRequestsDto } from '../../app/use-cases/collection-request/get-all-collection-requests-use-case/get-collection-requests.dto';
 import { GetCollectionRequestByIdUseCase } from '../../app/use-cases/collection-request/get-collection-request-by-id-use-case';
 import { UpdateCollectionRequestUseCase } from '../../app/use-cases/collection-request/update-collection-request-use-case';
 import { UpdateCollectionRequestDto } from '../../app/use-cases/collection-request/update-collection-request-use-case/update-collection-request.dto';
@@ -38,7 +38,6 @@ function requesterFrom(req: Request): { id: string; isPrivileged: boolean } {
 export class CollectionRequestController {
   constructor(
     private readonly createCollectionRequestUseCase: CreateCollectionRequestUseCase,
-    private readonly getCreatedCollectionRequestsUseCase: GetCreatedCollectionRequestsUseCase,
     private readonly getCollectionRequestByIdUseCase: GetCollectionRequestByIdUseCase,
     private readonly updateCollectionRequestUseCase: UpdateCollectionRequestUseCase,
     private readonly getAllCollectionRequestsUseCase: GetAllCollectionRequestsUseCase,
@@ -60,8 +59,8 @@ export class CollectionRequestController {
 
   @Get()
   @Roles(Role.ADMIN, Role.OPS)
-  getAll() {
-    return this.getAllCollectionRequestsUseCase.call();
+  getAll(@Query() query: GetCollectionRequestsDto) {
+    return this.getAllCollectionRequestsUseCase.call(query);
   }
 
   @Post()
@@ -76,10 +75,16 @@ export class CollectionRequestController {
     return this.createCollectionRequestUseCase.call({ ...body, userId });
   }
 
+  // Solicitações elegíveis para entrar numa rota. Mantido como rota própria
+  // porque DRIVER tem acesso a esta e não à listagem geral.
   @Get('created')
   @Roles(Role.ADMIN, Role.OPS, Role.DRIVER)
-  getCreatedCollectionRequests(@Query() query: GetCreatedCollectionRequestsDto) {
-    return this.getCreatedCollectionRequestsUseCase.call(query);
+  getCreatedCollectionRequests(@Query() query: GetCollectionRequestsDto) {
+    return this.getAllCollectionRequestsUseCase.call({
+      ...query,
+      status: CollectionRequestStatus.CREATED,
+      unrouted: true,
+    });
   }
 
   @Get(':id')

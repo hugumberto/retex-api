@@ -3,7 +3,6 @@ import { Request } from 'express';
 import { ConfirmCollectionUseCase } from '../../app/use-cases/collection-request/confirm-collection-use-case';
 import { CreateCollectionRequestUseCase } from '../../app/use-cases/collection-request/create-collection-request-use-case';
 import { GetAllCollectionRequestsUseCase } from '../../app/use-cases/collection-request/get-all-collection-requests-use-case';
-import { GetCreatedCollectionRequestsUseCase } from '../../app/use-cases/collection-request/get-created-collection-requests-use-case';
 import { GetCollectionRequestByIdUseCase } from '../../app/use-cases/collection-request/get-collection-request-by-id-use-case';
 import { RejectCollectionUseCase } from '../../app/use-cases/collection-request/reject-collection-use-case';
 import { UpdateCollectionRequestUseCase } from '../../app/use-cases/collection-request/update-collection-request-use-case';
@@ -25,7 +24,6 @@ describe('CollectionRequestController', () => {
       controllers: [CollectionRequestController],
       providers: [
         { provide: CreateCollectionRequestUseCase, useValue: { call: jest.fn() } },
-        { provide: GetCreatedCollectionRequestsUseCase, useValue: { call: jest.fn() } },
         { provide: GetCollectionRequestByIdUseCase, useValue: { call: jest.fn() } },
         { provide: UpdateCollectionRequestUseCase, useValue: { call: jest.fn() } },
         { provide: GetAllCollectionRequestsUseCase, useValue: { call: jest.fn() } },

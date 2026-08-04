@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } fro
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DeleteBlogPostUseCase } from '../../app/use-cases/blog-post/delete-blog-post-use-case';
 import { GetAllBlogPostsUseCase } from '../../app/use-cases/blog-post/get-all-blog-posts-use-case';
+import { GetBlogPostByIdUseCase } from '../../app/use-cases/blog-post/get-blog-post-by-id-use-case';
 import { GetAllBlogPostsDto } from '../../app/use-cases/blog-post/get-all-blog-posts-use-case/get-all-blog-posts.dto';
 import { GetPublicBlogPostBySlugUseCase } from '../../app/use-cases/blog-post/get-public-blog-post-by-slug-use-case';
 import { GetPublicBlogPostsUseCase } from '../../app/use-cases/blog-post/get-public-blog-posts-use-case';
@@ -29,6 +30,7 @@ export class BlogPostController {
     private readonly getPublicBlogPostsUseCase: GetPublicBlogPostsUseCase,
     private readonly getPublicBlogPostBySlugUseCase: GetPublicBlogPostBySlugUseCase,
     private readonly getAllBlogPostsUseCase: GetAllBlogPostsUseCase,
+    private readonly getBlogPostByIdUseCase: GetBlogPostByIdUseCase,
   ) { }
 
   @Post()
@@ -122,5 +124,17 @@ export class BlogPostController {
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   async getAllBlogPosts(@Query() query: GetAllBlogPostsDto): Promise<PaginatedResult<BlogPost>> {
     return this.getAllBlogPostsUseCase.call(query);
+  }
+
+  // Declarado depois de `public` e `public/:slug` para não os capturar.
+  @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Obter post por ID (edição)' })
+  @ApiResponse({ status: 200, description: 'Post encontrado', type: Object })
+  @ApiResponse({ status: 404, description: 'Post não encontrado' })
+  async getBlogPostById(@Param('id') id: string): Promise<BlogPost> {
+    return this.getBlogPostByIdUseCase.call(id);
   }
 }

@@ -3,7 +3,7 @@ import { StorageUnit, StorageUnitStatus } from '../../../../domain/storage-unit/
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
-import { generateFriendlyCode } from '../../collection-request-bag/bag.util';
+import { generateUniqueFriendlyCode } from '../../shared/friendly-code.util';
 import { CreateStorageUnitDto } from './create-storage-unit.dto';
 
 export { CreateStorageUnitDto };
@@ -37,15 +37,11 @@ export class CreateStorageUnitUseCase implements IUseCase<CreateStorageUnitDto, 
    * Gera um código amigável (`ano-XXXXXX`) único contra os já existentes. O
    * índice único na coluna é a rede de segurança final.
    */
-  private async generateUniqueFriendlyCode(): Promise<string> {
-    const year = new Date().getFullYear();
-    for (let attempt = 0; attempt < 5; attempt++) {
-      const code = generateFriendlyCode(year);
-      const existing = await this.storageUnitRepository.findOne({
-        friendlyCode: code,
-      } as Partial<StorageUnit>);
-      if (!existing) return code;
-    }
-    return `${generateFriendlyCode(year)}${Date.now().toString(36).slice(-2).toUpperCase()}`;
+  private generateUniqueFriendlyCode(): Promise<string> {
+    return generateUniqueFriendlyCode((friendlyCode) =>
+      this.storageUnitRepository.findOne({
+        friendlyCode,
+      } as Partial<StorageUnit>),
+    );
   }
 }
