@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { GetCollectionRequestDetailUseCase } from '../../app/use-cases/collection-request/get-collection-request-detail-use-case';
 import { ProcessTriageQrUseCase } from '../../app/use-cases/triage/process-triage-qr-use-case';
 import { ProcessTriageQrDto } from '../../app/use-cases/triage/process-triage-qr-use-case/process-triage-qr.dto';
@@ -26,5 +26,18 @@ export class TriageController {
     @Body() dto: ProcessTriageQrDto,
   ) {
     return this.processTriageQrUseCase.call({ bagId, weight: dto.weight });
+  }
+
+  // Grava só o peso do volume (guardar progresso), sem o marcar como processado.
+  @Patch('bag/:bagId/weight')
+  saveBagWeight(
+    @Param('bagId') bagId: string,
+    @Body() dto: ProcessTriageQrDto,
+  ) {
+    return this.processTriageQrUseCase.call({
+      bagId,
+      weight: dto.weight,
+      markProcessed: false,
+    });
   }
 }
