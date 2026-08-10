@@ -61,6 +61,27 @@ describe('ProcessTriageQrUseCase', () => {
     );
   });
 
+  it('saves only the weight when markProcessed is false', async () => {
+    collectionRequestBagRepo.findOne.mockResolvedValue({ id: 'q1', collectionRequestId: 'p1' } as CollectionRequestBag);
+    collectionRequestRepo.findOne.mockResolvedValue({ id: 'p1', status: 'COLLECTED' } as CollectionRequest);
+    collectionRequestBagRepo.update.mockResolvedValue([{ id: 'q1', weight: 4 } as CollectionRequestBag]);
+    collectionRequestBagRepo.find.mockResolvedValue([
+      { weight: '4.00' } as unknown as CollectionRequestBag,
+    ]);
+
+    await useCase.call({ bagId: 'q1', weight: 4, markProcessed: false });
+
+    // Sem processedAt no update — o volume fica por terminar.
+    expect(collectionRequestBagRepo.update).toHaveBeenCalledWith(
+      { id: 'q1' },
+      { weight: 4 },
+    );
+    expect(collectionRequestRepo.update).toHaveBeenCalledWith(
+      { id: 'p1' },
+      { weight: 4, status: 'SCREENING' },
+    );
+  });
+
   it('throws NotFound when the QR does not exist', async () => {
     collectionRequestBagRepo.findOne.mockResolvedValue(undefined);
     await expect(useCase.call({ bagId: 'x', weight: 1 })).rejects.toThrow(
