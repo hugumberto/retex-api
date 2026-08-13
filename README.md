@@ -56,6 +56,18 @@ and to run them all, run the following command:
 yarn typeorm:run
 ```
 
+## Scripts
+
+Maintenance and development helper scripts live in [`scripts/`](./scripts/README.md),
+which documents each one in detail (options, where to run it, and which ones are
+destructive).
+
+| Command | Purpose |
+|---------|---------|
+| `yarn seed:triage` | Seed collection requests ready to be triaged |
+| `yarn geocode:backfill` | Fill in missing address coordinates via TomTom |
+| `yarn db:refresh` | Rebuild the local database from a production dump |
+
 ## Authentication System
 
 The API includes a complete authentication system with the following features:

@@ -32,6 +32,11 @@ lerna-debug.log*
 
 # Environment
 .env
+.env.prod
+
+# Yarn é o gestor de pacotes (packageManager: yarn@4.9.1); o yarn.lock é a fonte
+# de verdade e um package-lock.json só aparece por engano, via npm install.
+package-lock.json
 
 # Yarn
 .yarn/*
