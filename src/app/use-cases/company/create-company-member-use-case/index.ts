@@ -12,6 +12,7 @@ import {
   ICompanyProfileRepository,
   ICompanyRepository,
 } from '../../../../domain/company/company.repository';
+import { IUnitOfWork } from '../../../../domain/interfaces/unit-of-work.interface';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUserRoleRepository } from '../../../../domain/user/user-role.repository';
 import { User } from '../../../../domain/user/user.entity';
@@ -45,6 +46,8 @@ export class CreateCompanyMemberUseCase
     private readonly userRepository: IUserRepository,
     @Inject(DOMAIN_TOKENS.USER_ROLE_REPOSITORY)
     private readonly userRoleRepository: IUserRoleRepository,
+    @Inject(DOMAIN_TOKENS.UNIT_OF_WORK)
+    private readonly unitOfWork: IUnitOfWork,
     @Inject(SERVICE_TOKENS.CRYPTO_SERVICE)
     private readonly cryptoService: ICryptoService,
     private readonly sendActivationEmail: SendActivationEmailUseCase,
@@ -73,16 +76,23 @@ export class CreateCompanyMemberUseCase
       throw new BadRequestException('errors.company.profileNotAvailable');
     }
 
-    const member = await provisionMember(
-      { ...data, companyId, profileId: profile.id },
-      {
-        userRepository: this.userRepository,
-        userRoleRepository: this.userRoleRepository,
-        companyMemberRepository: this.companyMemberRepository,
-        cryptoService: this.cryptoService,
-      },
+    // `provisionMember` escreve em user, user_role e company_member. Falhar a
+    // meio deixava um utilizador sem role ou sem vínculo à empresa — invisível
+    // no ecrã de membros, mas a ocupar o email para sempre, já que a criação
+    // seguinte com o mesmo endereço passa a dar 409.
+    const member = await this.unitOfWork.runInTransaction(() =>
+      provisionMember(
+        { ...data, companyId, profileId: profile.id },
+        {
+          userRepository: this.userRepository,
+          userRoleRepository: this.userRoleRepository,
+          companyMemberRepository: this.companyMemberRepository,
+          cryptoService: this.cryptoService,
+        },
+      ),
     );
 
+    // Só depois do commit: ver a nota em CreateCompanyUseCase.
     this.sendActivationEmail
       .call({ email: member.email })
       .catch((err) =>

@@ -12,6 +12,7 @@ import {
   ICompanyProfileRepository,
   ICompanyRepository,
 } from '../../../../domain/company/company.repository';
+import { IUnitOfWork } from '../../../../domain/interfaces/unit-of-work.interface';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUserRoleRepository } from '../../../../domain/user/user-role.repository';
 import { IUserRepository } from '../../../../domain/user/user.repository';
@@ -51,6 +52,8 @@ export class CreateCompanyUseCase
     private readonly userRepository: IUserRepository,
     @Inject(DOMAIN_TOKENS.USER_ROLE_REPOSITORY)
     private readonly userRoleRepository: IUserRoleRepository,
+    @Inject(DOMAIN_TOKENS.UNIT_OF_WORK)
+    private readonly unitOfWork: IUnitOfWork,
     @Inject(SERVICE_TOKENS.CRYPTO_SERVICE)
     private readonly cryptoService: ICryptoService,
     private readonly sendActivationEmail: SendActivationEmailUseCase,
@@ -75,28 +78,48 @@ export class CreateCompanyUseCase
       this.companyRepository.findOne({ friendlyCode: code } as Partial<Company>),
     );
 
-    const company = (await this.companyRepository.create({
-      name: param.name,
-      legalName: param.legalName ?? null,
-      taxId: param.taxId,
-      email: param.email ?? null,
-      phone: param.phone ?? null,
-      status: CompanyStatus.ACTIVE,
-      friendlyCode,
-    } as Partial<Company>)) as Company;
+    // Empresa e gestor nascem juntos ou não nascem: `provisionMember` escreve em
+    // três tabelas (user, user_role, company_member) e qualquer uma pode falhar
+    // depois de a empresa já estar gravada — tipicamente por o email do gestor
+    // já existir. Sem transação isso deixava uma empresa órfã, sem membro nenhum
+    // e com o NIF ocupado, pelo que nem repetir o pedido corrigido funcionava.
+    // A verificação de NIF acima também deixa de ser uma corrida perdida: se
+    // duas criações simultâneas passarem, o índice único falha a segunda e ela
+    // desfaz-se por inteiro.
+    const { company, manager } = await this.unitOfWork.runInTransaction(
+      async () => {
+        const created = (await this.companyRepository.create({
+          name: param.name,
+          legalName: param.legalName ?? null,
+          taxId: param.taxId,
+          email: param.email ?? null,
+          phone: param.phone ?? null,
+          status: CompanyStatus.ACTIVE,
+          friendlyCode,
+        } as Partial<Company>)) as Company;
 
-    const manager = await provisionMember(
-      { ...param.manager, companyId: company.id, profileId: managerProfile.id },
-      {
-        userRepository: this.userRepository,
-        userRoleRepository: this.userRoleRepository,
-        companyMemberRepository: this.companyMemberRepository,
-        cryptoService: this.cryptoService,
+        const provisioned = await provisionMember(
+          {
+            ...param.manager,
+            companyId: created.id,
+            profileId: managerProfile.id,
+          },
+          {
+            userRepository: this.userRepository,
+            userRoleRepository: this.userRoleRepository,
+            companyMemberRepository: this.companyMemberRepository,
+            cryptoService: this.cryptoService,
+          },
+        );
+
+        return { company: created, manager: provisioned };
       },
     );
 
-    // Fire-and-forget: a empresa fica criada mesmo que o SMTP falhe; o admin
-    // pode reenviar a ativação pelo ecrã de utilizadores.
+    // Depois do commit, e não dentro dele: um email de ativação para uma empresa
+    // que a transação viesse a desfazer seria um convite para uma conta que não
+    // existe. Fire-and-forget — a empresa fica criada mesmo que o SMTP falhe; o
+    // admin pode reenviar a ativação pelo ecrã de utilizadores.
     this.sendActivationEmail
       .call({ email: manager.email })
       .catch((err) =>
