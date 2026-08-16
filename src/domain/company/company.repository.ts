@@ -22,12 +22,12 @@ export interface ICompanyRepository extends IRepository<Company> {
 export interface ICompanyProfileRepository extends IRepository<CompanyProfile> {
   // Perfis de sistema (companyId null) mais os próprios da empresa indicada.
   findAvailableForCompany(companyId: string): Promise<CompanyProfile[]>;
-  findByKey(key: string): Promise<CompanyProfile>;
+  findByKey(key: string): Promise<CompanyProfile | null>;
 }
 
 export interface ICompanyMemberRepository extends IRepository<CompanyMember> {
   // Membro de um utilizador, com `company` e `profile` carregados. É o que
   // alimenta o CompanyContextService a cada pedido.
-  findByUserWithRelations(userId: string): Promise<CompanyMember>;
+  findByUserWithRelations(userId: string): Promise<CompanyMember | null>;
   findByCompanyWithRelations(companyId: string): Promise<CompanyMember[]>;
 }

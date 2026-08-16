@@ -5,7 +5,7 @@ import { IEmailService } from '../../../services/interfaces/email.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { ICompanyMemberRepository } from '../../../../domain/company/company.repository';
-import { findCompanyManagerEmails } from '../../shared/company-managers.util';
+import { createCompanyManagerEmailsResolver } from '../../shared/company-managers.util';
 import { buildCollectionReminderEmail } from '../collection-reminder-email';
 
 export interface SendCollectionRemindersResult {
@@ -43,6 +43,11 @@ export class SendCollectionRemindersUseCase
 
     let sent = 0;
     let failed = 0;
+    // Cache por lote: sem ele, N solicitações da mesma empresa faziam N
+    // leituras idênticas dos membros dessa empresa.
+    const managerEmailsFor = createCompanyManagerEmailsResolver(
+      this.companyMemberRepository,
+    );
 
     for (const pkg of pending) {
       if (!pkg.user?.email || !pkg.route?.startDate) {
@@ -50,11 +55,7 @@ export class SendCollectionRemindersUseCase
       }
 
       try {
-        const cc = await findCompanyManagerEmails(
-          this.companyMemberRepository,
-          pkg.companyId,
-          pkg.user.email,
-        );
+        const cc = await managerEmailsFor(pkg.companyId, pkg.user.email);
         await this.emailService.send(buildCollectionReminderEmail(pkg, cc));
         // Só marcamos depois do envio: se o SMTP falhar, o registo fica por
         // enviar e a falha fica visível no email_log.
