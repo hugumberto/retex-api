@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
 import { SERVICE_TOKENS } from '../../../../app/services/tokens';
 import {
@@ -12,12 +12,15 @@ import {
   CollectionRequestStatus,
 } from '../../../../domain/collection-request/collection-request.entity';
 import {
+  AddressCollectionCount,
   CityCount,
+  DashboardScope,
   ICollectionRequestRepository,
   CollectionRequestFilters,
   CollectionRequestStatusCount,
   CollectionRequestTotals,
   CollectionRequestTrendPoint,
+  MemberCollectionCount,
 } from '../../../../domain/collection-request/collection-request.repository';
 import { RouteStatus } from '../../../../domain/route/route.entity';
 import { BaseRepository } from '../abstraction/base.repository';
@@ -54,6 +57,9 @@ export class CollectionRequestRepository
     // Incluir relacionamentos (address é necessário para plotar lat/long no mapa)
     queryBuilder
       .leftJoinAndSelect('collectionRequest.user', 'user')
+      // Sem esta relação o crachá de empresa no portal fica sem nome, e é o nome
+      // que permite agrupar as recolhas do mesmo cliente na construção da rota.
+      .leftJoinAndSelect('collectionRequest.company', 'company')
       .leftJoinAndSelect('collectionRequest.address', 'address')
       .leftJoinAndSelect('collectionRequest.route', 'route')
       .leftJoinAndSelect('collectionRequest.items', 'items');
@@ -103,6 +109,9 @@ export class CollectionRequestRepository
     return repository
       .createQueryBuilder('collectionRequest')
       .leftJoinAndSelect('collectionRequest.user', 'user')
+      // Sem esta relação o crachá de empresa no portal fica sem nome, e é o nome
+      // que permite agrupar as recolhas do mesmo cliente na construção da rota.
+      .leftJoinAndSelect('collectionRequest.company', 'company')
       .leftJoinAndSelect('collectionRequest.address', 'address')
       .leftJoinAndSelect('collectionRequest.route', 'route')
       .where('user.id = :userId', { userId })
@@ -115,6 +124,9 @@ export class CollectionRequestRepository
     return repository
       .createQueryBuilder('collectionRequest')
       .leftJoinAndSelect('collectionRequest.user', 'user')
+      // Sem esta relação o crachá de empresa no portal fica sem nome, e é o nome
+      // que permite agrupar as recolhas do mesmo cliente na construção da rota.
+      .leftJoinAndSelect('collectionRequest.company', 'company')
       .leftJoinAndSelect('collectionRequest.address', 'address')
       .leftJoinAndSelect('collectionRequest.route', 'route')
       .orderBy('collectionRequest.createdAt', 'DESC')
@@ -137,12 +149,44 @@ export class CollectionRequestRepository
     return count > 0;
   }
 
-  async countByStatus(): Promise<CollectionRequestStatusCount[]> {
+  /**
+   * Restringe uma agregação a uma empresa ou a um utilizador.
+   *
+   * `company_id` e `user_id` são colunas cruas: a primeira está mapeada no
+   * EntitySchema, a segunda só existe como relação, e o QueryBuilder aceita
+   * ambas por nome — é o que `findByFiltersWithPagination` já faz.
+   *
+   * Sempre `andWhere`: `getWeightTrend` e `countOutOfZoneByCity` já têm um
+   * `where` próprio, e um segundo `where` apagava-o.
+   */
+  private applyScope<T>(
+    queryBuilder: SelectQueryBuilder<T>,
+    scope?: DashboardScope,
+  ): SelectQueryBuilder<T> {
+    if (scope?.companyId) {
+      queryBuilder.andWhere('collectionRequest.company_id = :scopeCompanyId', {
+        scopeCompanyId: scope.companyId,
+      });
+    }
+    if (scope?.userId) {
+      queryBuilder.andWhere('collectionRequest.user_id = :scopeUserId', {
+        scopeUserId: scope.userId,
+      });
+    }
+    return queryBuilder;
+  }
+
+  async countByStatus(
+    scope?: DashboardScope,
+  ): Promise<CollectionRequestStatusCount[]> {
     const repository = await this.getRepository();
-    const rows = await repository
-      .createQueryBuilder('collectionRequest')
-      .select('collectionRequest.status', 'status')
-      .addSelect('COUNT(*)', 'count')
+    const rows = await this.applyScope(
+      repository
+        .createQueryBuilder('collectionRequest')
+        .select('collectionRequest.status', 'status')
+        .addSelect('COUNT(*)', 'count'),
+      scope,
+    )
       .groupBy('collectionRequest.status')
       .getRawMany<{ status: CollectionRequestStatus; count: string }>();
 
@@ -152,21 +196,23 @@ export class CollectionRequestRepository
     }));
   }
 
-  async getTotals(): Promise<CollectionRequestTotals> {
+  async getTotals(scope?: DashboardScope): Promise<CollectionRequestTotals> {
     const repository = await this.getRepository();
-    const row = await repository
-      .createQueryBuilder('collectionRequest')
-      .select('COUNT(*)', 'totalCollectionRequests')
-      .addSelect('COALESCE(SUM(collectionRequest.weight), 0)', 'totalWeight')
-      .addSelect(
-        'COALESCE(SUM(collectionRequest.estimatedBags), 0)',
-        'totalEstimatedBags',
-      )
-      .addSelect(
-        'COALESCE(SUM(collectionRequest.bagsGenerated), 0)',
-        'totalCollectedBags',
-      )
-      .getRawOne<{
+    const row = await this.applyScope(
+      repository
+        .createQueryBuilder('collectionRequest')
+        .select('COUNT(*)', 'totalCollectionRequests')
+        .addSelect('COALESCE(SUM(collectionRequest.weight), 0)', 'totalWeight')
+        .addSelect(
+          'COALESCE(SUM(collectionRequest.estimatedBags), 0)',
+          'totalEstimatedBags',
+        )
+        .addSelect(
+          'COALESCE(SUM(collectionRequest.bagsGenerated), 0)',
+          'totalCollectedBags',
+        ),
+      scope,
+    ).getRawOne<{
         totalCollectionRequests: string;
         totalWeight: string;
         totalEstimatedBags: string;
@@ -181,22 +227,28 @@ export class CollectionRequestRepository
     };
   }
 
-  async getWeightTrend(months: number): Promise<CollectionRequestTrendPoint[]> {
+  async getWeightTrend(
+    months: number,
+    scope?: DashboardScope,
+  ): Promise<CollectionRequestTrendPoint[]> {
     const repository = await this.getRepository();
-    const rows = await repository
-      .createQueryBuilder('collectionRequest')
-      .select(
-        "to_char(date_trunc('month', collectionRequest.createdAt), 'YYYY-MM')",
-        'period',
-      )
-      .addSelect('COALESCE(SUM(collectionRequest.weight), 0)', 'weight')
-      .addSelect('COUNT(*)', 'count')
-      .where(
-        "collectionRequest.createdAt >= now() - (:months * interval '1 month')",
-        {
-          months: Math.max(0, months - 1),
-        },
-      )
+    const rows = await this.applyScope(
+      repository
+        .createQueryBuilder('collectionRequest')
+        .select(
+          "to_char(date_trunc('month', collectionRequest.createdAt), 'YYYY-MM')",
+          'period',
+        )
+        .addSelect('COALESCE(SUM(collectionRequest.weight), 0)', 'weight')
+        .addSelect('COUNT(*)', 'count')
+        .where(
+          "collectionRequest.createdAt >= now() - (:months * interval '1 month')",
+          {
+            months: Math.max(0, months - 1),
+          },
+        ),
+      scope,
+    )
       .groupBy("date_trunc('month', collectionRequest.createdAt)")
       .orderBy("date_trunc('month', collectionRequest.createdAt)", 'ASC')
       .getRawMany<{ period: string; weight: string; count: string }>();
@@ -205,6 +257,82 @@ export class CollectionRequestRepository
       period: row.period,
       weightKg: Number(row.weight),
       count: Number(row.count),
+    }));
+  }
+
+  /**
+   * Repartição das recolhas de uma empresa por quem as pediu.
+   *
+   * `innerJoin` e não `leftJoin`: uma solicitação tem sempre autor, e um join
+   * externo só abriria a porta a uma linha órfã sem nome.
+   */
+  async aggregateByMember(companyId: string): Promise<MemberCollectionCount[]> {
+    const repository = await this.getRepository();
+    const rows = await repository
+      .createQueryBuilder('collectionRequest')
+      .innerJoin('collectionRequest.user', 'user')
+      .select('user.id', 'userId')
+      .addSelect('user.firstName', 'firstName')
+      .addSelect('user.lastName', 'lastName')
+      .addSelect('COUNT(*)', 'count')
+      .addSelect('COALESCE(SUM(collectionRequest.weight), 0)', 'weight')
+      .where('collectionRequest.company_id = :companyId', { companyId })
+      .groupBy('user.id')
+      .addGroupBy('user.firstName')
+      .addGroupBy('user.lastName')
+      .orderBy('COUNT(*)', 'DESC')
+      .getRawMany<{
+        userId: string;
+        firstName: string;
+        lastName: string;
+        count: string;
+        weight: string;
+      }>();
+
+    return rows.map((row) => ({
+      userId: row.userId,
+      name: `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim(),
+      count: Number(row.count),
+      weightKg: Number(row.weight),
+    }));
+  }
+
+  /** Repartição das recolhas de uma empresa pelos seus locais de recolha. */
+  async aggregateByAddress(
+    companyId: string,
+  ): Promise<AddressCollectionCount[]> {
+    const repository = await this.getRepository();
+    const rows = await repository
+      .createQueryBuilder('collectionRequest')
+      .innerJoin('collectionRequest.address', 'address')
+      .select('address.id', 'addressId')
+      .addSelect('address.street', 'street')
+      .addSelect('address.number', 'number')
+      .addSelect('address.city', 'city')
+      .addSelect('COUNT(*)', 'count')
+      .addSelect('COALESCE(SUM(collectionRequest.weight), 0)', 'weight')
+      .where('collectionRequest.company_id = :companyId', { companyId })
+      .groupBy('address.id')
+      .addGroupBy('address.street')
+      .addGroupBy('address.number')
+      .addGroupBy('address.city')
+      .orderBy('COUNT(*)', 'DESC')
+      .getRawMany<{
+        addressId: string;
+        street: string;
+        number: string;
+        city: string;
+        count: string;
+        weight: string;
+      }>();
+
+    return rows.map((row) => ({
+      addressId: row.addressId,
+      label: [`${row.street ?? ''} ${row.number ?? ''}`.trim(), row.city]
+        .filter(Boolean)
+        .join(' — '),
+      count: Number(row.count),
+      weightKg: Number(row.weight),
     }));
   }
 
@@ -234,6 +362,9 @@ export class CollectionRequestRepository
     return repository
       .createQueryBuilder('collectionRequest')
       .leftJoinAndSelect('collectionRequest.user', 'user')
+      // Sem esta relação o crachá de empresa no portal fica sem nome, e é o nome
+      // que permite agrupar as recolhas do mesmo cliente na construção da rota.
+      .leftJoinAndSelect('collectionRequest.company', 'company')
       .leftJoinAndSelect('collectionRequest.address', 'address')
       .leftJoinAndSelect('collectionRequest.route', 'route')
       .leftJoinAndSelect('collectionRequest.items', 'items')

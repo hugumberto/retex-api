@@ -105,6 +105,7 @@
   "triage": {
     "requestNotFoundForCode": "No se ha encontrado ninguna solicitud para el código indicado",
     "qrCodeNotLinked": "El código QR no está asociado a una solicitud",
-    "requestNotInTriage": "La solicitud no está en recogida/triaje"
+    "requestNotInTriage": "La solicitud no está en recogida/triaje",
+    "bagWithoutItems": "No se puede cerrar un saco sin artículos registrados"
   }
 }
