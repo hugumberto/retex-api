@@ -11,6 +11,7 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IEmailService } from '../../../services/interfaces/email.interface';
 import { ISanitizationService } from '../../../services/interfaces/sanitization.interface';
+import { CompanyContextService } from '../../../services/company-context/company-context.service';
 import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { generateUniqueFriendlyCode } from '../../shared/friendly-code.util';
@@ -37,6 +38,7 @@ export class CreateCollectionRequestUseCase
     private readonly sanitizationService: ISanitizationService,
     @Inject(SERVICE_TOKENS.EMAIL_SERVICE)
     private readonly emailService: IEmailService,
+    private readonly companyContextService: CompanyContextService,
   ) {}
 
   async call(param: CreateCollectionRequestDto): Promise<CollectionRequest> {
@@ -45,10 +47,25 @@ export class CreateCollectionRequestUseCase
       throw new NotFoundException('errors.user.notFound');
     }
 
+    // Empresa do requerente, quando é membro de uma. Resolvida da BD e não do
+    // JWT, para que perder o acesso à empresa tenha efeito imediato.
+    const companyContext = await this.companyContextService.resolve(
+      param.userId,
+    );
+
     const address = await this.addressRepository.findOne({
       id: param.addressId,
     });
-    if (!address || address.userId !== param.userId) {
+
+    // A morada tem de ser do próprio ou da empresa a que pertence — é o que
+    // permite a um colaborador pedir recolha num local da empresa.
+    const ownsAddress = address?.userId === param.userId;
+    const companyOwnsAddress =
+      !!companyContext &&
+      !!address?.companyId &&
+      address.companyId === companyContext.companyId;
+
+    if (!address || (!ownsAddress && !companyOwnsAddress)) {
       throw new NotFoundException('errors.address.notFound');
     }
 
@@ -67,6 +84,9 @@ export class CreateCollectionRequestUseCase
         status: collectionRequestStatus,
         friendlyCode,
         user: user,
+        // NULL para particulares. É o sinal que distingue empresa de particular
+        // na listagem e na construção de rotas.
+        companyId: companyContext?.companyId ?? null,
         address: address,
         estimatedBags: param.estimatedBags,
       };

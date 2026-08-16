@@ -1,6 +1,7 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
+import { CompanyContextService } from '../../../services/company-context/company-context.service';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import {
   CollectionRequest,
@@ -15,12 +16,17 @@ describe('UpdateCollectionRequestUseCase', () => {
   const collectionRequestRepositoryMock = mock<ICollectionRequestRepository>();
   const finishRouteMock = mock<FinishRouteIfAllCollectedUseCase>();
 
+  // Por omissão o utilizador não é membro de empresa — preserva o comportamento
+  // dos particulares, que é o que estes testes cobrem.
+  const companyContextMock = { resolve: jest.fn().mockResolvedValue(null) };
+
   beforeEach(async () => {
     jest.clearAllMocks();
 
     const module = await Test.createTestingModule({
       providers: [
         UpdateCollectionRequestUseCase,
+        { provide: CompanyContextService, useValue: companyContextMock },
         {
           provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY,
           useValue: collectionRequestRepositoryMock,

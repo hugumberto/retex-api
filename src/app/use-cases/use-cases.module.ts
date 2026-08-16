@@ -8,6 +8,7 @@ import { BLOG_CATEGORY_USE_CASES } from './blog-category';
 import { BLOG_POST_USE_CASES } from './blog-post';
 import { BRAND_USE_CASES } from './brand';
 import { COLLECTION_USE_CASES } from './collection';
+import { COMPANY_USE_CASES } from './company';
 import { CONTACT_USE_CASES } from './contact';
 import { DASHBOARD_USE_CASES } from './dashboard';
 import { EMAIL_LOG_USE_CASES } from './email-log';
@@ -35,6 +36,7 @@ export class UseCasesModule {
       ...STORAGE_UNIT_USE_CASES,
       ...COLLECTION_REQUEST_BAG_USE_CASES,
       ...COLLECTION_USE_CASES,
+      ...COMPANY_USE_CASES,
       ...SYSTEM_PARAMETER_USE_CASES,
       ...TRIAGE_USE_CASES,
       ...BRAND_USE_CASES,

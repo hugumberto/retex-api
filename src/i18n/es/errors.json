@@ -40,6 +40,13 @@
     "bagRequiredToFinalize": "Vincula al menos una bolsa antes de finalizar la recogida",
     "confirmationDeadlineExpired": "El plazo para confirmar la recogida ha caducado"
   },
+  "company": {
+    "notFound": "Empresa no encontrada",
+    "taxIdAlreadyExists": "Ya existe una empresa con este NIF",
+    "profileNotFound": "Perfil no encontrado",
+    "profileNotAvailable": "Este perfil no está disponible para esta empresa",
+    "memberNotFound": "Miembro no encontrado"
+  },
   "collectionRequest": {
     "notFound": "Solicitud de recogida no encontrada",
     "notFoundWithId": "Solicitud de recogida {id} no encontrada",
@@ -98,6 +105,7 @@
   "triage": {
     "requestNotFoundForCode": "No se ha encontrado ninguna solicitud para el código indicado",
     "qrCodeNotLinked": "El código QR no está asociado a una solicitud",
-    "requestNotInTriage": "La solicitud no está en recogida/triaje"
+    "requestNotInTriage": "La solicitud no está en recogida/triaje",
+    "bagWithoutItems": "No se puede cerrar un saco sin artículos registrados"
   }
 }

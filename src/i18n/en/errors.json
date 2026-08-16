@@ -40,6 +40,13 @@
     "bagRequiredToFinalize": "Link at least one bag before finalising the collection",
     "confirmationDeadlineExpired": "The deadline to confirm the collection has passed"
   },
+  "company": {
+    "notFound": "Company not found",
+    "taxIdAlreadyExists": "A company with this tax ID already exists",
+    "profileNotFound": "Profile not found",
+    "profileNotAvailable": "This profile is not available for this company",
+    "memberNotFound": "Member not found"
+  },
   "collectionRequest": {
     "notFound": "Collection request not found",
     "notFoundWithId": "Collection request {id} not found",
@@ -98,6 +105,7 @@
   "triage": {
     "requestNotFoundForCode": "No request found for the given code",
     "qrCodeNotLinked": "The QR code is not linked to a request",
-    "requestNotInTriage": "The request is not in collection/triage"
+    "requestNotInTriage": "The request is not in collection/triage",
+    "bagWithoutItems": "A bag cannot be closed without any registered items"
   }
 }

@@ -1,4 +1,5 @@
 import { Address } from '../address/address.entity';
+import { Company } from '../company/company.entity';
 import { Entity } from '../interfaces/entity.interface';
 import { Item } from '../item/item.entity';
 import { Route } from '../route/route.entity';
@@ -9,7 +10,13 @@ export interface CollectionRequest extends Entity {
   // Código amigável (`ano-XXXXXX`) usado como referência da solicitação de
   // recolha no email ao utilizador e na listagem.
   friendlyCode?: string | null;
+  // Quem pediu. Numa solicitação de empresa é o colaborador, não a empresa —
+  // o rasto de quem pediu preserva-se.
   user: User;
+  // Empresa da solicitação. NULL = particular. É o sinal que distingue os dois
+  // na listagem e na construção de rotas.
+  companyId?: string | null;
+  company?: Company | null;
   route?: Route;
   weight?: number;
   estimatedBags?: number;

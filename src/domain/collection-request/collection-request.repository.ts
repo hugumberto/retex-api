@@ -12,6 +12,38 @@ export interface CollectionRequestFilters {
   status?: CollectionRequestStatus;
   // Quando true, retorna apenas solicitações ainda não vinculadas a uma rota.
   unrouted?: boolean;
+  // Solicitações de uma empresa. Usado na listagem do gestor.
+  companyId?: string;
+  // Solicitações criadas por um utilizador. Usado quando o membro não tem
+  // permissão para ver as de toda a empresa.
+  userId?: string;
+}
+
+/**
+ * Âmbito das agregações do dashboard: sem âmbito agrega tudo (vista de ADMIN),
+ * com `companyId` agrega uma empresa, com `userId` agrega um particular.
+ * Deriva de `CollectionRequestFilters` para não haver dois vocabulários de
+ * filtro sobre a mesma tabela.
+ */
+export type DashboardScope = Pick<
+  CollectionRequestFilters,
+  'companyId' | 'userId'
+>;
+
+/** Repartição das recolhas de uma empresa por membro. */
+export interface MemberCollectionCount {
+  userId: string;
+  name: string;
+  count: number;
+  weightKg: number;
+}
+
+/** Repartição das recolhas de uma empresa por local de recolha. */
+export interface AddressCollectionCount {
+  addressId: string;
+  label: string;
+  count: number;
+  weightKg: number;
 }
 
 export interface CollectionRequestStatusCount {
@@ -64,9 +96,14 @@ export interface ICollectionRequestRepository
   // amanhã e que ainda não receberam o lembrete. Traz `user` e `address`.
   findPendingCollectionReminders(): Promise<CollectionRequest[]>;
 
-  // Agregações para o dashboard (somente leitura).
-  countByStatus(): Promise<CollectionRequestStatusCount[]>;
-  getTotals(): Promise<CollectionRequestTotals>;
-  getWeightTrend(months: number): Promise<CollectionRequestTrendPoint[]>;
+  // Agregações para o dashboard (somente leitura). Sem `scope` agregam tudo.
+  countByStatus(scope?: DashboardScope): Promise<CollectionRequestStatusCount[]>;
+  getTotals(scope?: DashboardScope): Promise<CollectionRequestTotals>;
+  getWeightTrend(
+    months: number,
+    scope?: DashboardScope,
+  ): Promise<CollectionRequestTrendPoint[]>;
   countOutOfZoneByCity(limit: number): Promise<CityCount[]>;
+  aggregateByMember(companyId: string): Promise<MemberCollectionCount[]>;
+  aggregateByAddress(companyId: string): Promise<AddressCollectionCount[]>;
 }

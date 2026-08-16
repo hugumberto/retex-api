@@ -25,6 +25,9 @@ describe('SendCollectionRemindersUseCase', () => {
   const emailService = mock<IEmailService>();
   let useCase: SendCollectionRemindersUseCase;
 
+  // Sem empresa: findByCompanyWithRelations nunca é chamado porque companyId é null.
+  const companyMemberRepo = { findByCompanyWithRelations: jest.fn().mockResolvedValue([]) };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     const module = await Test.createTestingModule({
@@ -32,6 +35,7 @@ describe('SendCollectionRemindersUseCase', () => {
         SendCollectionRemindersUseCase,
         { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepo },
         { provide: SERVICE_TOKENS.EMAIL_SERVICE, useValue: emailService },
+        { provide: DOMAIN_TOKENS.COMPANY_MEMBER_REPOSITORY, useValue: companyMemberRepo },
       ],
     }).compile();
     useCase = module.get(SendCollectionRemindersUseCase);

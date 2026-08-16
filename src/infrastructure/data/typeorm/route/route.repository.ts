@@ -81,6 +81,9 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
       .leftJoinAndSelect('driver.roles', 'driverRoles')
       .leftJoinAndSelect('route.collectionRequests', 'collectionRequests')
       .leftJoinAndSelect('collectionRequests.user', 'collectionRequestUser')
+      // Idem à listagem: o construtor de rotas mostra o crachá de empresa nas
+      // solicitações já atribuídas, e sem esta relação sai sem nome.
+      .leftJoinAndSelect('collectionRequests.company', 'collectionRequestCompany')
       .leftJoinAndSelect('collectionRequests.address', 'collectionRequestAddress')
       .where('route.id = :id', { id })
       .getOne();
