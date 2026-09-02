@@ -8,7 +8,8 @@ import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { buildActivationEmail } from '../activation-email';
 import { generateActivationToken } from '../activation-token.util';
-import { SendActivationEmailDto } from './send-activation-email.dto';
+import { assertCanManageUser } from '../user-management.policy';
+import { SendActivationEmailParamDto } from './send-activation-email-param.dto';
 
 /**
  * Envia (ou reenvia) o email de ativação a um utilizador existente para que ele
@@ -17,7 +18,7 @@ import { SendActivationEmailDto } from './send-activation-email.dto';
  */
 @Injectable()
 export class SendActivationEmailUseCase
-  implements IUseCase<SendActivationEmailDto, { ok: true }>
+  implements IUseCase<SendActivationEmailParamDto, { ok: true }>
 {
   constructor(
     @Inject(DOMAIN_TOKENS.USER_REPOSITORY)
@@ -26,11 +27,17 @@ export class SendActivationEmailUseCase
     private readonly emailService: IEmailService,
   ) {}
 
-  async call({ email }: SendActivationEmailDto): Promise<{ ok: true }> {
-    const user = await this.userRepository.findOne({ email } as Partial<User>);
+  async call({ data, actor }: SendActivationEmailParamDto): Promise<{ ok: true }> {
+    const { email } = data;
+
+    // Com relações: reenviar a ativação de um ADMIN/MASTER (que lhe deixa a
+    // conta INATIVA e permite definir nova senha) é exclusivo do MASTER.
+    const user = await this.userRepository.findOneWithRelations({ email } as Partial<User>);
     if (!user) {
       throw new NotFoundException('errors.user.notFound');
     }
+
+    assertCanManageUser(actor, user);
 
     const { token, expiresAt } = generateActivationToken();
 

@@ -21,6 +21,7 @@ import { ICryptoService } from '../../../services/interfaces/crypto.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { SendActivationEmailUseCase } from '../../user/send-activation-email-use-case';
+import { SYSTEM_ACTOR } from '../../user/user-management.policy';
 import { provisionMember } from '../provision-member.util';
 import { CreateCompanyMemberDto } from './create-company-member.dto';
 
@@ -94,7 +95,7 @@ export class CreateCompanyMemberUseCase
 
     // Só depois do commit: ver a nota em CreateCompanyUseCase.
     this.sendActivationEmail
-      .call({ email: member.email })
+      .call({ data: { email: member.email }, actor: SYSTEM_ACTOR })
       .catch((err) =>
         this.logger.error(
           `Falha ao enviar ativação ao membro ${member.email}: ${err.message}`,

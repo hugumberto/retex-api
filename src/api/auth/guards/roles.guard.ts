@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtPayload } from '../../../app/services/interfaces/auth.interface';
+import { hasAnyRole } from '../../../domain/user/role-hierarchy';
 import { Role } from '../../../domain/user/user-roles.entity';
 
 export const ROLES_KEY = 'roles';
@@ -26,7 +27,9 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('errors.auth.notAuthenticated');
     }
 
-    const hasRole = requiredRoles.some((role) => user.roles?.includes(role));
+    // Via `hasAnyRole` e não `includes` directo: o MASTER satisfaz tudo o que o
+    // ADMIN satisfaz sem estar listado em cada `@Roles(...)`.
+    const hasRole = hasAnyRole(user.roles, requiredRoles);
 
     if (!hasRole) {
       throw new ForbiddenException('errors.auth.accessDenied');

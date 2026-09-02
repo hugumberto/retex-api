@@ -1,3 +1,4 @@
+import { CreateCollectionRequestBagUseCase } from './create-collection-request-bag-use-case';
 import { DeleteCollectionRequestBagUseCase } from './delete-collection-request-bag-use-case';
 import { GenerateCollectionBagsUseCase } from './generate-collection-bags-use-case';
 import { GetRouteBagsUseCase } from './get-route-bags-use-case';
@@ -5,11 +6,13 @@ import { UnassignCollectionRequestBagUseCase } from './unassign-collection-reque
 
 export const COLLECTION_REQUEST_BAG_USE_CASES = [
   GenerateCollectionBagsUseCase,
+  CreateCollectionRequestBagUseCase,
   GetRouteBagsUseCase,
   UnassignCollectionRequestBagUseCase,
   DeleteCollectionRequestBagUseCase,
 ];
 
+export * from './create-collection-request-bag-use-case';
 export * from './generate-collection-bags-use-case';
 export * from './get-route-bags-use-case';
 export * from './unassign-collection-request-bag-use-case';

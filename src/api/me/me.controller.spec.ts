@@ -9,7 +9,8 @@ import { GetUserCollectionRequestsUseCase } from '../../app/use-cases/collection
 import { UpdateMePasswordUseCase, UpdateUserUseCase } from '../../app/use-cases/user';
 import { MeController } from './me.controller';
 
-const reqAs = (sub: string) => ({ user: { sub } } as unknown as Request);
+const reqAs = (sub: string) =>
+  ({ user: { sub, roles: ['USER'] } } as unknown as Request);
 
 describe('MeController (uses JWT sub, never a client-supplied id)', () => {
   let controller: MeController;
@@ -77,6 +78,7 @@ describe('MeController (uses JWT sub, never a client-supplied id)', () => {
     expect(mocks.updateUser.call).toHaveBeenCalledWith({
       id: 'me-id',
       data: { contactPhone: '999' },
+      actor: { id: 'me-id', roles: ['USER'] },
     });
   });
 });

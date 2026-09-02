@@ -21,6 +21,7 @@ import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { generateUniqueFriendlyCode } from '../../shared/friendly-code.util';
 import { SendActivationEmailUseCase } from '../../user/send-activation-email-use-case';
+import { SYSTEM_ACTOR } from '../../user/user-management.policy';
 import { provisionMember } from '../provision-member.util';
 import { CreateCompanyDto } from './create-company.dto';
 
@@ -121,7 +122,7 @@ export class CreateCompanyUseCase
     // existe. Fire-and-forget — a empresa fica criada mesmo que o SMTP falhe; o
     // admin pode reenviar a ativação pelo ecrã de utilizadores.
     this.sendActivationEmail
-      .call({ email: manager.email })
+      .call({ data: { email: manager.email }, actor: SYSTEM_ACTOR })
       .catch((err) =>
         this.logger.error(
           `Falha ao enviar ativação ao gestor ${manager.email}: ${err.message}`,

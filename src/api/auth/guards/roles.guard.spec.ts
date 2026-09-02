@@ -31,6 +31,18 @@ describe('RolesGuard', () => {
     expect(guard.canActivate(ctx)).toBe(true);
   });
 
+  it('lets a MASTER through an ADMIN-only route', () => {
+    reflector.getAllAndOverride.mockReturnValue([Role.ADMIN]);
+    const ctx = contextWithUser({ roles: [Role.MASTER] });
+    expect(guard.canActivate(ctx)).toBe(true);
+  });
+
+  it('denies an ADMIN on a MASTER-only route', () => {
+    reflector.getAllAndOverride.mockReturnValue([Role.MASTER]);
+    const ctx = contextWithUser({ roles: [Role.ADMIN] });
+    expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);
+  });
+
   it('denies access when the user lacks the required roles', () => {
     reflector.getAllAndOverride.mockReturnValue([Role.ADMIN]);
     const ctx = contextWithUser({ roles: [Role.USER] });

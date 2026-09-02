@@ -18,6 +18,7 @@ import { ICryptoService } from '../../../services/interfaces/crypto.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
 import { SendActivationEmailUseCase } from '../../user/send-activation-email-use-case';
 import { CreateCompanyUseCase } from '.';
+import { SYSTEM_ACTOR } from '../../user/user-management.policy';
 
 describe('CreateCompanyUseCase', () => {
   let useCase: CreateCompanyUseCase;
@@ -107,7 +108,8 @@ describe('CreateCompanyUseCase', () => {
     // Depois do commit: um convite para uma empresa que a transação desfizesse
     // apontaria para uma conta inexistente.
     expect(sendActivationEmailMock.call).toHaveBeenCalledWith({
-      email: 'gestor@empresa.pt',
+      data: { email: 'gestor@empresa.pt' },
+      actor: SYSTEM_ACTOR,
     });
   });
 

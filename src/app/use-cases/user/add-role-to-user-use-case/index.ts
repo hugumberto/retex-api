@@ -1,10 +1,15 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUserRoleRepository } from '../../../../domain/user/user-role.repository';
-import { Role, UserRole } from '../../../../domain/user/user-roles.entity';
+import { UserRole } from '../../../../domain/user/user-roles.entity';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import {
+  assertCanAssignRoles,
+  assertCanManageUser,
+  assertNotSelfDemotion,
+} from '../user-management.policy';
 import { AddRoleToUserParamDto } from './add-role-to-user-param.dto';
 
 @Injectable()
@@ -17,7 +22,7 @@ export class AddRoleToUserUseCase implements IUseCase<AddRoleToUserParamDto, Omi
   ) { }
 
   async call(param: AddRoleToUserParamDto): Promise<Omit<User, 'password'>> {
-    const { userId, data } = param;
+    const { userId, data, actor } = param;
 
     // Verificar se usuário existe com roles
     const user = await this.userRepository.findOneWithRelations({ id: userId });
@@ -25,18 +30,22 @@ export class AddRoleToUserUseCase implements IUseCase<AddRoleToUserParamDto, Omi
       throw new NotFoundException('errors.user.notFound');
     }
 
+    // Um ADMIN não mexe nos perfis de um ADMIN/MASTER nem se promove a um deles.
+    assertCanManageUser(actor, user);
+
     const currentRoles = user.roles?.map((ur) => ur.role) ?? [];
     const incomingRoles = data.roles ?? [];
 
-    // Regra: ADMIN é exclusiva — se for atribuída, todas as outras roles são
-    // removidas (o utilizador fica apenas com ADMIN).
-    const effectiveRoles = incomingRoles.includes(Role.ADMIN)
-      ? [Role.ADMIN]
-      : incomingRoles;
+    assertCanAssignRoles(actor, incomingRoles);
 
+    assertNotSelfDemotion(actor, userId, incomingRoles);
+
+    // Os perfis ficam exatamente como foram enviados: um ADMIN pode acumular
+    // OPS ou DRIVER, por exemplo. (Até aqui, atribuir ADMIN apagava todos os
+    // outros, o que impedia essas combinações sem o dizer a ninguém.)
     // Calcular diferenças
-    const rolesToAdd = effectiveRoles.filter((role) => !currentRoles.includes(role));
-    const rolesToRemove = currentRoles.filter((role) => !effectiveRoles.includes(role));
+    const rolesToAdd = incomingRoles.filter((role) => !currentRoles.includes(role));
+    const rolesToRemove = currentRoles.filter((role) => !incomingRoles.includes(role));
 
     // Adicionar novas roles
     for (const role of rolesToAdd) {
