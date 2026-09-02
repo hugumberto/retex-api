@@ -397,7 +397,13 @@ export class CollectionRequestRepository
         status: CollectionRequestStatus.CREATED,
       })
       .andWhere('collectionRequest.collectionConfirmedAt IS NULL')
-      .andWhere('(route.start_date::date - :days) < CURRENT_DATE', { days })
+      // `:days` tem de ir com cast explícito: sem ele o Postgres recebe o
+      // parâmetro como `unknown`, resolve `date - $1` para o operador
+      // `date - date → integer` e rebenta com "operator does not exist:
+      // integer < date" — o que fazia falhar a tarefa diária inteira.
+      .andWhere('(route.start_date::date - CAST(:days AS int)) < CURRENT_DATE', {
+        days,
+      })
       .getMany();
   }
 
