@@ -4,6 +4,8 @@
     "tokenInvalid": "Token inválido",
     "notAuthenticated": "Utilizador não autenticado",
     "accessDenied": "Acesso negado: roles insuficientes",
+    "masterOnly": "Apenas um utilizador MASTER pode gerir contas ADMIN/MASTER",
+    "cannotDemoteSelf": "Não é possível remover o seu próprio perfil MASTER",
     "invalidCredentials": "Email ou senha inválidos",
     "accountInactive": "Conta inativa",
     "accountAlreadyActive": "Conta já ativada",

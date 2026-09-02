@@ -37,7 +37,7 @@ export class SeedService implements OnApplicationBootstrap {
 
     const hashedPassword = await this.cryptoService.hashPassword(password);
     const user = await this.userRepository.create({
-      firstName: 'Admin',
+      firstName: 'Master',
       lastName: 'Retex',
       email,
       contactPhone: '000000000',
@@ -46,6 +46,8 @@ export class SeedService implements OnApplicationBootstrap {
       userType: UserType.PERSON,
     });
 
-    await this.userRoleRepository.create({ user: user as User, role: Role.ADMIN });
+    // MASTER e não ADMIN: a conta de bootstrap é a que gere os próprios admins
+    // (o MASTER herda tudo o que o ADMIN pode — ver `role-hierarchy.ts`).
+    await this.userRoleRepository.create({ user: user as User, role: Role.MASTER });
   }
 }

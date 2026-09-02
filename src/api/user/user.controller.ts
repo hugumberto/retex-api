@@ -46,6 +46,8 @@ import { UpdateUserDto } from '../../app/use-cases/user/update-user-use-case/upd
 import { Address } from '../../domain/address/address.entity';
 import { Role } from '../../domain/user/user-roles.entity';
 import { User } from '../../domain/user/user.entity';
+import { JwtPayload } from '../../app/services/interfaces/auth.interface';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -138,8 +140,12 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'Utilizador não encontrado' })
   async sendActivationEmail(
     @Body() dto: SendActivationEmailDto,
+    @CurrentUser() actor: JwtPayload,
   ): Promise<{ ok: true }> {
-    return this.sendActivationEmailUseCase.call(dto);
+    return this.sendActivationEmailUseCase.call({
+      data: dto,
+      actor: { id: actor.sub, roles: actor.roles },
+    });
   }
 
   @Post()
@@ -217,8 +223,12 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async resetUserPassword(
     @Body() resetUserPasswordDto: ResetUserPasswordDto,
+    @CurrentUser() actor: JwtPayload,
   ): Promise<Omit<User, 'password'>> {
-    return this.resetUserPasswordUseCase.call(resetUserPasswordDto);
+    return this.resetUserPasswordUseCase.call({
+      data: resetUserPasswordDto,
+      actor: { id: actor.sub, roles: actor.roles },
+    });
   }
 
   @Put(':id')
@@ -237,8 +247,13 @@ export class UserController {
   async updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
+    @CurrentUser() actor: JwtPayload,
   ): Promise<Omit<User, 'password'>> {
-    return this.updateUserUseCase.call({ id, data: updateUserDto });
+    return this.updateUserUseCase.call({
+      id,
+      data: updateUserDto,
+      actor: { id: actor.sub, roles: actor.roles },
+    });
   }
 
   @Post(':id/roles')
@@ -255,12 +270,21 @@ export class UserController {
     type: Object,
   })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
-  @ApiResponse({ status: 403, description: 'Acesso negado - apenas ADMINs' })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Acesso negado - atribuir ADMIN/MASTER (ou mexer numa conta que os tenha) é exclusivo do MASTER',
+  })
   async addRoleToUser(
     @Param('id') userId: string,
     @Body() addRoleDto: AddRoleToUserDto,
+    @CurrentUser() actor: JwtPayload,
   ): Promise<Omit<User, 'password'>> {
-    return this.addRoleToUserUseCase.call({ userId, data: addRoleDto });
+    return this.addRoleToUserUseCase.call({
+      userId,
+      data: addRoleDto,
+      actor: { id: actor.sub, roles: actor.roles },
+    });
   }
 
   @Post(':id/address')

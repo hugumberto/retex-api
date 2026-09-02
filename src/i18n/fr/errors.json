@@ -4,6 +4,8 @@
     "tokenInvalid": "Jeton invalide",
     "notAuthenticated": "Utilisateur non authentifié",
     "accessDenied": "Accès refusé : rôles insuffisants",
+    "masterOnly": "Seul un utilisateur MASTER peut gérer les comptes ADMIN/MASTER",
+    "cannotDemoteSelf": "Vous ne pouvez pas retirer votre propre rôle MASTER",
     "invalidCredentials": "E-mail ou mot de passe invalide",
     "accountInactive": "Compte inactif",
     "accountAlreadyActive": "Compte déjà activé",
