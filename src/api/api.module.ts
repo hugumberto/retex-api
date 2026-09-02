@@ -4,11 +4,13 @@ import { TerminusModule } from '@nestjs/terminus';
 import { AuthModule } from '../app/services/auth/auth.module';
 import { UseCasesModule } from '../app/use-cases/use-cases.module';
 import { AuthController } from './auth/auth.controller';
+import { ImpersonationGuard } from './auth/guards/impersonation.guard';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { BlogCategoryController } from './blog-category/blog-category.controller';
 import { BlogPostController } from './blog-post/blog-post.controller';
 import { CollectionController } from './collection/collection.controller';
+import { CompanyController } from './company/company.controller';
 import { ContactController } from './contact/contact.controller';
 import { DashboardController } from './dashboard/dashboard.controller';
 import { EmailLogController } from './email-log/email-log.controller';
@@ -44,6 +46,7 @@ import { WelcomeController } from './welcome/welcome.controller';
     RouteController,
     StorageUnitController,
     CollectionController,
+    CompanyController,
     SystemParameterController,
     TriageController,
     BrandController,
@@ -58,11 +61,15 @@ import { WelcomeController } from './welcome/welcome.controller';
   ],
   providers: [
     JwtAuthGuard,
+    ImpersonationGuard,
     RolesGuard,
     // Secure-by-default: autentica TODAS as rotas, exceto as marcadas com @Public().
     // As roles são validadas apenas nas rotas/classes marcadas com @Roles().
     // A ordem importa — JwtAuthGuard preenche request.user antes de o RolesGuard validar as roles.
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    // Entre os dois de propósito: troca request.user pelo alvo do "ver como"
+    // antes de as roles serem validadas, para o RolesGuard julgar o alvo.
+    { provide: APP_GUARD, useClass: ImpersonationGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })

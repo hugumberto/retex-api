@@ -11,4 +11,6 @@ export enum Role {
   DRIVER = "DRIVER",
   OPS = "OPS",
   ADMIN = "ADMIN",
+  /** Acima do ADMIN. Ver `role-hierarchy.ts` para o que isso implica. */
+  MASTER = "MASTER",
 }

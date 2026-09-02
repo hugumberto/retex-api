@@ -8,6 +8,7 @@ import { CollectionRequestStatus } from '../../../../domain/collection-request/c
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
 import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
+import { IItemRepository } from '../../../../domain/item/item.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 
@@ -38,6 +39,8 @@ export class ProcessTriageQrUseCase
     private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
+    @Inject(DOMAIN_TOKENS.ITEM_REPOSITORY)
+    private readonly itemRepository: IItemRepository,
   ) {}
 
   async call({
@@ -66,6 +69,18 @@ export class ProcessTriageQrUseCase
     ) {
       throw new BadRequestException('errors.triage.requestNotInTriage',
       );
+    }
+
+    // Um saco fechado sem itens é um volume que a triagem dá por concluído sem
+    // ter registado nada: entra no peso do pacote e conta como processado, mas
+    // não deixa rasto do que lá vinha. Só bloqueia ao marcar processado — o
+    // "guardar progresso" existe precisamente para o operador gravar o peso a
+    // meio do volume, antes de haver itens.
+    if (markProcessed) {
+      const itemCount = await this.itemRepository.countByBagId(bagId);
+      if (itemCount === 0) {
+        throw new BadRequestException('errors.triage.bagWithoutItems');
+      }
     }
 
     // Sem `processedAt` no update, o valor existente é preservado (o repositório

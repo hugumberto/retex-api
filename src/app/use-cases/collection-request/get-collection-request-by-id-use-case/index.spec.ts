@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
 import { CollectionRequest } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
+import { CompanyContextService } from '../../../services/company-context/company-context.service';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { GetCollectionRequestByIdUseCase } from '.';
 
@@ -10,12 +11,17 @@ describe('GetCollectionRequestByIdUseCase', () => {
   let getCollectionRequestByIdUseCase: GetCollectionRequestByIdUseCase;
   const collectionRequestRepositoryMock = mock<ICollectionRequestRepository>();
 
+  // Por omissão o utilizador não é membro de empresa — preserva o comportamento
+  // dos particulares, que é o que estes testes cobrem.
+  const companyContextMock = { resolve: jest.fn().mockResolvedValue(null) };
+
   beforeEach(async () => {
     jest.clearAllMocks();
 
     const module = await Test.createTestingModule({
       providers: [
         GetCollectionRequestByIdUseCase,
+        { provide: CompanyContextService, useValue: companyContextMock },
         {
           provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY,
           useValue: collectionRequestRepositoryMock,

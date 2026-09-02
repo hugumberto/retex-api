@@ -24,6 +24,11 @@ export class GetCollectionRequestsDto {
   @IsBoolean()
   unrouted?: boolean;
 
+  // Preenchidos pelo controller a partir do contexto de empresa, nunca aceites
+  // do cliente — caso contrário qualquer um listava os pedidos de outra empresa.
+  companyId?: string;
+  userId?: string;
+
   @IsOptional()
   @Type(() => Number)
   @IsNumber()

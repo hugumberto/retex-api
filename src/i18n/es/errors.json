@@ -4,6 +4,11 @@
     "tokenInvalid": "Token no válido",
     "notAuthenticated": "Usuario no autenticado",
     "accessDenied": "Acceso denegado: roles insuficientes",
+    "masterOnly": "Solo un usuario MASTER puede gestionar cuentas ADMIN/MASTER",
+    "cannotDemoteSelf": "No puede eliminar su propio perfil MASTER",
+    "impersonationForbidden": "Solo un usuario MASTER puede ver el portal como otro usuario",
+    "impersonationReadOnly": "Modo de lectura: no se pueden cambiar datos mientras se ve como otro usuario",
+    "impersonationTargetNotAllowed": "Solo se puede ver como un cliente (particular o miembro de empresa)",
     "invalidCredentials": "Email o contraseña no válidos",
     "accountInactive": "Cuenta inactiva",
     "accountAlreadyActive": "La cuenta ya está activada",
@@ -39,6 +44,13 @@
     "cancellationReasonRequired": "Indica el motivo de la cancelación",
     "bagRequiredToFinalize": "Vincula al menos una bolsa antes de finalizar la recogida",
     "confirmationDeadlineExpired": "El plazo para confirmar la recogida ha caducado"
+  },
+  "company": {
+    "notFound": "Empresa no encontrada",
+    "taxIdAlreadyExists": "Ya existe una empresa con este NIF",
+    "profileNotFound": "Perfil no encontrado",
+    "profileNotAvailable": "Este perfil no está disponible para esta empresa",
+    "memberNotFound": "Miembro no encontrado"
   },
   "collectionRequest": {
     "notFound": "Solicitud de recogida no encontrada",
@@ -98,6 +110,7 @@
   "triage": {
     "requestNotFoundForCode": "No se ha encontrado ninguna solicitud para el código indicado",
     "qrCodeNotLinked": "El código QR no está asociado a una solicitud",
-    "requestNotInTriage": "La solicitud no está en recogida/triaje"
+    "requestNotInTriage": "La solicitud no está en recogida/triaje",
+    "bagWithoutItems": "No se puede cerrar un saco sin artículos registrados"
   }
 }

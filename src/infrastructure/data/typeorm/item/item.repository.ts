@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
 import { SERVICE_TOKENS } from '../../../../app/services/tokens';
+import { DashboardScope } from '../../../../domain/collection-request/collection-request.repository';
 import { Item } from '../../../../domain/item/item.entity';
 import {
   IItemRepository,
@@ -40,7 +41,47 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
     });
   }
 
-  async aggregateBy(dimension: ItemDimension): Promise<ItemDimensionCount[]> {
+  async countByBagId(bagId: string): Promise<number> {
+    const repository = await this.getRepository();
+    // `count` ignora itens soft-deleted, que é o que se quer: um saco a que
+    // removeram todos os itens está tão vazio como um que nunca teve nenhum.
+    return repository.count({ where: { bag: { id: bagId } } });
+  }
+
+  /**
+   * Restringe uma agregação de itens a uma empresa ou a um utilizador.
+   *
+   * A tabela `item` não tem `company_id` nem `user_id`: só lá chega pela
+   * solicitação a que pertence, daí o join. É `innerJoin` porque todo o item
+   * pertence a uma solicitação, e sem âmbito nem sequer se junta — assim a
+   * vista de ADMIN continua a correr exatamente a mesma consulta de antes.
+   */
+  private applyScope<T>(
+    queryBuilder: SelectQueryBuilder<T>,
+    scope?: DashboardScope,
+  ): SelectQueryBuilder<T> {
+    if (!scope?.companyId && !scope?.userId) {
+      return queryBuilder;
+    }
+
+    queryBuilder.innerJoin('item.collectionRequest', 'collectionRequest');
+    if (scope.companyId) {
+      queryBuilder.andWhere('collectionRequest.company_id = :scopeCompanyId', {
+        scopeCompanyId: scope.companyId,
+      });
+    }
+    if (scope.userId) {
+      queryBuilder.andWhere('collectionRequest.user_id = :scopeUserId', {
+        scopeUserId: scope.userId,
+      });
+    }
+    return queryBuilder;
+  }
+
+  async aggregateBy(
+    dimension: ItemDimension,
+    scope?: DashboardScope,
+  ): Promise<ItemDimensionCount[]> {
     const repository = await this.getRepository();
     // Whitelist runtime: nunca interpolar `dimension` no SQL sem validar, pois o
     // tipo é apagado em runtime (defesa contra valores inválidos / injeção).
@@ -53,11 +94,14 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
     if (!column) {
       throw new Error(`Dimensão de item inválida: ${dimension}`);
     }
-    const rows = await repository
-      .createQueryBuilder('item')
-      .select(`item.${column}`, 'key')
-      .addSelect('COUNT(*)', 'count')
-      .addSelect('COALESCE(SUM(item.quantity), 0)', 'quantity')
+    const rows = await this.applyScope(
+      repository
+        .createQueryBuilder('item')
+        .select(`item.${column}`, 'key')
+        .addSelect('COUNT(*)', 'count')
+        .addSelect('COALESCE(SUM(item.quantity), 0)', 'quantity'),
+      scope,
+    )
       .groupBy(`item.${column}`)
       .getRawMany<{ key: string; count: string; quantity: string }>();
 
@@ -68,14 +112,17 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
     }));
   }
 
-  async aggregateByBrand(): Promise<ItemBrandCount[]> {
+  async aggregateByBrand(scope?: DashboardScope): Promise<ItemBrandCount[]> {
     const repository = await this.getRepository();
-    const rows = await repository
-      .createQueryBuilder('item')
-      .leftJoin('item.brand', 'brand')
-      .select("COALESCE(brand.name, 'Sem marca')", 'brand')
-      .addSelect('COUNT(*)', 'count')
-      .addSelect('COALESCE(SUM(item.quantity), 0)', 'quantity')
+    const rows = await this.applyScope(
+      repository
+        .createQueryBuilder('item')
+        .leftJoin('item.brand', 'brand')
+        .select("COALESCE(brand.name, 'Sem marca')", 'brand')
+        .addSelect('COUNT(*)', 'count')
+        .addSelect('COALESCE(SUM(item.quantity), 0)', 'quantity'),
+      scope,
+    )
       .groupBy('brand.name')
       .orderBy('COUNT(*)', 'DESC')
       .getRawMany<{ brand: string; count: string; quantity: string }>();

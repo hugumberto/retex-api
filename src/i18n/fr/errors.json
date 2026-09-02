@@ -4,6 +4,11 @@
     "tokenInvalid": "Jeton invalide",
     "notAuthenticated": "Utilisateur non authentifié",
     "accessDenied": "Accès refusé : rôles insuffisants",
+    "masterOnly": "Seul un utilisateur MASTER peut gérer les comptes ADMIN/MASTER",
+    "cannotDemoteSelf": "Vous ne pouvez pas retirer votre propre rôle MASTER",
+    "impersonationForbidden": "Seul un utilisateur MASTER peut voir le portail en tant qu'un autre utilisateur",
+    "impersonationReadOnly": "Mode lecture : impossible de modifier des données en tant qu'un autre utilisateur",
+    "impersonationTargetNotAllowed": "Vous ne pouvez voir qu'en tant que client (particulier ou membre d'une entreprise)",
     "invalidCredentials": "E-mail ou mot de passe invalide",
     "accountInactive": "Compte inactif",
     "accountAlreadyActive": "Compte déjà activé",
@@ -39,6 +44,13 @@
     "cancellationReasonRequired": "Indiquez le motif de l'annulation",
     "bagRequiredToFinalize": "Associez au moins un sac avant de finaliser la collecte",
     "confirmationDeadlineExpired": "Le délai pour confirmer la collecte est dépassé"
+  },
+  "company": {
+    "notFound": "Entreprise introuvable",
+    "taxIdAlreadyExists": "Une entreprise avec ce numéro fiscal existe déjà",
+    "profileNotFound": "Profil introuvable",
+    "profileNotAvailable": "Ce profil n'est pas disponible pour cette entreprise",
+    "memberNotFound": "Membre introuvable"
   },
   "collectionRequest": {
     "notFound": "Demande de collecte introuvable",
@@ -98,6 +110,7 @@
   "triage": {
     "requestNotFoundForCode": "Aucune demande trouvée pour le code indiqué",
     "qrCodeNotLinked": "Le QR code n'est pas associé à une demande",
-    "requestNotInTriage": "La demande n'est pas en collecte/tri"
+    "requestNotInTriage": "La demande n'est pas en collecte/tri",
+    "bagWithoutItems": "Impossible de fermer un sac sans articles enregistrés"
   }
 }

@@ -92,6 +92,7 @@ export class EmailService implements IEmailService {
       await this.transporter.sendMail({
         from: process.env.SMTP_FROM,
         to: options.to,
+        ...(options.cc?.length ? { cc: options.cc } : {}),
         subject,
         html,
       });

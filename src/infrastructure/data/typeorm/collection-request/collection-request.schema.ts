@@ -36,6 +36,11 @@ export const collectionRequestSchema = new EntitySchema<CollectionRequest>({
       nullable: true,
       name: 'estimated_bags',
     },
+    companyId: {
+      type: 'uuid',
+      nullable: true,
+      name: 'company_id',
+    },
     addressId: {
       type: 'uuid',
       nullable: true,
@@ -80,6 +85,14 @@ export const collectionRequestSchema = new EntitySchema<CollectionRequest>({
         name: 'user_id',
       },
       inverseSide: 'collectionRequests',
+    },
+    company: {
+      type: 'many-to-one',
+      target: 'company',
+      joinColumn: {
+        name: 'company_id',
+      },
+      nullable: true,
     },
     address: {
       type: 'many-to-one',

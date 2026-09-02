@@ -7,6 +7,11 @@ export interface SendEmailMeta {
 
 export interface SendEmailOptions {
   to: string;
+  /**
+   * Destinatários em cópia. Usado para pôr o gestor da empresa a par das
+   * confirmações e lembretes dos seus colaboradores.
+   */
+  cc?: string[];
   template: string;
   context: Record<string, unknown>;
   /**

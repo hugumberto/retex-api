@@ -1,16 +1,13 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
-import { randomBytes } from 'crypto';
+import { Inject, Injectable } from '@nestjs/common';
 import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
 import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import {
   generateBatchId,
-  generateFriendlyCode,
   generateToken,
+  generateUniqueFriendlyCode,
 } from '../bag.util';
-
-const MAX_COLLISION_RETRIES = 5;
 
 export interface GenerateCollectionBagsParams {
   routeId: string;
@@ -39,9 +36,8 @@ export class GenerateCollectionBagsUseCase
     const created: CollectionRequestBag[] = [];
 
     for (let i = 0; i < param.quantity; i++) {
-      const friendlyCode = await this.generateUniqueFriendlyCode(
-        year,
-        usedInBatch,
+      const friendlyCode = await generateUniqueFriendlyCode(year, (code) =>
+        this.isFriendlyCodeTaken(code, usedInBatch),
       );
       usedInBatch.add(friendlyCode);
 
@@ -57,34 +53,14 @@ export class GenerateCollectionBagsUseCase
     return created;
   }
 
-  /**
-   * Gera um friendlyCode único (não usado no lote nem persistido). Tenta o
-   * formato padrão; se esgotar as retentativas, cai para um fallback com
-   * entropia extra (evita abortar o lote por uma colisão rara). O erro
-   * explícito é apenas a salvaguarda final, que na prática nunca dispara.
-   */
-  private async generateUniqueFriendlyCode(
-    year: number,
+  /** Ocupado se já saiu neste lote ou se já existe em BD. */
+  private async isFriendlyCodeTaken(
+    code: string,
     usedInBatch: Set<string>,
-  ): Promise<string> {
-    const isFree = async (code: string) =>
-      !usedInBatch.has(code) &&
-      !(await this.collectionRequestBagRepository.findOne({ friendlyCode: code }));
-
-    for (let attempt = 0; attempt < MAX_COLLISION_RETRIES; attempt++) {
-      const code = generateFriendlyCode(year);
-      if (await isFree(code)) return code;
-    }
-
-    // Fallback: sufixo aleatório (mais entropia), ainda verificando unicidade.
-    for (let attempt = 0; attempt < MAX_COLLISION_RETRIES; attempt++) {
-      const code = `${generateFriendlyCode(year)}${randomBytes(2)
-        .toString('hex')
-        .toUpperCase()}`;
-      if (await isFree(code)) return code;
-    }
-
-    throw new ConflictException('errors.qrCode.uniqueCodeGenerationFailed',
-    );
+  ): Promise<boolean> {
+    if (usedInBatch.has(code)) return true;
+    return !!(await this.collectionRequestBagRepository.findOne({
+      friendlyCode: code,
+    }));
   }
 }

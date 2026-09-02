@@ -60,8 +60,13 @@ export class MeController {
     @Req() req: Request,
     @Body() dto: UpdateMeDto,
   ): Promise<Omit<User, 'password'>> {
-    const { sub } = req['user'] as JwtPayload;
-    return this.updateUserUseCase.call({ id: sub, data: { contactPhone: dto.contactPhone } });
+    const { sub, roles } = req['user'] as JwtPayload;
+    return this.updateUserUseCase.call({
+      id: sub,
+      data: { contactPhone: dto.contactPhone },
+      // O próprio é sempre o alvo aqui — a política de gestão deixa passar.
+      actor: { id: sub, roles },
+    });
   }
 
   @Patch('password')

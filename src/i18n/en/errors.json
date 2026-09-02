@@ -4,6 +4,11 @@
     "tokenInvalid": "Invalid token",
     "notAuthenticated": "User not authenticated",
     "accessDenied": "Access denied: insufficient roles",
+    "masterOnly": "Only a MASTER user can manage ADMIN/MASTER accounts",
+    "cannotDemoteSelf": "You cannot remove your own MASTER role",
+    "impersonationForbidden": "Only a MASTER user can view the portal as another user",
+    "impersonationReadOnly": "Read-only mode: data cannot be changed while viewing as another user",
+    "impersonationTargetNotAllowed": "You can only view as a customer (individual or company member)",
     "invalidCredentials": "Invalid email or password",
     "accountInactive": "Inactive account",
     "accountAlreadyActive": "Account already activated",
@@ -39,6 +44,13 @@
     "cancellationReasonRequired": "Please provide a cancellation reason",
     "bagRequiredToFinalize": "Link at least one bag before finalising the collection",
     "confirmationDeadlineExpired": "The deadline to confirm the collection has passed"
+  },
+  "company": {
+    "notFound": "Company not found",
+    "taxIdAlreadyExists": "A company with this tax ID already exists",
+    "profileNotFound": "Profile not found",
+    "profileNotAvailable": "This profile is not available for this company",
+    "memberNotFound": "Member not found"
   },
   "collectionRequest": {
     "notFound": "Collection request not found",
@@ -98,6 +110,7 @@
   "triage": {
     "requestNotFoundForCode": "No request found for the given code",
     "qrCodeNotLinked": "The QR code is not linked to a request",
-    "requestNotInTriage": "The request is not in collection/triage"
+    "requestNotInTriage": "The request is not in collection/triage",
+    "bagWithoutItems": "A bag cannot be closed without any registered items"
   }
 }

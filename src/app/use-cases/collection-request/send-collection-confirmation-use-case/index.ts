@@ -5,6 +5,8 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IEmailService } from '../../../services/interfaces/email.interface';
 import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { ICompanyMemberRepository } from '../../../../domain/company/company.repository';
+import { findCompanyManagerEmails } from '../../shared/company-managers.util';
 import { generateCollectionConfirmationToken } from '../collection-token.util';
 
 /**
@@ -21,6 +23,8 @@ export class SendCollectionConfirmationUseCase implements IUseCase<string, void>
     private readonly collectionRequestRepository: ICollectionRequestRepository,
     @Inject(SERVICE_TOKENS.EMAIL_SERVICE)
     private readonly emailService: IEmailService,
+    @Inject(DOMAIN_TOKENS.COMPANY_MEMBER_REPOSITORY)
+    private readonly companyMemberRepository: ICompanyMemberRepository,
   ) { }
 
   async call(collectionRequestId: string): Promise<void> {
@@ -44,8 +48,17 @@ export class SendCollectionConfirmationUseCase implements IUseCase<string, void>
       DATE_LOCALE[language],
     );
 
+    // Numa solicitação de empresa, confirma quem pediu (está no local) e o
+    // gestor fica a par.
+    const cc = await findCompanyManagerEmails(
+      this.companyMemberRepository,
+      pkg.companyId,
+      pkg.user.email,
+    );
+
     await this.emailService.send({
       to: pkg.user.email,
+      cc,
       template: 'collection-confirmation',
       locale: language,
       context: {

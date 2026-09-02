@@ -54,8 +54,12 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
     const offset = (pagination.page - 1) * pagination.limit;
     queryBuilder.skip(offset).take(pagination.limit);
 
-    // Ordenar por data de criação (mais recentes primeiro)
-    queryBuilder.orderBy('route.createdAt', 'DESC');
+    // Ordenar pela data da recolha (mais recentes primeiro), que é por onde o
+    // ecrã de gestão procura. `createdAt` desempata as recolhas do mesmo dia e
+    // garante uma ordem estável entre páginas.
+    queryBuilder
+      .orderBy('route.startDate', 'DESC')
+      .addOrderBy('route.createdAt', 'DESC');
 
     // Executar consulta
     const [data, total] = await queryBuilder.getManyAndCount();
@@ -81,6 +85,9 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
       .leftJoinAndSelect('driver.roles', 'driverRoles')
       .leftJoinAndSelect('route.collectionRequests', 'collectionRequests')
       .leftJoinAndSelect('collectionRequests.user', 'collectionRequestUser')
+      // Idem à listagem: o construtor de rotas mostra o crachá de empresa nas
+      // solicitações já atribuídas, e sem esta relação sai sem nome.
+      .leftJoinAndSelect('collectionRequests.company', 'collectionRequestCompany')
       .leftJoinAndSelect('collectionRequests.address', 'collectionRequestAddress')
       .where('route.id = :id', { id })
       .getOne();

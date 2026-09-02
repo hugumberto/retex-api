@@ -3,6 +3,11 @@ import { IAddressRepository } from './address/address.repository';
 import { IBlogCategoryRepository } from './blog-post/blog-category.repository';
 import { IBlogPostRepository } from './blog-post/blog-post.repository';
 import { IBrandRepository } from './brand/brand.repository';
+import {
+  ICompanyMemberRepository,
+  ICompanyProfileRepository,
+  ICompanyRepository,
+} from './company/company.repository';
 import { IEmailLogRepository } from './email-log/email-log.repository';
 import { IFaqCategoryRepository } from './faq/faq-category.repository';
 import { IFaqItemRepository } from './faq/faq-item.repository';
@@ -37,6 +42,9 @@ export interface DomainModuleOptions {
   faqCategoryRepository: Type<IFaqCategoryRepository>;
   faqItemRepository: Type<IFaqItemRepository>;
   emailLogRepository: Type<IEmailLogRepository>;
+  companyRepository: Type<ICompanyRepository>;
+  companyProfileRepository: Type<ICompanyProfileRepository>;
+  companyMemberRepository: Type<ICompanyMemberRepository>;
   unitOfWork: Type<IUnitOfWork>;
   imports?: Array<
     Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
@@ -119,6 +127,18 @@ export class DomainModule {
           useClass: options.emailLogRepository,
         },
         {
+          provide: DOMAIN_TOKENS.COMPANY_REPOSITORY,
+          useClass: options.companyRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.COMPANY_PROFILE_REPOSITORY,
+          useClass: options.companyProfileRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.COMPANY_MEMBER_REPOSITORY,
+          useClass: options.companyMemberRepository,
+        },
+        {
           provide: DOMAIN_TOKENS.UNIT_OF_WORK,
           useClass: options.unitOfWork,
         },
@@ -191,6 +211,18 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.EMAIL_LOG_REPOSITORY,
           useClass: options.emailLogRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.COMPANY_REPOSITORY,
+          useClass: options.companyRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.COMPANY_PROFILE_REPOSITORY,
+          useClass: options.companyProfileRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.COMPANY_MEMBER_REPOSITORY,
+          useClass: options.companyMemberRepository,
         },
         {
           provide: DOMAIN_TOKENS.UNIT_OF_WORK,

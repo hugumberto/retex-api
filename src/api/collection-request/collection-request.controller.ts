@@ -22,15 +22,14 @@ import { GetCollectionRequestsDto } from '../../app/use-cases/collection-request
 import { GetCollectionRequestByIdUseCase } from '../../app/use-cases/collection-request/get-collection-request-by-id-use-case';
 import { UpdateCollectionRequestUseCase } from '../../app/use-cases/collection-request/update-collection-request-use-case';
 import { UpdateCollectionRequestDto } from '../../app/use-cases/collection-request/update-collection-request-use-case/update-collection-request.dto';
+import { hasAnyRole } from '../../domain/user/role-hierarchy';
 import { Role } from '../../domain/user/user-roles.entity';
 import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 
 function requesterFrom(req: Request): { id: string; isPrivileged: boolean } {
   const user = req['user'] as JwtPayload;
-  const isPrivileged = !!user?.roles?.some(
-    (role) => role === Role.ADMIN || role === Role.OPS,
-  );
+  const isPrivileged = hasAnyRole(user?.roles, [Role.ADMIN, Role.OPS]);
   return { id: user?.sub, isPrivileged };
 }
 

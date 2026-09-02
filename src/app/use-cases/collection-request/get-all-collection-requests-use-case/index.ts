@@ -37,6 +37,8 @@ export class GetAllCollectionRequestsUseCase
       {
         status: param?.status,
         unrouted: param?.unrouted,
+        companyId: param?.companyId,
+        userId: param?.userId,
       },
       {
         page: param?.page || DEFAULT_PAGE,

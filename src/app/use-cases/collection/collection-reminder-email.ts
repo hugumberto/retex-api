@@ -10,6 +10,7 @@ import { SendEmailOptions } from '../../services/interfaces/email.interface';
  */
 export function buildCollectionReminderEmail(
   pkg: CollectionRequest,
+  cc: string[] = [],
 ): SendEmailOptions {
   // A data sai no formato do idioma do destinatário, tal como no email de
   // confirmação de coleta.
@@ -20,6 +21,7 @@ export function buildCollectionReminderEmail(
 
   return {
     to: pkg.user.email,
+    cc,
     template: 'collection-reminder',
     locale: language,
     context: {

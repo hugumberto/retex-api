@@ -3,6 +3,7 @@ import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { assertCanManageUser } from '../user-management.policy';
 import { UpdateUserParamDto } from './update-user-param.dto';
 
 @Injectable()
@@ -13,13 +14,15 @@ export class UpdateUserUseCase implements IUseCase<UpdateUserParamDto, Omit<User
   ) { }
 
   async call(param: UpdateUserParamDto): Promise<Omit<User, 'password'>> {
-    const { id, data } = param;
+    const { id, data, actor } = param;
 
-    // Verificar se usuário existe
-    const existingUser = await this.userRepository.findOne({ id });
+    // Com relações: os perfis do alvo decidem quem o pode editar.
+    const existingUser = await this.userRepository.findOneWithRelations({ id });
     if (!existingUser) {
       throw new NotFoundException('errors.user.notFound');
     }
+
+    assertCanManageUser(actor, existingUser);
 
     // Preparar dados para atualização
     const updateData: Partial<User> = { ...data };

@@ -17,6 +17,9 @@ import { faqCategorySchema } from './faq/faq-category.schema';
 import { faqItemSchema } from './faq/faq-item.schema';
 import { testZoneSchema } from './test-zone/test-zone.schema';
 import { userRoleSchema } from './user-role/user-role.schema';
+import { companyMemberSchema } from './company/company-member.schema';
+import { companyProfileSchema } from './company/company-profile.schema';
+import { companySchema } from './company/company.schema';
 import { refreshTokenSchema } from './user/refresh-token.schema';
 import { userSchema } from './user/user.schema';
 
@@ -43,6 +46,9 @@ import { userSchema } from './user/user.schema';
       faqCategorySchema,
       faqItemSchema,
       emailLogSchema,
+      companySchema,
+      companyProfileSchema,
+      companyMemberSchema,
     ]),
   ],
   exports: [TypeOrmModule],
