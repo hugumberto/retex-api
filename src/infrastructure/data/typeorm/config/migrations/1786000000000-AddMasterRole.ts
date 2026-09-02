@@ -29,20 +29,36 @@ export class AddMasterRole1786000000000 implements MigrationInterface {
       process.env.ADMIN_EMAIL ??
       (process.env.NODE_ENV === 'development' ? 'admin@retex.pt' : undefined);
 
-    if (!bootstrapEmail) return;
+    if (!bootstrapEmail) {
+      // Sem isto, um deploy sem ADMIN_EMAIL definida deixa o enum criado e o
+      // sistema sem nenhum MASTER — e sem nada no log que o denuncie.
+      console.warn(
+        '[AddMasterRole] ADMIN_EMAIL não definida: ninguém foi promovido a MASTER.',
+      );
+      return;
+    }
 
     // ADMIN passa a MASTER em vez de acumular as duas: o MASTER já inclui o
     // ADMIN pela hierarquia, portanto a segunda linha não acrescentava nada.
-    await queryRunner.query(
+    const promoted: unknown[] = await queryRunner.query(
       `UPDATE "user_role" ur
          SET "role" = 'MASTER'
        FROM "user" u
        WHERE ur."user_id" = u."id"
          AND ur."role" = 'ADMIN'
          AND ur."deleted_at" IS NULL
-         AND lower(u."email") = lower($1)`,
+         AND lower(u."email") = lower($1)
+       RETURNING 1`,
       [bootstrapEmail],
     );
+
+    if (promoted.length) {
+      console.log(`[AddMasterRole] ${bootstrapEmail} promovido a MASTER.`);
+    } else {
+      console.warn(
+        `[AddMasterRole] ${bootstrapEmail} não foi promovido: não existe ou já não era ADMIN. Confirme que há um MASTER.`,
+      );
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
