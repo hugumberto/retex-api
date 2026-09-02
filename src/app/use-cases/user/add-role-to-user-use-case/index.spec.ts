@@ -70,7 +70,7 @@ describe('AddRoleToUserUseCase', () => {
     ).rejects.toThrow(ForbiddenException);
   });
 
-  it('lets a MASTER promote someone, and MASTER replaces every other role', async () => {
+  it('keeps the roles exactly as sent — ADMIN/MASTER acumulam com as outras', async () => {
     const target = targetWith('u1', [Role.USER, Role.OPS]);
     userRepo.findOneWithRelations.mockResolvedValue(target);
     userRoleRepo.create.mockResolvedValue({} as never);
@@ -81,12 +81,31 @@ describe('AddRoleToUserUseCase', () => {
       actor: master,
     });
 
+    // OPS já lá estava e mantém-se; só MASTER é criada.
     expect(userRoleRepo.create).toHaveBeenCalledTimes(1);
     expect(userRoleRepo.create).toHaveBeenCalledWith({
       user: target,
       role: Role.MASTER,
     });
-    // USER e OPS saem: MASTER é exclusiva.
-    expect(userRoleRepo.delete).toHaveBeenCalledTimes(2);
+    // Sai apenas USER, que não veio no pedido.
+    expect(userRoleRepo.delete).toHaveBeenCalledTimes(1);
+  });
+
+  it('lets an ADMIN also be a DRIVER', async () => {
+    const target = targetWith('u1', [Role.ADMIN]);
+    userRepo.findOneWithRelations.mockResolvedValue(target);
+    userRoleRepo.create.mockResolvedValue({} as never);
+
+    await useCase.call({
+      userId: 'u1',
+      data: { roles: [Role.ADMIN, Role.DRIVER] },
+      actor: master,
+    });
+
+    expect(userRoleRepo.create).toHaveBeenCalledWith({
+      user: target,
+      role: Role.DRIVER,
+    });
+    expect(userRoleRepo.delete).not.toHaveBeenCalled();
   });
 });

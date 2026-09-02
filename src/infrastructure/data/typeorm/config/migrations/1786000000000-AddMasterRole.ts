@@ -31,8 +31,8 @@ export class AddMasterRole1786000000000 implements MigrationInterface {
 
     if (!bootstrapEmail) return;
 
-    // ADMIN passa a MASTER (que já o inclui na hierarquia) em vez de acumular as
-    // duas roles — mantém a exclusividade que o portal assume.
+    // ADMIN passa a MASTER em vez de acumular as duas: o MASTER já inclui o
+    // ADMIN pela hierarquia, portanto a segunda linha não acrescentava nada.
     await queryRunner.query(
       `UPDATE "user_role" ur
          SET "role" = 'MASTER'

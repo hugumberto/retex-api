@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUserRoleRepository } from '../../../../domain/user/user-role.repository';
-import { Role, UserRole } from '../../../../domain/user/user-roles.entity';
+import { UserRole } from '../../../../domain/user/user-roles.entity';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
@@ -38,21 +38,14 @@ export class AddRoleToUserUseCase implements IUseCase<AddRoleToUserParamDto, Omi
 
     assertCanAssignRoles(actor, incomingRoles);
 
-    // Regra: ADMIN e MASTER são exclusivas — se uma for atribuída, todas as
-    // outras roles são removidas. MASTER ganha ao ADMIN por já o incluir na
-    // hierarquia (ver `role-hierarchy.ts`).
-    const exclusiveRole = incomingRoles.includes(Role.MASTER)
-      ? Role.MASTER
-      : incomingRoles.includes(Role.ADMIN)
-        ? Role.ADMIN
-        : undefined;
-    const effectiveRoles = exclusiveRole ? [exclusiveRole] : incomingRoles;
+    assertNotSelfDemotion(actor, userId, incomingRoles);
 
-    assertNotSelfDemotion(actor, userId, effectiveRoles);
-
+    // Os perfis ficam exatamente como foram enviados: um ADMIN pode acumular
+    // OPS ou DRIVER, por exemplo. (Até aqui, atribuir ADMIN apagava todos os
+    // outros, o que impedia essas combinações sem o dizer a ninguém.)
     // Calcular diferenças
-    const rolesToAdd = effectiveRoles.filter((role) => !currentRoles.includes(role));
-    const rolesToRemove = currentRoles.filter((role) => !effectiveRoles.includes(role));
+    const rolesToAdd = incomingRoles.filter((role) => !currentRoles.includes(role));
+    const rolesToRemove = currentRoles.filter((role) => !incomingRoles.includes(role));
 
     // Adicionar novas roles
     for (const role of rolesToAdd) {
