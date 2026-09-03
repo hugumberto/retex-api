@@ -9,6 +9,7 @@ tempo de execução pela API — são todos para correr à mão.
 | `backfill-geocoding.ts` | `yarn geocode:backfill` | Preenche coordenadas em falta nas moradas | Não |
 | `db-refresh-from-prod.sh` | `yarn db:refresh` | Repõe a base local a partir de um dump da produção | **Sim** |
 | `blog-post-clean.sh` | — | Testa os endpoints do blog de ponta a ponta | **Sim** |
+| `seed-test-users.sql` | — | Cria um utilizador de teste por perfil (sem MASTER) | Não |
 
 ## Onde correr cada um
 
@@ -30,6 +31,9 @@ Isto é a fonte da maioria dos enganos, por isso vale a pena fixar:
 
 - **Os scripts bash** (`db:refresh`, `blog-post-clean.sh`) correm **no host**: o
   primeiro comanda o Docker, o segundo fala com a API por HTTP.
+
+- **O `seed-test-users.sql`** é SQL puro: corre-se com `psql` contra a base que
+  se quiser, dentro ou fora do Docker.
 
 > Nota: inicializar o `DATA_SOURCE` aplica migrações pendentes
 > (`migrationsRun: true` em `typeorm.config.ts`). Vale para os dois scripts
@@ -121,6 +125,49 @@ objetos que não existem em produção, o `DROP TABLE` fica bloqueado por
 dependências e a base acaba silenciosamente inconsistente. Durante o processo o
 contentor `application` é parado (para libertar ligações) e arrancado no fim, o
 que aplica as migrações pendentes.
+
+---
+
+## `seed-test-users.sql` — um utilizador por perfil
+
+Cria (ou repõe) quatro contas de teste, uma por perfil — ADMIN, OPS, DRIVER e
+USER. **MASTER não**: esse perfil gere os próprios admins e não é para andar em
+credenciais partilhadas.
+
+```bash
+# stack local do docker-compose
+docker exec -i postgresdb psql -U postgres -d retex -f - < scripts/seed-test-users.sql
+
+# qualquer outra base
+psql "$DATABASE_URL" -f scripts/seed-test-users.sql
+```
+
+| Perfil | Email | Senha |
+|---|---|---|
+| ADMIN | `admin.teste@retex.pt` | `Teste@2026` |
+| OPS | `ops.teste@retex.pt` | `Teste@2026` |
+| DRIVER | `motorista.teste@retex.pt` | `Teste@2026` |
+| USER | `cliente.teste@retex.pt` | `Teste@2026` |
+
+As contas nascem `ACTIVE`, portanto entram no portal sem passar pelo email de
+ativação. Ao cliente é criada uma morada na primeira cidade que existir em
+`test_zone`, senão a conta não consegue pedir uma recolha; se a base não tiver
+zonas nenhumas, o script avisa e a morada fica fora de zona.
+
+A senha vai como hash bcrypt pré-calculado (12 rounds, como o `CryptoService`) —
+a base não sabe fazer bcrypt. O hash está escrito com `#` no lugar do cifrão e é
+reposto por `replace(..., chr(36))`: há clientes SQL (DBeaver, entre outros) que
+leem o cifrão como delimitador de literal e partem o script ao meio antes de o
+enviar ao servidor. Para trocar a senha, gera outro hash e substitui a
+constante no topo do ficheiro:
+
+```bash
+docker exec -e PW='nova-senha' application \
+  node -e 'const b=require("bcryptjs");console.log(b.hashSync(process.env.PW,b.genSaltSync(12)))'
+```
+
+Pode ser corrido as vezes que forem precisas: repõe senha, estado e perfis, e
+não duplica contas nem moradas.
 
 ---
 
