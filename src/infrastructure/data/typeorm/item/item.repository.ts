@@ -4,6 +4,7 @@ import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
 import { SERVICE_TOKENS } from '../../../../app/services/tokens';
 import { DashboardScope } from '../../../../domain/collection-request/collection-request.repository';
+import { DateRange } from '../../../../domain/dashboard/date-range';
 import { Item } from '../../../../domain/item/item.entity';
 import {
   IItemRepository,
@@ -23,6 +24,28 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
     localStorageService: ILocalStorageService,
   ) {
     super(itemRepository, localStorageService);
+  }
+
+  async sumQuantityInRange(range: DateRange): Promise<number> {
+    const repository = await this.getRepository();
+    const queryBuilder = repository
+      .createQueryBuilder('item')
+      // Peças, e não linhas de item: cada lançamento traz uma quantidade.
+      .select('COALESCE(SUM(item.quantity), 0)', 'total');
+
+    if (range.from) {
+      queryBuilder.andWhere('item.created_at >= CAST(:from AS date)', {
+        from: range.from,
+      });
+    }
+    if (range.to) {
+      queryBuilder.andWhere('item.created_at < CAST(:to AS date) + 1', {
+        to: range.to,
+      });
+    }
+
+    const { total } = await queryBuilder.getRawOne<{ total: string }>();
+    return Number(total);
   }
 
   async findByIds(ids: string[]): Promise<Item[]> {

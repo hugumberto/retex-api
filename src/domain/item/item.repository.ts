@@ -1,4 +1,5 @@
 import { DashboardScope } from '../collection-request/collection-request.repository';
+import { DateRange } from '../dashboard/date-range';
 import { IRepository } from '../interfaces/repository.interface';
 import { Item } from './item.entity';
 
@@ -28,4 +29,6 @@ export interface IItemRepository extends IRepository<Item> {
     scope?: DashboardScope,
   ): Promise<ItemDimensionCount[]>;
   aggregateByBrand(scope?: DashboardScope): Promise<ItemBrandCount[]>;
+  /** Peças (soma das quantidades) lançadas na triagem dentro do intervalo. */
+  sumQuantityInRange(range: DateRange): Promise<number>;
 }

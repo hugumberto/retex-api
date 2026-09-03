@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
+import { DateRange } from '../../../../domain/dashboard/date-range';
 import { SERVICE_TOKENS } from '../../../../app/services/tokens';
 import {
   PaginatedResult,
@@ -171,6 +172,46 @@ export class CollectionRequestRepository
     if (scope?.userId) {
       queryBuilder.andWhere('collectionRequest.user_id = :scopeUserId', {
         scopeUserId: scope.userId,
+      });
+    }
+    return queryBuilder;
+  }
+
+  async countCreatedInRange(range: DateRange): Promise<number> {
+    const repository = await this.getRepository();
+    const queryBuilder = repository
+      .createQueryBuilder('collectionRequest')
+      .select('COUNT(*)', 'count');
+
+    const { count } = await this.applyDateRange(
+      queryBuilder,
+      'collectionRequest.created_at',
+      range,
+    ).getRawOne<{ count: string }>();
+
+    return Number(count);
+  }
+
+  /**
+   * Filtro de intervalo por dia. O `to` é inclusivo, daí o `+ 1` e o `<`: quem
+   * escolhe 3 de setembro quer o dia inteiro, não até à meia-noite dele.
+   *
+   * Os parâmetros vão com CAST explícito — sem ele o Postgres recebe-os como
+   * `unknown`, escolhe o operador errado para a aritmética de datas e falha.
+   */
+  private applyDateRange<T>(
+    queryBuilder: SelectQueryBuilder<T>,
+    column: string,
+    range: DateRange,
+  ): SelectQueryBuilder<T> {
+    if (range.from) {
+      queryBuilder.andWhere(`${column} >= CAST(:from AS date)`, {
+        from: range.from,
+      });
+    }
+    if (range.to) {
+      queryBuilder.andWhere(`${column} < CAST(:to AS date) + 1`, {
+        to: range.to,
       });
     }
     return queryBuilder;
