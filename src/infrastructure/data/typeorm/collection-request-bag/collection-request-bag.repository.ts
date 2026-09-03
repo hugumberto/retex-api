@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ILocalStorageService } from '../../../../app/services/local-storage/local-storage.service';
 import { SERVICE_TOKENS } from '../../../../app/services/tokens';
 import { CollectionRequestBag } from '../../../../domain/collection-request-bag/collection-request-bag.entity';
 import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
+import { DateRange } from '../../../../domain/dashboard/date-range';
 import { BaseRepository } from '../abstraction/base.repository';
 import { collectionRequestBagSchema } from './collection-request-bag.schema';
 
@@ -20,6 +21,48 @@ export class CollectionRequestBagRepository
     localStorageService: ILocalStorageService,
   ) {
     super(collectionRequestBagRepository, localStorageService);
+  }
+
+  async countRequestsCollectedInRange(range: DateRange): Promise<number> {
+    return this.countDistinctRequests('bag.used_at', range);
+  }
+
+  async countRequestsTriagedInRange(range: DateRange): Promise<number> {
+    return this.countDistinctRequests('bag.processed_at', range);
+  }
+
+  /**
+   * Solicitações distintas com pelo menos um saco cuja `column` cai no
+   * intervalo. Sacos soltos (sem solicitação) não contam para nada aqui.
+   *
+   * O `to` é inclusivo — daí o `+ 1` e o `<`. Os parâmetros vão com CAST
+   * explícito: sem ele o Postgres trata-os como `unknown` e escolhe o operador
+   * errado na aritmética de datas.
+   */
+  private async countDistinctRequests(
+    column: string,
+    range: DateRange,
+  ): Promise<number> {
+    const repository = await this.getRepository();
+    const queryBuilder: SelectQueryBuilder<CollectionRequestBag> = repository
+      .createQueryBuilder('bag')
+      .select('COUNT(DISTINCT bag.collection_request_id)', 'count')
+      .where(`${column} IS NOT NULL`)
+      .andWhere('bag.collection_request_id IS NOT NULL');
+
+    if (range.from) {
+      queryBuilder.andWhere(`${column} >= CAST(:from AS date)`, {
+        from: range.from,
+      });
+    }
+    if (range.to) {
+      queryBuilder.andWhere(`${column} < CAST(:to AS date) + 1`, {
+        to: range.to,
+      });
+    }
+
+    const { count } = await queryBuilder.getRawOne<{ count: string }>();
+    return Number(count);
   }
 
   async deleteExpiredUnused(olderThan: Date): Promise<number> {
