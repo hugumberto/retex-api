@@ -1,5 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
-import { isUuid, resolveEntityId } from './identifier.util';
+import {
+  isUuid,
+  normalizeFriendlyCode,
+  resolveEntityId,
+} from './identifier.util';
 
 const UUID = '4f00094b-59b1-45cd-82a9-d6b32357ec07';
 
@@ -13,6 +17,16 @@ describe('isUuid', () => {
   it('rejects a friendly code', () => {
     expect(isUuid('2026-NR38BC')).toBe(false);
     expect(isUuid('')).toBe(false);
+  });
+});
+
+describe('normalizeFriendlyCode', () => {
+  it('passa a maiúsculas e tira os espaços', () => {
+    expect(normalizeFriendlyCode('  2026-nr38bc ')).toBe('2026-NR38BC');
+  });
+
+  it('deixa intacto um código já normalizado', () => {
+    expect(normalizeFriendlyCode('2026-NR38BC')).toBe('2026-NR38BC');
   });
 });
 
@@ -31,6 +45,15 @@ describe('resolveEntityId', () => {
 
     await expect(
       resolveEntityId('2026-NR38BC', findByFriendlyCode, 'errors.route.notFound'),
+    ).resolves.toBe(UUID);
+    expect(findByFriendlyCode).toHaveBeenCalledWith('2026-NR38BC');
+  });
+
+  it('procura o código em maiúsculas, seja qual for a caixa digitada', async () => {
+    const findByFriendlyCode = jest.fn().mockResolvedValue({ id: UUID });
+
+    await expect(
+      resolveEntityId(' 2026-nr38bc ', findByFriendlyCode, 'errors.route.notFound'),
     ).resolves.toBe(UUID);
     expect(findByFriendlyCode).toHaveBeenCalledWith('2026-NR38BC');
   });

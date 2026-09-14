@@ -11,6 +11,7 @@ import { CollectionRequestBag } from '../../../../domain/collection-request-bag/
 import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
+import { normalizeFriendlyCode } from '../../shared/identifier.util';
 import { BindQrCodeDto } from './bind-qr-code.dto';
 
 export { BindQrCodeDto };
@@ -39,10 +40,14 @@ export class BindQrCodeUseCase implements IUseCase<BindQrCodeParams, CollectionR
       throw new BadRequestException('errors.collection.notAwaitingPickup');
     }
 
-    // Aceita o token (escaneado) ou o código amigável (digitado).
+    // Aceita o token (escaneado) ou o código amigável (digitado). O token vai
+    // como veio — é hexadecimal minúsculo; o código é normalizado, porque quem
+    // o lê da etiqueta não tem de acertar nas maiúsculas.
     let bag = await this.collectionRequestBagRepository.findOne({ token: code });
     if (!bag) {
-      bag = await this.collectionRequestBagRepository.findOne({ friendlyCode: code });
+      bag = await this.collectionRequestBagRepository.findOne({
+        friendlyCode: normalizeFriendlyCode(code),
+      });
     }
     if (!bag) {
       throw new NotFoundException('errors.qrCode.notFound');

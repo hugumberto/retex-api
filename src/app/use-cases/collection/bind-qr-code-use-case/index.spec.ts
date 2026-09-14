@@ -96,4 +96,17 @@ describe('BindQrCodeUseCase', () => {
     expect(collectionRequestBagRepo.findOne).toHaveBeenNthCalledWith(2, { friendlyCode: '2026-ABC123' });
     expect(collectionRequestBagRepo.update).toHaveBeenCalled();
   });
+
+  it('normaliza o código amigável mas não o token', async () => {
+    collectionRequestRepo.findOneWithAllRelations.mockResolvedValue(waiting);
+    collectionRequestBagRepo.findOne
+      .mockResolvedValueOnce(undefined) // por token
+      .mockResolvedValueOnce({ id: 'q2', usedAt: null } as CollectionRequestBag);
+    collectionRequestBagRepo.update.mockResolvedValue([{ id: 'q2' } as CollectionRequestBag]);
+
+    await useCase.call({ collectionRequestId: 'p1', code: '2026-abc123' });
+
+    expect(collectionRequestBagRepo.findOne).toHaveBeenNthCalledWith(1, { token: '2026-abc123' });
+    expect(collectionRequestBagRepo.findOne).toHaveBeenNthCalledWith(2, { friendlyCode: '2026-ABC123' });
+  });
 });

@@ -52,6 +52,16 @@ describe('GetCollectionRequestDetailUseCase', () => {
     expect(result.collectionRequest).toBe(entity);
   });
 
+  it('resolve o código da solicitação seja qual for a caixa digitada', async () => {
+    collectionRequestRepo.findOne.mockResolvedValue(entity);
+
+    await useCase.call(' 2026-nr38bc ');
+
+    expect(collectionRequestRepo.findOne).toHaveBeenCalledWith({
+      friendlyCode: '2026-NR38BC',
+    });
+  });
+
   it('resolves by a bag token', async () => {
     collectionRequestRepo.findOne.mockResolvedValue(null);
     bagRepo.findOne.mockResolvedValueOnce({ collectionRequestId: UUID } as CollectionRequestBag);
