@@ -5,7 +5,10 @@ import { CollectionRequestBag } from '../../../../domain/collection-request-bag/
 import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
-import { isUuid } from '../../shared/identifier.util';
+import {
+  isUuid,
+  normalizeFriendlyCode,
+} from '../../shared/identifier.util';
 
 export interface CollectionRequestDetail {
   collectionRequest: CollectionRequest;
@@ -57,6 +60,10 @@ export class GetCollectionRequestDetailUseCase
    * Tenta, por esta ordem: UUID da solicitação, código amigável da solicitação,
    * token do saco, código amigável do saco. A ordem importa — o UUID é o caso
    * barato e os códigos de saco são os menos frequentes.
+   *
+   * Os códigos são procurados normalizados (quem os digita a partir da etiqueta
+   * não tem de acertar nas maiúsculas); o token vai tal como veio, porque é
+   * hexadecimal minúsculo lido do QR.
    */
   private async resolve(identifier: string): Promise<string> {
     const value = identifier.trim();
@@ -65,8 +72,10 @@ export class GetCollectionRequestDetailUseCase
       return value;
     }
 
+    const code = normalizeFriendlyCode(value);
+
     const byCollectionRequest = await this.collectionRequestRepository.findOne({
-      friendlyCode: value,
+      friendlyCode: code,
     } as Partial<CollectionRequest>);
     if (byCollectionRequest) {
       return byCollectionRequest.id;
@@ -80,7 +89,7 @@ export class GetCollectionRequestDetailUseCase
     }
 
     const byBagCode = await this.collectionRequestBagRepository.findOne({
-      friendlyCode: value,
+      friendlyCode: code,
     });
     if (byBagCode?.collectionRequestId) {
       return byBagCode.collectionRequestId;
