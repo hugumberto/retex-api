@@ -15,6 +15,21 @@ export function isUuid(value: string): boolean {
 }
 
 /**
+ * Normaliza um código amigável para a forma em que está gravado.
+ *
+ * Os códigos são sempre gerados em maiúsculas (ver `FRIENDLY_ALPHABET` em
+ * `bag.util.ts` e o backfill das migrações), pelo que passar a entrada a
+ * maiúsculas basta para a procura deixar de ser sensível a maiúsculas —
+ * sem `citext` nem índice funcional, e o índice único continua válido.
+ *
+ * Aplica-se só ao código: o token do QR é hexadecimal minúsculo e uma
+ * normalização destas partiria a leitura.
+ */
+export function normalizeFriendlyCode(value: string): string {
+  return value.trim().toUpperCase();
+}
+
+/**
  * Devolve o `id` a partir de um identificador que tanto pode ser o UUID como o
  * código amigável. Quando não é UUID, delega a procura em `findByFriendlyCode`.
  *
@@ -31,7 +46,7 @@ export async function resolveEntityId<T extends { id: string }>(
     return value;
   }
 
-  const found = await findByFriendlyCode(value);
+  const found = await findByFriendlyCode(normalizeFriendlyCode(value));
 
   if (!found) {
     throw new NotFoundException(notFoundKey);
