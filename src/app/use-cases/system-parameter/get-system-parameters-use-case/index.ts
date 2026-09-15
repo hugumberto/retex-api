@@ -10,6 +10,7 @@ const DEFAULT_QR_CODE_THRESHOLD_PERCENTAGE = 10;
 const DEFAULT_LABEL_WIDTH_MM = 50;
 const DEFAULT_LABEL_HEIGHT_MM = 30;
 const DEFAULT_LABEL_QR_SIZE_MM = 24;
+const DEFAULT_LABEL_ROTATION_DEG = 0;
 
 @Injectable()
 export class GetSystemParametersUseCase implements IUseCase<void, SystemParameter> {
@@ -30,6 +31,7 @@ export class GetSystemParametersUseCase implements IUseCase<void, SystemParamete
       labelWidthMm: DEFAULT_LABEL_WIDTH_MM,
       labelHeightMm: DEFAULT_LABEL_HEIGHT_MM,
       labelQrSizeMm: DEFAULT_LABEL_QR_SIZE_MM,
+      labelRotationDeg: DEFAULT_LABEL_ROTATION_DEG,
     });
   }
 }

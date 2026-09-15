@@ -40,6 +40,12 @@ export const systemParameterSchema = new EntitySchema<SystemParameter>({
       default: 24,
       name: 'label_qr_size_mm',
     },
+    labelRotationDeg: {
+      type: 'integer',
+      nullable: false,
+      default: 0,
+      name: 'label_rotation_deg',
+    },
     ...BaseTimestampColumns,
   },
 });
