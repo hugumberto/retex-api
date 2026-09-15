@@ -112,5 +112,8 @@
     "qrCodeNotLinked": "The QR code is not linked to a request",
     "requestNotInTriage": "The request is not in collection/triage",
     "bagWithoutItems": "A bag cannot be closed without any registered items"
+  },
+  "systemParameter": {
+    "qrLargerThanLabel": "The QR does not fit the label at the given size"
   }
 }

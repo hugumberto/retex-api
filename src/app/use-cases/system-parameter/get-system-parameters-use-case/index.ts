@@ -6,6 +6,10 @@ import { IUseCase } from '../../interfaces/use-case.interface';
 
 const DEFAULT_CONFIRMATION_DEADLINE_DAYS = 2;
 const DEFAULT_QR_CODE_THRESHOLD_PERCENTAGE = 10;
+// O rolo em uso: 50x30mm, com o QR a ocupar a altura útil.
+const DEFAULT_LABEL_WIDTH_MM = 50;
+const DEFAULT_LABEL_HEIGHT_MM = 30;
+const DEFAULT_LABEL_QR_SIZE_MM = 24;
 
 @Injectable()
 export class GetSystemParametersUseCase implements IUseCase<void, SystemParameter> {
@@ -23,6 +27,9 @@ export class GetSystemParametersUseCase implements IUseCase<void, SystemParamete
     return this.systemParameterRepository.create({
       collectionConfirmationDeadlineDays: DEFAULT_CONFIRMATION_DEADLINE_DAYS,
       qrCodeThresholdPercentage: DEFAULT_QR_CODE_THRESHOLD_PERCENTAGE,
+      labelWidthMm: DEFAULT_LABEL_WIDTH_MM,
+      labelHeightMm: DEFAULT_LABEL_HEIGHT_MM,
+      labelQrSizeMm: DEFAULT_LABEL_QR_SIZE_MM,
     });
   }
 }

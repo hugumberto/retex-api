@@ -5,4 +5,11 @@ export interface SystemParameter extends Entity {
   collectionConfirmationDeadlineDays: number
   // Percentual extra (threshold) de QR codes gerados sobre os volumes informados.
   qrCodeThresholdPercentage: number
+  // Etiqueta de saco, em milímetros. O rolo de etiquetas muda com a compra, e
+  // até agora a medida estava fixa no CSS de impressão do portal.
+  labelWidthMm: number
+  labelHeightMm: number
+  // Lado do QR impresso. É o que decide se a câmara o consegue ler, por isso
+  // fica separado do tamanho da etiqueta em vez de ser deduzido dele.
+  labelQrSizeMm: number
 }

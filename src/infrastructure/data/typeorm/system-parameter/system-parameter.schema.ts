@@ -22,6 +22,24 @@ export const systemParameterSchema = new EntitySchema<SystemParameter>({
       default: 10,
       name: 'qr_code_threshold_percentage',
     },
+    labelWidthMm: {
+      type: 'integer',
+      nullable: false,
+      default: 50,
+      name: 'label_width_mm',
+    },
+    labelHeightMm: {
+      type: 'integer',
+      nullable: false,
+      default: 30,
+      name: 'label_height_mm',
+    },
+    labelQrSizeMm: {
+      type: 'integer',
+      nullable: false,
+      default: 24,
+      name: 'label_qr_size_mm',
+    },
     ...BaseTimestampColumns,
   },
 });
