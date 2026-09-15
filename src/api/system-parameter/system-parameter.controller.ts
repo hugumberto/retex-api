@@ -15,7 +15,12 @@ export class SystemParameterController {
     private readonly updateSystemParametersUseCase: UpdateSystemParametersUseCase,
   ) { }
 
+  // A impressão de etiquetas vive em /portal/package-collection, aberto a OPS e
+  // DRIVER. Sem isto, só um ADMIN conseguia imprimir com as medidas certas — os
+  // outros levavam 403 e caíam nos valores por omissão sem perceber porquê.
+  // Escrever continua a ser exclusivo do ADMIN, pela regra da classe.
   @Get()
+  @Roles(Role.ADMIN, Role.OPS, Role.DRIVER)
   async get() {
     return this.getSystemParametersUseCase.call();
   }
