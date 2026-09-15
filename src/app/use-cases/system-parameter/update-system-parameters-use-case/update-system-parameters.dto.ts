@@ -1,4 +1,4 @@
-import { IsInt, Max, Min } from 'class-validator';
+import { IsIn, IsInt, Max, Min } from 'class-validator';
 
 export class UpdateSystemParametersDto {
   @IsInt()
@@ -28,4 +28,9 @@ export class UpdateSystemParametersDto {
   @Min(10)
   @Max(200)
   labelQrSizeMm: number;
+
+  // Só múltiplos de 90: qualquer outro ângulo deixaria o conteúdo a transbordar
+  // da etiqueta, sem hipótese de o enquadrar.
+  @IsIn([0, 90, 180, 270])
+  labelRotationDeg: number;
 }

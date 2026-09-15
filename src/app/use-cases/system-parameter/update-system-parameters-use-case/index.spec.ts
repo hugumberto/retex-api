@@ -16,6 +16,7 @@ const validDto = (): UpdateSystemParametersDto => ({
   labelWidthMm: 50,
   labelHeightMm: 30,
   labelQrSizeMm: 24,
+  labelRotationDeg: 0,
 });
 
 describe('UpdateSystemParametersUseCase', () => {
@@ -65,6 +66,15 @@ describe('UpdateSystemParametersUseCase', () => {
 
   // A regra não cabe no DTO: os três valores só fazem sentido uns face aos
   // outros, e gravar um QR a mais dava uma folha inteira de etiquetas cortadas.
+  it('grava a rotação escolhida', async () => {
+    await useCase.call({ ...validDto(), labelRotationDeg: 90 });
+
+    expect(repository.update).toHaveBeenCalledWith(
+      { id: 'sp-1' },
+      expect.objectContaining({ labelRotationDeg: 90 }),
+    );
+  });
+
   it('recusa um QR mais alto do que a altura útil da etiqueta', async () => {
     // 30mm de altura menos 2mm de margem de cada lado deixam 26mm.
     await expect(
