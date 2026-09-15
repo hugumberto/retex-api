@@ -10,7 +10,9 @@ const DEFAULT_QR_CODE_THRESHOLD_PERCENTAGE = 10;
 const DEFAULT_LABEL_WIDTH_MM = 50;
 const DEFAULT_LABEL_HEIGHT_MM = 30;
 const DEFAULT_LABEL_QR_SIZE_MM = 24;
-const DEFAULT_LABEL_ROTATION_DEG = 0;
+// 90 graus: nas impressoras em uso, a cabeça térmica imprime ao alto, e sem
+// rodar o conteúdo saía deitado na etiqueta.
+const DEFAULT_LABEL_ROTATION_DEG = 90;
 
 @Injectable()
 export class GetSystemParametersUseCase implements IUseCase<void, SystemParameter> {

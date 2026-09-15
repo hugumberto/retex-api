@@ -43,7 +43,7 @@ export const systemParameterSchema = new EntitySchema<SystemParameter>({
     labelRotationDeg: {
       type: 'integer',
       nullable: false,
-      default: 0,
+      default: 90,
       name: 'label_rotation_deg',
     },
     ...BaseTimestampColumns,
