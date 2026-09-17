@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import * as ptEmail from '../../../i18n/pt/email.json';
 import { TemplateEngine } from './template.engine';
 
@@ -53,8 +55,8 @@ describe('TemplateEngine (shared partials)', () => {
     });
 
     // layout shell
-    expect(html).toContain('https://www.retex.pt/assets/logo.png');
-    expect(html).toContain('https://www.retex.pt/assets/logo-white.png');
+    expect(html).toContain('https://retex.pt/assets/logo.png');
+    expect(html).toContain('https://retex.pt/assets/logo-white.png');
     expect(html).toContain('&copy;2026 RETEX');
     expect(html).toContain('<html lang="pt">');
     expect(html).toContain('<title>Ative a sua conta Retex</title>');
@@ -189,6 +191,33 @@ describe('TemplateEngine (shared partials)', () => {
 
         expect(html).toContain(`<html lang="${lang}">`);
       }
+    }
+  });
+  /**
+   * As imagens dos emails estiveram meses partidas: o template de confirmação
+   * apontava para anexos do CDN do Discord, cujos URLs são assinados e
+   * expiram. Nenhum teste apanhava isso, por isso só se soube por quem recebeu
+   * o email. Todas as imagens têm de sair de `assetsBaseUrl`, que é domínio
+   * nosso e servido a partir do site.
+   */
+  it('não tem imagens presas a domínios externos', () => {
+    const templatesDir = path.join(__dirname, 'templates');
+    const ficheiros = [
+      ...fs.readdirSync(templatesDir),
+      ...fs
+        .readdirSync(path.join(templatesDir, 'partials'))
+        .map((f) => path.join('partials', f)),
+    ].filter((f) => f.endsWith('.hbs'));
+
+    expect(ficheiros.length).toBeGreaterThan(0);
+
+    for (const ficheiro of ficheiros) {
+      const html = fs.readFileSync(path.join(templatesDir, ficheiro), 'utf-8');
+      const externos = [...html.matchAll(/src="(https?:\/\/[^"]+)"/g)].map(
+        (m) => m[1],
+      );
+
+      expect({ ficheiro, externos }).toEqual({ ficheiro, externos: [] });
     }
   });
 });
