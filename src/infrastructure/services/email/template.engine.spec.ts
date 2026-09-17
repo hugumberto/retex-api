@@ -55,8 +55,8 @@ describe('TemplateEngine (shared partials)', () => {
     });
 
     // layout shell
-    expect(html).toContain('https://www.retex.pt/assets/logo.png');
-    expect(html).toContain('https://www.retex.pt/assets/logo-white.png');
+    expect(html).toContain('https://retex.pt/assets/logo.png');
+    expect(html).toContain('https://retex.pt/assets/logo-white.png');
     expect(html).toContain('&copy;2026 RETEX');
     expect(html).toContain('<html lang="pt">');
     expect(html).toContain('<title>Ative a sua conta Retex</title>');
