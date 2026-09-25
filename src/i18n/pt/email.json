@@ -74,7 +74,8 @@
     "rejectLabel": "Não vou poder — remover da recolha",
     "rejectNotice": "Se preferir não receber neste dia, use o botão \"Não vou poder\" acima — a sua solicitação será removida desta recolha.",
     "linkNotice": "Se os botões não funcionarem, copie e cole o seguinte endereço no seu navegador:",
-    "signature": "A sua equipa <strong>RETEX Portugal</strong>"
+    "signature": "A sua equipa <strong>RETEX Portugal</strong>",
+    "dontsAlt": "O que NÃO recolhemos: calçado, malas e acessórios, artigos volumosos, têxtil lar, brinquedos, eletrodomésticos, artigos contaminados e livros."
   },
   "collection-reminder": {
     "subject": "A sua recolha Retex é amanhã",
@@ -90,7 +91,8 @@
     "cityLabel": "Cidade",
     "zipLabel": "Código-Postal",
     "prepNotice": "Deixe os seus volumes prontos e acessíveis para que o nosso motorista os possa recolher sem demora.",
-    "signature": "A sua equipa <strong>RETEX Portugal</strong>"
+    "signature": "A sua equipa <strong>RETEX Portugal</strong>",
+    "dontsAlt": "O que NÃO recolhemos: calçado, malas e acessórios, artigos volumosos, têxtil lar, brinquedos, eletrodomésticos, artigos contaminados e livros."
   },
   "package-confirmation": {
     "subject": "O seu pacote foi registado!",
@@ -102,6 +104,7 @@
     "detailsNote": "Encontre no final deste email, os detalhes da sua encomenda.",
     "contactNote": "Caso necessite de mais informações sobre o seu processo, não hesite em contactar-nos através do <a href=\"https://www.retex.pt/#form\" style=\"color:#02748E;text-decoration:none;font-weight:bold;\">formulário de contacto</a>, disponível <a href=\"https://www.retex.pt/#form\" style=\"color:#02748E;text-decoration:none;font-weight:bold;\">aqui</a>.",
     "signature": "A sua equipa <strong>RETEX Portugal</strong>",
+    "dontsAlt": "O que NÃO recolhemos: calçado, malas e acessórios, artigos volumosos, têxtil lar, brinquedos, eletrodomésticos, artigos contaminados e livros.",
     "detailsHeader": "DETALHES DO PROCESSO DE REGISTO",
     "codeLabel": "Código",
     "nameLabel": "Nome",

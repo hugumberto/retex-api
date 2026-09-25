@@ -1,0 +1,23 @@
+<!--
+  Banner "O que NÃO recolhemos".
+
+  A arte é por idioma (`donts-{{lang}}.jpg`) porque o texto está dentro da
+  imagem; os ficheiros vivem em retex-web/.../public/assets/emails (ver README
+  dessa pasta). Servem-se duas versões: a desktop por omissão e a mobile trocada
+  pela media query `.donts-*` declarada no <head>. O Outlook ignora media
+  queries e fica com a desktop — daí a mobile estar escondida com `mso-hide`.
+-->
+<tr>
+  <td style="padding:0;font-size:0;line-height:0;">
+    <img class="donts-desktop"
+      src="{{assetsBaseUrl}}/assets/emails/donts-{{lang}}.jpg"
+      alt="{{t "dontsAlt"}}" width="600"
+      style="display:block;width:100%;max-width:600px;height:auto;border:0;" />
+    <!--[if !mso]><!-->
+    <img class="donts-mobile"
+      src="{{assetsBaseUrl}}/assets/emails/donts-{{lang}}-mobile.jpg"
+      alt="{{t "dontsAlt"}}" width="600"
+      style="display:none;width:0;max-height:0;overflow:hidden;mso-hide:all;border:0;" />
+    <!--<![endif]-->
+  </td>
+</tr>

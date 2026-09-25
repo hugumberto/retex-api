@@ -1,0 +1,24 @@
+<!--
+  Regras responsivas partilhadas. Emails não carregam CSS externo, por isso vão
+  inline no <head> de cada template; clientes que ignoram <style> (Outlook
+  desktop) ficam com o layout desktop, que é o default nos estilos inline.
+-->
+<style type="text/css">
+  @media only screen and (max-width: 600px) {
+    /* Troca o banner "o que não recolhemos" pela arte preparada para ecrãs pequenos. */
+    .donts-desktop {
+      display: none !important;
+      width: 0 !important;
+      max-height: 0 !important;
+      overflow: hidden !important;
+    }
+
+    .donts-mobile {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      max-height: none !important;
+      height: auto !important;
+    }
+  }
+</style>
