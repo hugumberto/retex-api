@@ -74,7 +74,8 @@
     "rejectLabel": "Je ne serai pas disponible — me retirer de la collecte",
     "rejectNotice": "Si ce jour ne vous convient pas, utilisez le bouton « Je ne serai pas disponible » ci-dessus — votre demande sera retirée de cette collecte.",
     "linkNotice": "Si les boutons ne fonctionnent pas, copiez et collez l'adresse suivante dans votre navigateur :",
-    "signature": "Votre équipe <strong>RETEX Portugal</strong>"
+    "signature": "Votre équipe <strong>RETEX Portugal</strong>",
+    "dontsAlt": "Ce que nous NE collectons PAS : chaussures, sacs et accessoires, objets volumineux, textile de maison, jouets, électroménager, articles contaminés et livres."
   },
   "collection-reminder": {
     "subject": "Votre collecte Retex a lieu demain",
@@ -90,7 +91,8 @@
     "cityLabel": "Ville",
     "zipLabel": "Code postal",
     "prepNotice": "Préparez vos colis et rendez-les accessibles afin que notre chauffeur puisse les collecter sans attendre.",
-    "signature": "Votre équipe <strong>RETEX Portugal</strong>"
+    "signature": "Votre équipe <strong>RETEX Portugal</strong>",
+    "dontsAlt": "Ce que nous NE collectons PAS : chaussures, sacs et accessoires, objets volumineux, textile de maison, jouets, électroménager, articles contaminés et livres."
   },
   "package-confirmation": {
     "subject": "Votre colis a bien été enregistré !",
@@ -102,6 +104,7 @@
     "detailsNote": "Vous trouverez les détails de votre demande à la fin de cet e-mail.",
     "contactNote": "Si vous avez besoin de plus d'informations sur votre dossier, n'hésitez pas à nous contacter via le <a href=\"https://www.retex.pt/#form\" style=\"color:#02748E;text-decoration:none;font-weight:bold;\">formulaire de contact</a>, disponible <a href=\"https://www.retex.pt/#form\" style=\"color:#02748E;text-decoration:none;font-weight:bold;\">ici</a>.",
     "signature": "Votre équipe <strong>RETEX Portugal</strong>",
+    "dontsAlt": "Ce que nous NE collectons PAS : chaussures, sacs et accessoires, objets volumineux, textile de maison, jouets, électroménager, articles contaminés et livres.",
     "detailsHeader": "DÉTAILS DU DOSSIER D'ENREGISTREMENT",
     "codeLabel": "Code",
     "nameLabel": "Nom",

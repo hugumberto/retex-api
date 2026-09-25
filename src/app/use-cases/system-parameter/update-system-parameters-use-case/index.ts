@@ -34,6 +34,7 @@ export class UpdateSystemParametersUseCase
         labelWidthMm: param.labelWidthMm,
         labelHeightMm: param.labelHeightMm,
         labelQrSizeMm: param.labelQrSizeMm,
+        labelRotationDeg: param.labelRotationDeg,
       });
     }
 
@@ -46,6 +47,7 @@ export class UpdateSystemParametersUseCase
         labelWidthMm: param.labelWidthMm,
         labelHeightMm: param.labelHeightMm,
         labelQrSizeMm: param.labelQrSizeMm,
+        labelRotationDeg: param.labelRotationDeg,
       },
     );
     return updated;

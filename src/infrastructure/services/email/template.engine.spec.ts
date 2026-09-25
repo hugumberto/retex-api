@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import * as ptEmail from '../../../i18n/pt/email.json';
 import { TemplateEngine } from './template.engine';
 
@@ -43,6 +45,69 @@ function render(
   );
 }
 
+const LANGS = ['pt', 'en', 'es', 'fr'] as const;
+
+function loadMessages(lang: string): Record<string, unknown> {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  return require(`../../../i18n/${lang}/email.json`);
+}
+
+/** Contexto mínimo para cada template renderizar sem buracos. */
+const FIXTURES: Record<string, Record<string, unknown>> = {
+  'account-activation': { activationUrl: 'https://x.pt/a' },
+  'password-reset': { resetUrl: 'https://x.pt/r' },
+  'out-of-service-zone': { city: 'Porto' },
+  'contact-form': {
+    name: 'Ana',
+    email: 'a@x.pt',
+    phone: '910000000',
+    contactTitle: 'Olá',
+    message: 'Texto',
+  },
+  survey: { surveyUrl: 'https://x.pt/s' },
+  'collection-cancelled': {
+    reason: 'Sem acesso',
+    friendlyCode: '2026-000001',
+  },
+  'collection-confirmation': {
+    friendlyCode: '2026-000001',
+    collectionDate: '13/05/2026',
+    collectionInterval: '09h-12h',
+    confirmUrl: 'https://x.pt/c',
+    rejectUrl: 'https://x.pt/j',
+  },
+  'collection-reminder': {
+    friendlyCode: '2026-000001',
+    collectionDate: '13/05/2026',
+    collectionInterval: '09:00 - 13:00',
+    address: {
+      street: 'Rua A',
+      number: '1',
+      city: 'Porto',
+      countryDivision: 'Porto',
+      zipCode: '4000-000',
+    },
+  },
+  'package-confirmation': {
+    fullName: 'Ana Silva',
+    friendlyCode: '2026-000001',
+    statusKey: 'status.CREATED',
+    address: {
+      street: 'Rua A',
+      number: '1',
+      city: 'Porto',
+      zipCode: '4000-000',
+    },
+  },
+};
+
+const baseContext = (context: Record<string, unknown>) => ({
+  firstName: 'Ana',
+  lastName: 'Silva',
+  year: 2026,
+  ...context,
+});
+
 describe('TemplateEngine (shared partials)', () => {
   it('renders account-activation through the layout/cta/eyebrow partials', () => {
     const html = render('account-activation', {
@@ -53,8 +118,8 @@ describe('TemplateEngine (shared partials)', () => {
     });
 
     // layout shell
-    expect(html).toContain('https://www.retex.pt/assets/logo.png');
-    expect(html).toContain('https://www.retex.pt/assets/logo-white.png');
+    expect(html).toContain('https://retex.pt/assets/logo.png');
+    expect(html).toContain('https://retex.pt/assets/logo-white.png');
     expect(html).toContain('&copy;2026 RETEX');
     expect(html).toContain('<html lang="pt">');
     expect(html).toContain('<title>Ative a sua conta Retex</title>');
@@ -127,68 +192,93 @@ describe('TemplateEngine (shared partials)', () => {
   // Rede de segurança das traduções: qualquer chave que um template use e que
   // falte num idioma faz este teste rebentar com o nome da chave.
   it('renders every template in every language without missing keys', () => {
-    const fixtures: Record<string, Record<string, unknown>> = {
-      'account-activation': { activationUrl: 'https://x.pt/a' },
-      'password-reset': { resetUrl: 'https://x.pt/r' },
-      'out-of-service-zone': { city: 'Porto' },
-      'contact-form': {
-        name: 'Ana',
-        email: 'a@x.pt',
-        phone: '910000000',
-        contactTitle: 'Olá',
-        message: 'Texto',
-      },
-      survey: { surveyUrl: 'https://x.pt/s' },
-      'collection-cancelled': {
-        reason: 'Sem acesso',
-        friendlyCode: '2026-000001',
-      },
-      'collection-confirmation': {
-        friendlyCode: '2026-000001',
-        collectionDate: '13/05/2026',
-        collectionInterval: '09h-12h',
-        confirmUrl: 'https://x.pt/c',
-        rejectUrl: 'https://x.pt/j',
-      },
-      'collection-reminder': {
-        friendlyCode: '2026-000001',
-        collectionDate: '13/05/2026',
-        collectionInterval: '09:00 - 13:00',
-        address: {
-          street: 'Rua A',
-          number: '1',
-          city: 'Porto',
-          countryDivision: 'Porto',
-          zipCode: '4000-000',
-        },
-      },
-      'package-confirmation': {
-        fullName: 'Ana Silva',
-        friendlyCode: '2026-000001',
-        statusKey: 'status.CREATED',
-        address: {
-          street: 'Rua A',
-          number: '1',
-          city: 'Porto',
-          zipCode: '4000-000',
-        },
-      },
-    };
+    for (const lang of LANGS) {
+      const messages = loadMessages(lang);
 
-    for (const lang of ['pt', 'en', 'es', 'fr']) {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const messages = require(`../../../i18n/${lang}/email.json`);
+      for (const [template, context] of Object.entries(FIXTURES)) {
+        const html = render(template, baseContext(context), messages, lang);
 
-      for (const [template, context] of Object.entries(fixtures)) {
+        expect(html).toContain(`<html lang="${lang}">`);
+      }
+    }
+  });
+
+  /**
+   * O banner "o que NÃO recolhemos" tem o texto dentro da imagem, por isso a
+   * arte é escolhida pelo idioma do destinatário — e há sempre duas versões,
+   * porque a desktop fica ilegível num telemóvel. Se algum dos três emails
+   * perder o banner, ou apontar para a arte do idioma errado, é aqui que parte.
+   */
+  it('serve o banner "o que não recolhemos" na arte do idioma e nas duas medidas', () => {
+    const comBanner = [
+      'package-confirmation',
+      'collection-confirmation',
+      'collection-reminder',
+    ];
+
+    for (const lang of LANGS) {
+      const messages = loadMessages(lang);
+
+      for (const template of comBanner) {
         const html = render(
           template,
-          { firstName: 'Ana', lastName: 'Silva', year: 2026, ...context },
+          baseContext(FIXTURES[template]),
           messages,
           lang,
         );
 
-        expect(html).toContain(`<html lang="${lang}">`);
+        expect(html).toContain(
+          `https://retex.pt/assets/emails/donts-${lang}.jpg`,
+        );
+        expect(html).toContain(
+          `https://retex.pt/assets/emails/donts-${lang}-mobile.jpg`,
+        );
+        // A troca desktop/mobile depende destas classes e da media query.
+        expect(html).toContain('class="donts-desktop"');
+        expect(html).toContain('class="donts-mobile"');
+        expect(html).toContain('@media only screen and (max-width: 600px)');
+        // Alt traduzido: o texto do banner não existe fora da imagem.
+        expect(html).toContain(
+          (messages[template] as Record<string, string>).dontsAlt,
+        );
       }
+    }
+
+    // Os restantes emails não levam o banner.
+    const semBanner = Object.keys(FIXTURES).filter(
+      (t) => !comBanner.includes(t),
+    );
+    for (const template of semBanner) {
+      const html = render(template, baseContext(FIXTURES[template]));
+      expect(html).not.toContain('/assets/emails/donts-');
+    }
+  });
+
+  /**
+   * As imagens dos emails estiveram meses partidas: o template de confirmação
+   * apontava para anexos do CDN do Discord, cujos URLs são assinados e
+   * expiram. Nenhum teste apanhava isso, por isso só se soube por quem recebeu
+   * o email. Todas as imagens têm de sair de `assetsBaseUrl`, que é domínio
+   * nosso e servido a partir do site.
+   */
+  it('não tem imagens presas a domínios externos', () => {
+    const templatesDir = path.join(__dirname, 'templates');
+    const ficheiros = [
+      ...fs.readdirSync(templatesDir),
+      ...fs
+        .readdirSync(path.join(templatesDir, 'partials'))
+        .map((f) => path.join('partials', f)),
+    ].filter((f) => f.endsWith('.hbs'));
+
+    expect(ficheiros.length).toBeGreaterThan(0);
+
+    for (const ficheiro of ficheiros) {
+      const html = fs.readFileSync(path.join(templatesDir, ficheiro), 'utf-8');
+      const externos = [...html.matchAll(/src="(https?:\/\/[^"]+)"/g)].map(
+        (m) => m[1],
+      );
+
+      expect({ ficheiro, externos }).toEqual({ ficheiro, externos: [] });
     }
   });
 });

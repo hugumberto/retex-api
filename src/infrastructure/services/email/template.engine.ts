@@ -29,7 +29,7 @@ export class TemplateEngine {
 
   // Base URL dos assets dos emails (logo, etc.); configurável via env.
   private assetsBaseUrl(): string {
-    const base = process.env.ASSETS_BASE_URL ?? 'https://www.retex.pt';
+    const base = process.env.ASSETS_BASE_URL ?? 'https://retex.pt';
     return base.replace(/\/+$/, '');
   }
 

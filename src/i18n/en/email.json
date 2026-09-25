@@ -74,7 +74,8 @@
     "rejectLabel": "I can't make it — remove me from this collection",
     "rejectNotice": "If this day does not suit you, use the \"I can't make it\" button above — your request will be removed from this collection.",
     "linkNotice": "If the buttons do not work, copy and paste the following address into your browser:",
-    "signature": "Your <strong>RETEX Portugal</strong> team"
+    "signature": "Your <strong>RETEX Portugal</strong> team",
+    "dontsAlt": "What we DO NOT collect: footwear, bags and accessories, bulky items, home textiles, toys, home appliances, contaminated items and books."
   },
   "collection-reminder": {
     "subject": "Your Retex collection is tomorrow",
@@ -90,7 +91,8 @@
     "cityLabel": "City",
     "zipLabel": "Postcode",
     "prepNotice": "Please have your items ready and accessible so our driver can collect them without delay.",
-    "signature": "Your <strong>RETEX Portugal</strong> team"
+    "signature": "Your <strong>RETEX Portugal</strong> team",
+    "dontsAlt": "What we DO NOT collect: footwear, bags and accessories, bulky items, home textiles, toys, home appliances, contaminated items and books."
   },
   "package-confirmation": {
     "subject": "Your package has been registered!",
@@ -102,6 +104,7 @@
     "detailsNote": "You will find the details of your request at the end of this email.",
     "contactNote": "If you need more information about your case, do not hesitate to contact us through the <a href=\"https://www.retex.pt/#form\" style=\"color:#02748E;text-decoration:none;font-weight:bold;\">contact form</a>, available <a href=\"https://www.retex.pt/#form\" style=\"color:#02748E;text-decoration:none;font-weight:bold;\">here</a>.",
     "signature": "Your <strong>RETEX Portugal</strong> team",
+    "dontsAlt": "What we DO NOT collect: footwear, bags and accessories, bulky items, home textiles, toys, home appliances, contaminated items and books.",
     "detailsHeader": "REGISTRATION DETAILS",
     "codeLabel": "Code",
     "nameLabel": "Name",

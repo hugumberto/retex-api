@@ -10,6 +10,7 @@ tempo de execução pela API — são todos para correr à mão.
 | `db-refresh-from-prod.sh` | `yarn db:refresh` | Repõe a base local a partir de um dump da produção | **Sim** |
 | `blog-post-clean.sh` | — | Testa os endpoints do blog de ponta a ponta | **Sim** |
 | `seed-test-users.sql` | — | Cria um utilizador de teste por perfil (sem MASTER) | Não |
+| `send-test-emails.ts` | — | Envia um exemplar de cada template de email a um destinatário | Não |
 
 ## Onde correr cada um
 
@@ -187,3 +188,36 @@ estão fixas no topo do ficheiro (`admin@retex.pt`).
 > **Atenção:** antes de criar os posts de teste, o script **apaga os posts de
 > blog existentes** (até 50) na base a que a API estiver ligada. Corre-o apenas
 > contra um ambiente local descartável — nunca com a API apontada a produção.
+
+---
+
+## `send-test-emails.ts` — rever os emails numa caixa real
+
+Envia um exemplar de cada template para um único destinatário, com contextos
+plausíveis. É onde se vê o que nenhum teste apanha: imagens que não carregam,
+espaçamentos reescritos pelo cliente de email, texto ilegível no telemóvel.
+
+```bash
+npx ts-node -r tsconfig-paths/register scripts/send-test-emails.ts hugo@retex.pt pt --dry
+npx ts-node -r tsconfig-paths/register scripts/send-test-emails.ts hugo@retex.pt pt
+```
+
+| Argumento | Omissão | Efeito |
+|---|---|---|
+| `<destinatário>` | — | Obrigatório |
+| `[idioma]` | `pt` | Um dos `SUPPORTED_LANGUAGES` |
+| `--dry` | — | Renderiza e valida sem enviar |
+| `--inline-assets` | — | Anexa as imagens em `cid:` em vez de as ir buscar por URL |
+
+Não passa pelo `EmailService`, de propósito: esse grava em `email_log` e um
+envio de teste não tem de sujar o histórico. O que interessa validar — o
+`TemplateEngine` e as traduções — é o mesmo código.
+
+Antes de enviar, rebenta se sobrar algum `{placeholder}` ou se alguma imagem
+apontar para fora do `ASSETS_BASE_URL`.
+
+**`--inline-assets` serve para arte que ainda não está publicada.** Por URL, uma
+imagem nova dá 404 até a landing-page ir a produção; com esta flag os ficheiros
+vão anexados, lidos do `public/` da landing-page (`ASSETS_LOCAL_DIR` para
+apontar noutro sítio). Em produção os emails vão sempre por URL, por isso este
+modo é só para revisão — não valida que os URLs resolvem.
