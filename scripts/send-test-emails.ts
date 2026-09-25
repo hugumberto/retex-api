@@ -11,15 +11,23 @@
  * `TemplateEngine` e os ficheiros de tradução, esses são os mesmos.
  *
  * Uso:
- *   npx ts-node -r tsconfig-paths/register scripts/send-test-emails.ts <destinatário> [idioma] [--dry]
+ *   npx ts-node -r tsconfig-paths/register scripts/send-test-emails.ts <destinatário> [idioma] [--dry] [--inline-assets]
  *
  * `--dry` renderiza tudo e valida as imagens sem enviar nada — vale a pena
  * antes de um envio a sério.
  *
- * Variáveis: SMTP_*, e ASSETS_BASE_URL para escolher de onde vêm as imagens.
+ * `--inline-assets` troca os `src` remotos por anexos `cid:`, lidos do `public/`
+ * da landing-page. É a forma de rever arte nova antes de estar publicada: o
+ * email por URL mostraria um 404, e o que se quer ver é a peça. Em produção os
+ * emails vão sempre por URL, por isso este modo é só para revisão.
+ *
+ * Variáveis: SMTP_*, ASSETS_BASE_URL para escolher de onde vêm as imagens, e
+ * ASSETS_LOCAL_DIR para o `public/` que alimenta o `--inline-assets`.
  */
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
 import * as nodemailer from 'nodemailer';
+import * as path from 'path';
 import { TemplateEngine } from '../src/infrastructure/services/email/template.engine';
 import {
   normalizeLanguage,
@@ -27,6 +35,46 @@ import {
 } from '../src/config/i18n.constants';
 
 dotenv.config();
+
+/** `public/` da landing-page — é de lá que saem os assets dos emails. */
+const ASSETS_LOCAL_DIR =
+  process.env.ASSETS_LOCAL_DIR ??
+  path.resolve(__dirname, '../../retex-web/packages/landing-page/public');
+
+/**
+ * Substitui cada `src` que aponte para `base` por um `cid:` e devolve os anexos
+ * correspondentes. Um ficheiro usado duas vezes (a mesma imagem no corpo e no
+ * rodapé) vai anexado uma só vez.
+ */
+function inlineAssets(
+  html: string,
+  base: string,
+): { html: string; attachments: nodemailer.SendMailOptions['attachments'] } {
+  const cids = new Map<string, string>();
+  const attachments: { filename: string; path: string; cid: string }[] = [];
+
+  const inlined = html.replace(/src="([^"]+)"/g, (original, url: string) => {
+    if (!url.startsWith(base)) return original;
+
+    const relative = url.slice(base.length).replace(/^\/+/, '');
+    const file = path.join(ASSETS_LOCAL_DIR, decodeURIComponent(relative));
+
+    if (!fs.existsSync(file)) {
+      throw new Error(`asset local em falta: ${relative} (${file})`);
+    }
+
+    let cid = cids.get(file);
+    if (!cid) {
+      cid = `asset-${cids.size + 1}@retex`;
+      cids.set(file, cid);
+      attachments.push({ filename: path.basename(file), path: file, cid });
+    }
+
+    return `src="cid:${cid}"`;
+  });
+
+  return { html: inlined, attachments };
+}
 
 /** Contextos plausíveis, equivalentes aos das fixtures dos testes. */
 const FIXTURES: Record<string, Record<string, unknown>> = {
@@ -110,6 +158,7 @@ function makeTranslator(template: string, lang: SupportedLanguage) {
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const dry = args.includes('--dry');
+  const inline = args.includes('--inline-assets');
   const [recipient, langArg] = args.filter((a) => !a.startsWith('--'));
 
   if (!recipient) {
@@ -130,6 +179,7 @@ async function main(): Promise<void> {
   console.log(`destinatário: ${recipient}`);
   console.log(`idioma:       ${lang}`);
   console.log(`assets:       ${process.env.ASSETS_BASE_URL ?? '(default)'}`);
+  if (inline) console.log(`anexos:       inline a partir de ${ASSETS_LOCAL_DIR}`);
   if (dry) console.log('modo:         simulação (não envia)');
   console.log('');
 
@@ -165,6 +215,12 @@ async function main(): Promise<void> {
         throw new Error(`imagens fora dos assets: ${externas.join(', ')}`);
       }
 
+      // Corre também em `--dry`: é aqui que se apanha um ficheiro em falta no
+      // `public/`, que é metade da razão para simular antes de enviar.
+      const corpo = inline
+        ? inlineAssets(html, process.env.ASSETS_BASE_URL ?? 'https://retex.pt')
+        : { html, attachments: undefined };
+
       if (dry) {
         console.log(
           `  ok       ${template.padEnd(24)} ${imagens.length} imagem(ns)  ${subject}`,
@@ -176,7 +232,8 @@ async function main(): Promise<void> {
         from: process.env.SMTP_FROM,
         to: recipient,
         subject,
-        html,
+        html: corpo.html,
+        ...(corpo.attachments ? { attachments: corpo.attachments } : {}),
       });
 
       console.log(`  enviado  ${template.padEnd(24)} ${subject}`);
