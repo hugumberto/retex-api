@@ -80,11 +80,14 @@
     "someNotFound": "Itens não encontrados: {items}",
     "sameCollectionRequestRequired": "Todos os itens devem pertencer à mesma solicitação de recolha",
     "bindFailed": "Erro ao associar o item {id}: {error}",
-    "bulkOperationCancelled": "Operação cancelada devido a erros: {errors}"
+    "bulkOperationCancelled": "Operação cancelada devido a erros: {errors}",
+    "missingBasicIndicators": "Faltam indicadores básicos da peça (sexo, faixa etária, estação e categoria)",
+    "categoryTypeMismatch": "A categoria não corresponde à parte indicada (Superior / Inferior)"
   },
   "storageUnit": {
     "notFound": "Unidade de armazenamento não encontrada",
-    "someNotFound": "Unidades de armazenamento não encontradas: {units}"
+    "someNotFound": "Unidades de armazenamento não encontradas: {units}",
+    "invalidSlot": "Combinação de lote inválida: lotes de reutilização precisam de estação e parte; o lote não reutilizável não tem nenhuma"
   },
   "brand": {
     "notFound": "Marca não encontrada",

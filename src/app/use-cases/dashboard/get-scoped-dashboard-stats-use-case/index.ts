@@ -52,18 +52,31 @@ export class GetScopedDashboardStatsUseCase
       ? { companyId: companyContext.companyId }
       : { userId };
 
-    const [totals, byStatus, trend, byQuality, bySeason, byType, byBrand] =
+    const [
+      totals,
+      byStatus,
+      trend,
+      byCondition,
+      byDestination,
+      byCategory,
+      bySeason,
+      byType,
+      byBrand,
+    ] =
       await Promise.all([
         this.collectionRequestRepository.getTotals(scope),
         this.collectionRequestRepository.countByStatus(scope),
         this.collectionRequestRepository.getWeightTrend(TREND_MONTHS, scope),
-        this.itemRepository.aggregateBy('quality', scope),
+        this.itemRepository.aggregateBy('condition', scope),
+        this.itemRepository.aggregateBy('destination', scope),
+        this.itemRepository.aggregateBy('category', scope),
         this.itemRepository.aggregateBy('season', scope),
         this.itemRepository.aggregateBy('type', scope),
         this.itemRepository.aggregateByBrand(scope),
       ]);
 
-    const totalItems = byQuality.reduce((acc, row) => acc + row.count, 0);
+    // Todo o item tem destino: a soma por destino conta todos os itens.
+    const totalItems = byDestination.reduce((acc, row) => acc + row.count, 0);
     const { CO2_KG_PER_KG, WATER_LITERS_PER_KG } = ENVIRONMENTAL_FACTORS;
     const landfillDivertedKg = totals.totalWeight;
 
@@ -86,7 +99,9 @@ export class GetScopedDashboardStatsUseCase
       },
       triage: {
         totalItems,
-        byQuality,
+        byCondition,
+        byDestination,
+        byCategory,
         bySeason,
         byType,
         byBrand,

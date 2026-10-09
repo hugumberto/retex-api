@@ -39,7 +39,9 @@ export class GetDashboardStatsUseCase
       byStatus,
       trend,
       topCities,
-      byQuality,
+      byCondition,
+      byDestination,
+      byCategory,
       bySeason,
       byType,
       byBrand,
@@ -51,7 +53,9 @@ export class GetDashboardStatsUseCase
       this.collectionRequestRepository.countByStatus(),
       this.collectionRequestRepository.getWeightTrend(TREND_MONTHS),
       this.collectionRequestRepository.countOutOfZoneByCity(OUT_OF_ZONE_TOP_CITIES),
-      this.itemRepository.aggregateBy('quality'),
+      this.itemRepository.aggregateBy('condition'),
+        this.itemRepository.aggregateBy('destination'),
+        this.itemRepository.aggregateBy('category'),
       this.itemRepository.aggregateBy('season'),
       this.itemRepository.aggregateBy('type'),
       this.itemRepository.aggregateByBrand(),
@@ -60,7 +64,8 @@ export class GetDashboardStatsUseCase
       this.refreshTokenRepository.countActiveUsers(),
     ]);
 
-    const totalItems = byQuality.reduce((acc, row) => acc + row.count, 0);
+    // Todo o item tem destino: a soma por destino conta todos os itens.
+    const totalItems = byDestination.reduce((acc, row) => acc + row.count, 0);
     const outOfZoneTotal =
       byStatus.find((row) => row.status === CollectionRequestStatus.OUT_OF_ZONE)?.count ??
       0;
@@ -79,7 +84,9 @@ export class GetDashboardStatsUseCase
       },
       triage: {
         totalItems,
-        byQuality,
+        byCondition,
+        byDestination,
+        byCategory,
         bySeason,
         byType,
         byBrand,

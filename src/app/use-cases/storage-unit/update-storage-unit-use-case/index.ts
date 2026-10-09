@@ -1,4 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { isValidStorageSlot } from '../../../../domain/storage-unit/storage-slot';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -31,16 +32,8 @@ export class UpdateStorageUnitUseCase implements IUseCase<UpdateStorageUnitParam
     const updateData: Partial<StorageUnit> = {};
 
     // Atualizar campos se fornecidos
-    if (data.quality !== undefined) {
-      updateData.quality = data.quality;
-    }
-
-    if (data.sex !== undefined) {
-      updateData.sex = data.sex;
-    }
-
-    if (data.ageGroup !== undefined) {
-      updateData.ageGroup = data.ageGroup;
+    if (data.group !== undefined) {
+      updateData.group = data.group;
     }
 
     if (data.type !== undefined) {
@@ -49,6 +42,20 @@ export class UpdateStorageUnitUseCase implements IUseCase<UpdateStorageUnitParam
 
     if (data.season !== undefined) {
       updateData.season = data.season;
+    }
+
+    if (data.location !== undefined) {
+      updateData.location = data.location?.trim() || null;
+    }
+
+    // A combinação resultante tem de continuar a ser um lote válido.
+    const slot = {
+      group: updateData.group ?? existingStorageUnit.group,
+      season: updateData.season !== undefined ? updateData.season : existingStorageUnit.season ?? null,
+      type: updateData.type !== undefined ? updateData.type : existingStorageUnit.type ?? null,
+    };
+    if (!isValidStorageSlot(slot)) {
+      throw new BadRequestException('errors.storageUnit.invalidSlot');
     }
 
     if (data.status !== undefined) {
