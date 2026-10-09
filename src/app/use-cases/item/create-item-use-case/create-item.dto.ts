@@ -1,13 +1,28 @@
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   IsUUID,
-  Min
+  MaxLength,
+  Min,
+  ValidateIf,
 } from 'class-validator';
-import { AgeGroup, Quality, Season, Sex, Type } from '../../../../domain/item/item.entity';
+import { Category } from '../../../../domain/item/item-category';
+import {
+  AgeGroup,
+  Condition,
+  Destination,
+  Season,
+  Sex,
+  Type,
+  isReusableDestination,
+} from '../../../../domain/item/item.entity';
+
+const reusable = (dto: CreateItemDto) =>
+  isReusableDestination(dto.destination ?? Destination.REUSE);
 
 export class CreateItemDto {
   @IsString()
@@ -19,31 +34,63 @@ export class CreateItemDto {
   @IsUUID()
   bagId?: string;
 
-  @IsEnum(Quality)
-  @IsNotEmpty()
-  quality: Quality;
+  // Omitido = REUSE.
+  @IsOptional()
+  @IsEnum(Destination)
+  destination?: Destination;
 
-  @IsEnum(Type)
-  @IsNotEmpty()
-  type: Type;
-
-  @IsEnum(Season)
-  @IsNotEmpty()
-  season: Season;
-
+  // Indicadores básicos: obrigatórios só para destinos reutilizáveis.
+  @ValidateIf((dto) => reusable(dto) || dto.sex != null)
   @IsEnum(Sex)
-  @IsNotEmpty()
-  sex: Sex;
+  sex?: Sex;
 
+  @ValidateIf((dto) => reusable(dto) || dto.ageGroup != null)
   @IsEnum(AgeGroup)
-  @IsNotEmpty()
-  ageGroup: AgeGroup;
+  ageGroup?: AgeGroup;
 
+  @ValidateIf((dto) => reusable(dto) || dto.season != null)
+  @IsEnum(Season)
+  season?: Season;
+
+  // A parte (Superior / Inferior) vem da categoria; `type` só é preciso sem ela.
+  @ValidateIf((dto) => (reusable(dto) && dto.category == null) || dto.type != null)
+  @IsEnum(Type)
+  type?: Type;
+
+  @ValidateIf((dto) => (reusable(dto) && dto.type == null) || dto.category != null)
+  @IsEnum(Category)
+  category?: Category;
+
+  @ValidateIf((dto) => reusable(dto) || dto.condition != null)
+  @IsEnum(Condition)
+  condition?: Condition;
+
+  @ValidateIf((dto) => reusable(dto) || dto.brandId != null)
   @IsString()
   @IsNotEmpty()
-  brandId: string;
+  brandId?: string;
 
   @IsNumber()
   @Min(1)
   quantity: number;
+
+  // Indicadores informativos opcionais.
+  @IsOptional()
+  @IsBoolean()
+  denim?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  material?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  color?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  size?: string;
 }

@@ -4,6 +4,7 @@ import { IItemRepository } from '../../../../domain/item/item.repository';
 import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
 import { ICollectionRequestRepository } from '../../../../domain/collection-request/collection-request.repository';
 import { ICollectionRequestBagRepository } from '../../../../domain/collection-request-bag/collection-request-bag.repository';
+import { resolveStorageSlot, storageUnitMatchesSlot } from '../../../../domain/storage-unit/storage-slot';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -82,11 +83,17 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
         continue;
       }
 
+      // Acessórios não vão para nenhum lote: ficam só registados.
+      const slot = resolveStorageSlot(item);
+      if (!slot) {
+        continue;
+      }
+
       // Uma unidade (bin) pode receber vários itens do mesmo tipo — a unidade
       // NÃO é consumida. Itens iguais de volumes diferentes vão para a mesma
       // unidade compatível (menor peso).
       const compatibleStorageUnit = this.findCompatibleStorageUnit(
-        item,
+        slot,
         storageUnits,
       );
 
@@ -94,7 +101,7 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
         // Ao finalizar é erro; ao salvar progresso, apenas ignora o item.
         if (finalize) {
           errors.push(
-            `Nenhum Storage Unit compatível encontrado para item ${item.id} (quality: ${item.quality}, sex: ${item.sex}, ageGroup: ${item.ageGroup}, type: ${item.type}, season: ${item.season})`,
+            `Nenhum Storage Unit compatível encontrado para item ${item.id} (group: ${slot.group}, season: ${slot.season ?? '-'}, type: ${slot.type ?? '-'})`,
           );
         }
         continue;
@@ -148,15 +155,13 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
     };
   }
 
-  private findCompatibleStorageUnit(item: Item, storageUnits: StorageUnit[]): StorageUnit | null {
-    // Buscar storage units compatíveis pelos atributos de triagem
-    const compatible = storageUnits.filter(su =>
-      su.quality === item.quality &&
-      su.sex === item.sex &&
-      su.ageGroup === item.ageGroup &&
-      su.type === item.type &&
-      su.season === item.season
-    );
+  private findCompatibleStorageUnit(
+    slot: ReturnType<typeof resolveStorageSlot>,
+    storageUnits: StorageUnit[],
+  ): StorageUnit | null {
+    // Só os indicadores básicos (grupo × estação × parte) decidem o lote;
+    // lotes inativos não recebem itens.
+    const compatible = storageUnits.filter((su) => storageUnitMatchesSlot(su, slot));
 
     if (compatible.length === 0) {
       return null;

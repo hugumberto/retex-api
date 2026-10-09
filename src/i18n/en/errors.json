@@ -80,11 +80,14 @@
     "someNotFound": "Items not found: {items}",
     "sameCollectionRequestRequired": "All items must belong to the same collection request",
     "bindFailed": "Error linking item {id}: {error}",
-    "bulkOperationCancelled": "Operation cancelled due to errors: {errors}"
+    "bulkOperationCancelled": "Operation cancelled due to errors: {errors}",
+    "missingBasicIndicators": "Missing basic item indicators (sex, age group, season and category)",
+    "categoryTypeMismatch": "The category does not match the given part (upper / lower)"
   },
   "storageUnit": {
     "notFound": "Storage unit not found",
-    "someNotFound": "Storage units not found: {units}"
+    "someNotFound": "Storage units not found: {units}",
+    "invalidSlot": "Invalid storage unit combination: reuse units need a season and part; the non-reusable unit has neither"
   },
   "brand": {
     "notFound": "Brand not found",

@@ -80,11 +80,14 @@
     "someNotFound": "Artículos no encontrados: {items}",
     "sameCollectionRequestRequired": "Todos los artículos deben pertenecer a la misma solicitud de recogida",
     "bindFailed": "Error al asociar el artículo {id}: {error}",
-    "bulkOperationCancelled": "Operación cancelada debido a errores: {errors}"
+    "bulkOperationCancelled": "Operación cancelada debido a errores: {errors}",
+    "missingBasicIndicators": "Faltan indicadores básicos de la prenda (sexo, grupo de edad, temporada y categoría)",
+    "categoryTypeMismatch": "La categoría no corresponde a la parte indicada (superior / inferior)"
   },
   "storageUnit": {
     "notFound": "Unidad de almacenamiento no encontrada",
-    "someNotFound": "Unidades de almacenamiento no encontradas: {units}"
+    "someNotFound": "Unidades de almacenamiento no encontradas: {units}",
+    "invalidSlot": "Combinación de lote no válida: los lotes de reutilización necesitan temporada y parte; el lote no reutilizable no tiene ninguna"
   },
   "brand": {
     "notFound": "Marca no encontrada",

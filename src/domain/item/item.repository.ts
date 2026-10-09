@@ -3,7 +3,7 @@ import { DateRange } from '../dashboard/date-range';
 import { IRepository } from '../interfaces/repository.interface';
 import { Item } from './item.entity';
 
-export type ItemDimension = 'quality' | 'season' | 'type';
+export type ItemDimension = 'condition' | 'destination' | 'category' | 'season' | 'type';
 
 export interface ItemDimensionCount {
   key: string;

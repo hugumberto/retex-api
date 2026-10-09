@@ -109,7 +109,9 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
     // Whitelist runtime: nunca interpolar `dimension` no SQL sem validar, pois o
     // tipo é apagado em runtime (defesa contra valores inválidos / injeção).
     const columns: Record<ItemDimension, string> = {
-      quality: 'quality',
+      condition: 'condition',
+      destination: 'destination',
+      category: 'category',
       season: 'season',
       type: 'type',
     };

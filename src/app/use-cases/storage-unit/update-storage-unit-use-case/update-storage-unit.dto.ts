@@ -1,32 +1,26 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
-import { AgeGroup, Quality, Season, Sex, Type } from "../../../../domain/item/item.entity";
-import { StorageUnitStatus } from "../../../../domain/storage-unit/storage-unit.entity";
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator";
+import { Season, Type } from "../../../../domain/item/item.entity";
+import { StorageGroup, StorageUnitStatus } from "../../../../domain/storage-unit/storage-unit.entity";
 
 export class UpdateStorageUnitDto {
   @IsOptional()
   @IsNotEmpty()
-  @IsEnum(Quality)
-  quality?: Quality;
+  @IsEnum(StorageGroup)
+  group?: StorageGroup;
 
+  // `null` limpa (lote NON_REUSABLE).
   @IsOptional()
-  @IsNotEmpty()
-  @IsEnum(Sex)
-  sex?: Sex;
-
-  @IsOptional()
-  @IsNotEmpty()
-  @IsEnum(AgeGroup)
-  ageGroup?: AgeGroup;
-
-  @IsOptional()
-  @IsNotEmpty()
   @IsEnum(Type)
-  type?: Type;
+  type?: Type | null;
 
   @IsOptional()
-  @IsNotEmpty()
   @IsEnum(Season)
-  season?: Season;
+  season?: Season | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  location?: string | null;
 
   @IsOptional()
   @IsNotEmpty()
