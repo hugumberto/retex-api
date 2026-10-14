@@ -1,4 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { isValidStorageSlot } from '../../../../domain/storage-unit/storage-slot';
 import { StorageUnit, StorageUnitStatus } from '../../../../domain/storage-unit/storage-unit.entity';
 import { IStorageUnitRepository } from '../../../../domain/storage-unit/storage-unit.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -16,16 +17,22 @@ export class CreateStorageUnitUseCase implements IUseCase<CreateStorageUnitDto, 
   ) { }
 
   async call(param: CreateStorageUnitDto): Promise<StorageUnit> {
+    const slot = {
+      group: param.group,
+      season: param.season ?? null,
+      type: param.type ?? null,
+    };
+    if (!isValidStorageSlot(slot)) {
+      throw new BadRequestException('errors.storageUnit.invalidSlot');
+    }
+
     const friendlyCode = await this.generateUniqueFriendlyCode();
 
     // Criar o StorageUnit com peso inicial = 0
     const storageUnit = await this.storageUnitRepository.create({
       friendlyCode,
-      quality: param.quality,
-      sex: param.sex,
-      ageGroup: param.ageGroup,
-      type: param.type,
-      season: param.season,
+      ...slot,
+      location: param.location?.trim() || null,
       status: StorageUnitStatus.ATIVO,
       weight: 0,
     });

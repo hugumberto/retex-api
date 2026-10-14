@@ -1,6 +1,10 @@
 import { EntitySchema } from 'typeorm';
-import { AgeGroup, Quality, Season, Sex, Type } from '../../../../domain/item/item.entity';
-import { StorageUnit, StorageUnitStatus } from '../../../../domain/storage-unit/storage-unit.entity';
+import { Season, Type } from '../../../../domain/item/item.entity';
+import {
+  StorageGroup,
+  StorageUnit,
+  StorageUnitStatus,
+} from '../../../../domain/storage-unit/storage-unit.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
 
 export const storageUnitSchema = new EntitySchema<StorageUnit>({
@@ -18,31 +22,29 @@ export const storageUnitSchema = new EntitySchema<StorageUnit>({
       unique: true,
       name: 'friendly_code',
     },
-    quality: {
+    // `group` é palavra reservada em SQL; a coluna chama-se storage_group.
+    group: {
+      name: 'storage_group',
       type: 'enum',
-      enum: Quality,
+      enum: StorageGroup,
+      enumName: 'storage_unit_group_enum',
       nullable: false,
     },
-    sex: {
-      type: 'enum',
-      enum: Sex,
-      nullable: false,
-    },
-    ageGroup: {
-      name: 'age_group',
-      type: 'enum',
-      enum: AgeGroup,
-      nullable: false,
-    },
+    // Nulos apenas no lote NON_REUSABLE.
     type: {
       type: 'enum',
       enum: Type,
-      nullable: false,
+      nullable: true,
     },
     season: {
       type: 'enum',
       enum: Season,
-      nullable: false,
+      nullable: true,
+    },
+    location: {
+      type: 'varchar',
+      length: 100,
+      nullable: true,
     },
     status: {
       type: 'enum',
@@ -66,6 +68,13 @@ export const storageUnitSchema = new EntitySchema<StorageUnit>({
     },
     ...BaseTimestampColumns,
   },
+  checks: [
+    {
+      // Lotes de reutilização têm estação e parte; o não reutilizável nenhuma.
+      name: 'CHK_STORAGE_UNIT_SLOT',
+      expression: `("storage_group" = 'NON_REUSABLE' AND "season" IS NULL AND "type" IS NULL) OR ("storage_group" <> 'NON_REUSABLE' AND "season" IS NOT NULL AND "type" IS NOT NULL)`,
+    },
+  ],
   relations: {
     items: {
       type: 'one-to-many',

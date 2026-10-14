@@ -26,4 +26,20 @@ describe('CreateBrandUseCase', () => {
     expect(await useCase.call({ name: 'Nike' } as any)).toBe(brand);
     expect(repo.create).toHaveBeenCalled();
   });
+
+  it('defaults premium to false', async () => {
+    repo.create.mockResolvedValue({ id: 'b1', name: 'Nike' } as Brand);
+    await useCase.call({ name: 'Nike' });
+    expect(repo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Nike', manual: true, premium: false }),
+    );
+  });
+
+  it('persists the premium flag', async () => {
+    repo.create.mockResolvedValue({ id: 'b2', name: 'Gucci' } as Brand);
+    await useCase.call({ name: ' Gucci ', premium: true });
+    expect(repo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Gucci', premium: true }),
+    );
+  });
 });

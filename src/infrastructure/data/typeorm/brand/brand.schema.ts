@@ -20,6 +20,11 @@ export const brandSchema = new EntitySchema<Brand>({
       nullable: false,
       default: false,
     },
+    premium: {
+      type: 'boolean',
+      nullable: false,
+      default: false,
+    },
     ...BaseTimestampColumns,
   },
 }); 

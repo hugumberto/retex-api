@@ -1,5 +1,14 @@
 import { EntitySchema } from 'typeorm';
-import { AgeGroup, Item, Quality, Season, Sex, Type } from '../../../../domain/item/item.entity';
+import { Category } from '../../../../domain/item/item-category';
+import {
+  AgeGroup,
+  Condition,
+  Destination,
+  Item,
+  Season,
+  Sex,
+  Type,
+} from '../../../../domain/item/item.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
 
 export const itemSchema = new EntitySchema<Item>({
@@ -10,31 +19,61 @@ export const itemSchema = new EntitySchema<Item>({
       type: 'uuid',
       generated: 'uuid',
     },
-    quality: {
+    destination: {
       type: 'enum',
-      enum: Quality,
+      enum: Destination,
       nullable: false,
+      default: Destination.REUSE,
     },
     type: {
       type: 'enum',
       enum: Type,
-      nullable: false,
+      nullable: true,
     },
     season: {
       type: 'enum',
       enum: Season,
-      nullable: false,
+      nullable: true,
     },
     sex: {
       type: 'enum',
       enum: Sex,
-      nullable: false,
+      nullable: true,
     },
     ageGroup: {
       name: 'age_group',
       type: 'enum',
       enum: AgeGroup,
-      nullable: false,
+      nullable: true,
+    },
+    category: {
+      type: 'enum',
+      enum: Category,
+      nullable: true,
+    },
+    condition: {
+      type: 'enum',
+      enum: Condition,
+      nullable: true,
+    },
+    denim: {
+      type: 'boolean',
+      nullable: true,
+    },
+    material: {
+      type: 'varchar',
+      length: 100,
+      nullable: true,
+    },
+    color: {
+      type: 'varchar',
+      length: 50,
+      nullable: true,
+    },
+    size: {
+      type: 'varchar',
+      length: 20,
+      nullable: true,
     },
     quantity: {
       type: 'integer',
@@ -74,5 +113,13 @@ export const itemSchema = new EntitySchema<Item>({
       },
       nullable: true,
     },
+    operator: {
+      type: 'many-to-one',
+      target: 'user',
+      joinColumn: {
+        name: 'operator_id',
+      },
+      nullable: true,
+    },
   },
-}); 
+});

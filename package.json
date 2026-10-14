@@ -20,7 +20,8 @@
     "typeorm:migrate": "ts-node src/infrastructure/data/typeorm/config/generate-migration.ts",
     "geocode:backfill": "ts-node -r tsconfig-paths/register scripts/backfill-geocoding.ts",
     "seed:triage": "ts-node -r tsconfig-paths/register scripts/seed-triage-requests.ts",
-    "db:refresh": "bash scripts/db-refresh-from-prod.sh"
+    "db:refresh": "bash scripts/db-refresh-from-prod.sh",
+    "db:prune": "bash scripts/backups-prune.sh"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.1",

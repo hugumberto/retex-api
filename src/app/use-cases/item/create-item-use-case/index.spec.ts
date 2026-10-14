@@ -32,8 +32,16 @@ describe('CreateItemUseCase', () => {
   });
 
   const param = {
-    collectionRequestId: 'p1', brandId: 'b1', quality: 'GOOD', type: 'UPPER_PART', season: 'SUMMER', quantity: 3,
+    collectionRequestId: 'p1', brandId: 'b1', condition: 'GOOD', category: 'TOP', season: 'SUMMER',
+    sex: 'MALE', ageGroup: 'ADULT', quantity: 3,
   } as any;
+
+  const arrange = () => {
+    collectionRequestRepositoryMock.findOne.mockResolvedValue({ id: 'p1' } as any);
+    brandRepositoryMock.findOne.mockResolvedValue({ id: 'b1' } as any);
+    itemRepositoryMock.findByCollectionRequestId.mockResolvedValue([{ id: 'existing' } as Item]);
+    itemRepositoryMock.create.mockImplementation(async (data) => ({ id: 'new', ...data }) as Item);
+  };
 
   it('throws when the package does not exist', async () => {
     collectionRequestRepositoryMock.findOne.mockResolvedValue(undefined);
@@ -69,5 +77,51 @@ describe('CreateItemUseCase', () => {
     await useCase.call(param);
 
     expect(collectionRequestRepositoryMock.update).not.toHaveBeenCalled();
+  });
+
+  it('deriva a parte (Superior / Inferior) da categoria e indica o lote', async () => {
+    arrange();
+    const result = await useCase.call({ ...param, category: 'TROUSERS', operatorId: 'u1' });
+
+    expect(itemRepositoryMock.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'UNDER_PART',
+        destination: 'REUSE',
+        operator: { id: 'u1' },
+      }),
+    );
+    expect(result.storageSlot).toEqual({ group: 'MEN', season: 'SUMMER', type: 'UNDER_PART' });
+  });
+
+  it('rejeita type que não bate com a categoria', async () => {
+    arrange();
+    await expect(
+      useCase.call({ ...param, category: 'DRESS', type: 'UNDER_PART' }),
+    ).rejects.toThrow(BadRequestException);
+    expect(itemRepositoryMock.create).not.toHaveBeenCalled();
+  });
+
+  it('rejeita peça reutilizável sem os indicadores básicos', async () => {
+    arrange();
+    await expect(useCase.call({ ...param, season: undefined })).rejects.toThrow(BadRequestException);
+    expect(itemRepositoryMock.create).not.toHaveBeenCalled();
+  });
+
+  it('aceita peça não reutilizável sem marca nem indicadores básicos', async () => {
+    arrange();
+    const result = await useCase.call({
+      collectionRequestId: 'p1', destination: 'NON_REUSABLE', quantity: 2,
+    } as any);
+
+    expect(brandRepositoryMock.findOne).not.toHaveBeenCalled();
+    expect(result.storageSlot).toEqual({ group: 'NON_REUSABLE', season: null, type: null });
+  });
+
+  it('regista acessórios sem lote', async () => {
+    arrange();
+    const result = await useCase.call({
+      collectionRequestId: 'p1', destination: 'ACCESSORY', quantity: 1,
+    } as any);
+    expect(result.storageSlot).toBeNull();
   });
 });

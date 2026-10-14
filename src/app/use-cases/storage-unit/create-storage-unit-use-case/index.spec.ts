@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
@@ -20,24 +21,37 @@ describe('CreateStorageUnitUseCase', () => {
     useCase = module.get(CreateStorageUnitUseCase);
   });
 
-  it('creates the storage unit with its sorting attributes', async () => {
+  it('creates the storage unit with its basic indicators', async () => {
     repo.create.mockResolvedValue({ id: 's1' } as StorageUnit);
     await useCase.call({
-      quality: 'GOOD',
-      sex: 'MALE',
-      ageGroup: 'ADULT',
+      group: 'MEN',
       type: 'UPPER_PART',
       season: 'SUMMER',
+      location: ' A1 ',
     } as any);
     expect(repo.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        quality: 'GOOD',
-        sex: 'MALE',
-        ageGroup: 'ADULT',
+        group: 'MEN',
         type: 'UPPER_PART',
         season: 'SUMMER',
+        location: 'A1',
         weight: 0,
       }),
     );
+  });
+
+  it('cria o lote não reutilizável sem estação nem parte', async () => {
+    repo.create.mockResolvedValue({ id: 's1' } as StorageUnit);
+    await useCase.call({ group: 'NON_REUSABLE' } as any);
+    expect(repo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ group: 'NON_REUSABLE', season: null, type: null }),
+    );
+  });
+
+  it('rejeita lote não reutilizável com estação', async () => {
+    await expect(
+      useCase.call({ group: 'NON_REUSABLE', season: 'SUMMER' } as any),
+    ).rejects.toThrow(BadRequestException);
+    expect(repo.create).not.toHaveBeenCalled();
   });
 });

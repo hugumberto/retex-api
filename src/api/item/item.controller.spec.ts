@@ -50,9 +50,9 @@ describe('ItemController', () => {
         .spyOn(createItemUseCase, 'call')
         .mockResolvedValue(expectedResult as any);
 
-      const result = await controller.createItem(body as any);
+      const result = await controller.createItem(body as any, 'operator-id');
 
-      expect(createItemUseCase.call).toHaveBeenCalledWith(body);
+      expect(createItemUseCase.call).toHaveBeenCalledWith({ ...body, operatorId: 'operator-id' });
       expect(result).toEqual(expectedResult);
     });
   });
