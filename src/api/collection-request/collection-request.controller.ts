@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Param,
   Patch,
@@ -69,6 +70,13 @@ export class CollectionRequestController {
     @Body() body: CreateCollectionRequestDto,
   ) {
     const { id, isPrivileged } = requesterFrom(req);
+
+    // Criar cliente a partir dos dados escritos no formulário é operação de
+    // balcão: um USER que enviasse esta forma estaria a criar contas alheias.
+    if (body.address && !isPrivileged) {
+      throw new ForbiddenException('errors.auth.accessDenied');
+    }
+
     // Um USER só pode criar solicitações para si próprio; ADMIN/OPS podem indicar o userId.
     const userId = isPrivileged ? body.userId : id;
     return this.createCollectionRequestUseCase.call({ ...body, userId });
