@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Req,
 } from '@nestjs/common';
@@ -20,6 +21,8 @@ import { CreateCollectionRequestDto } from '../../app/use-cases/collection-reque
 import { GetAllCollectionRequestsUseCase } from '../../app/use-cases/collection-request/get-all-collection-requests-use-case';
 import { GetCollectionRequestsDto } from '../../app/use-cases/collection-request/get-all-collection-requests-use-case/get-collection-requests.dto';
 import { GetCollectionRequestByIdUseCase } from '../../app/use-cases/collection-request/get-collection-request-by-id-use-case';
+import { SetCollectionRequestRouteUseCase } from '../../app/use-cases/collection-request/set-collection-request-route-use-case';
+import { SetCollectionRequestRouteDto } from '../../app/use-cases/collection-request/set-collection-request-route-use-case/set-collection-request-route.dto';
 import { UpdateCollectionRequestUseCase } from '../../app/use-cases/collection-request/update-collection-request-use-case';
 import { UpdateCollectionRequestDto } from '../../app/use-cases/collection-request/update-collection-request-use-case/update-collection-request.dto';
 import { hasAnyRole } from '../../domain/user/role-hierarchy';
@@ -42,6 +45,7 @@ export class CollectionRequestController {
     private readonly getAllCollectionRequestsUseCase: GetAllCollectionRequestsUseCase,
     private readonly confirmCollectionUseCase: ConfirmCollectionUseCase,
     private readonly rejectCollectionUseCase: RejectCollectionUseCase,
+    private readonly setCollectionRequestRouteUseCase: SetCollectionRequestRouteUseCase,
   ) {}
 
   @Post('confirm-collection')
@@ -110,6 +114,17 @@ export class CollectionRequestController {
       data: body,
       requesterId,
       isPrivileged,
+    });
+  }
+
+  // Vincula a solicitação a uma rota existente (ou retira-a, com routeId
+  // null). Exclusivo do MASTER: ignora as regras de composição da rota.
+  @Put(':id/route')
+  @Roles(Role.MASTER)
+  setRoute(@Param('id') id: string, @Body() body: SetCollectionRequestRouteDto) {
+    return this.setCollectionRequestRouteUseCase.call({
+      collectionRequestId: id,
+      routeId: body.routeId ?? null,
     });
   }
 }

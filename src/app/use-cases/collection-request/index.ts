@@ -6,6 +6,7 @@ import { GetCollectionRequestDetailUseCase } from './get-collection-request-deta
 import { GetUserCollectionRequestsUseCase } from './get-user-collection-requests-use-case';
 import { RejectCollectionUseCase } from './reject-collection-use-case';
 import { SendCollectionConfirmationUseCase } from './send-collection-confirmation-use-case';
+import { SetCollectionRequestRouteUseCase } from './set-collection-request-route-use-case';
 import { UpdateCollectionRequestUseCase } from './update-collection-request-use-case';
 
 export const COLLECTION_REQUEST_USE_CASES = [
@@ -18,6 +19,7 @@ export const COLLECTION_REQUEST_USE_CASES = [
   SendCollectionConfirmationUseCase,
   ConfirmCollectionUseCase,
   RejectCollectionUseCase,
+  SetCollectionRequestRouteUseCase,
 ];
 
 export { ConfirmCollectionUseCase } from './confirm-collection-use-case';
@@ -26,3 +28,4 @@ export { SendCollectionConfirmationUseCase } from './send-collection-confirmatio
 export { GetUserCollectionRequestsUseCase } from './get-user-collection-requests-use-case';
 export { GetAllCollectionRequestsUseCase } from './get-all-collection-requests-use-case';
 export { GetCollectionRequestDetailUseCase } from './get-collection-request-detail-use-case';
+export { SetCollectionRequestRouteUseCase } from './set-collection-request-route-use-case';

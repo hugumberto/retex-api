@@ -8,6 +8,7 @@ import { RejectCollectionUseCase } from '../../app/use-cases/collection-request/
 import { UpdateCollectionRequestUseCase } from '../../app/use-cases/collection-request/update-collection-request-use-case';
 import { CollectionRequestStatus } from '../../domain/collection-request/collection-request.entity';
 import { Role } from '../../domain/user/user-roles.entity';
+import { SetCollectionRequestRouteUseCase } from '../../app/use-cases/collection-request/set-collection-request-route-use-case';
 import { CollectionRequestController } from './collection-request.controller';
 
 const reqWith = (roles: Role[], sub = 'requester-id') =>
@@ -29,6 +30,7 @@ describe('CollectionRequestController', () => {
         { provide: GetAllCollectionRequestsUseCase, useValue: { call: jest.fn() } },
         { provide: ConfirmCollectionUseCase, useValue: { call: jest.fn() } },
         { provide: RejectCollectionUseCase, useValue: { call: jest.fn() } },
+        { provide: SetCollectionRequestRouteUseCase, useValue: { call: jest.fn() } },
       ],
     }).compile();
 
