@@ -20,4 +20,18 @@ export interface SystemParameter extends Entity {
    * a partir do browser, por isso é configurável em vez de assumida.
    */
   labelRotationDeg: number
+  /**
+   * Armazém: ponto de partida e de chegada das rotas. As coordenadas vêm da
+   * morada (geocodificada no portal) e servem para calcular km e horas no
+   * painel "Nova rota". Nulos enquanto ninguém os definir.
+   */
+  warehouseAddress?: string | null
+  warehouseLat?: number | null
+  warehouseLong?: number | null
+  /**
+   * Tempo de cada recolha, além da condução: uma parte fixa e uma parte por
+   * saco estimado. Usado só para prever a hora de cada paragem.
+   */
+  stopBaseMinutes: number
+  stopMinutesPerBag: number
 }

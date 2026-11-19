@@ -1,4 +1,14 @@
-import { IsIn, IsInt, Max, Min } from 'class-validator';
+import {
+  IsIn,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+  ValidateIf,
+} from 'class-validator';
 
 export class UpdateSystemParametersDto {
   @IsInt()
@@ -33,4 +43,38 @@ export class UpdateSystemParametersDto {
   // da etiqueta, sem hipótese de o enquadrar.
   @IsIn([0, 90, 180, 270])
   labelRotationDeg: number;
+
+  // Armazém e tempos por paragem: opcionais, para quem só mexe nas etiquetas
+  // não ter de os enviar. `null` apaga a morada/coordenadas.
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsString()
+  @MaxLength(255)
+  warehouseAddress?: string | null;
+
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
+  warehouseLat?: number | null;
+
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  warehouseLong?: number | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(120)
+  stopBaseMinutes?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(30)
+  stopMinutesPerBag?: number;
 }

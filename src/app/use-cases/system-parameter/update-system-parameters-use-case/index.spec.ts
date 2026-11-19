@@ -53,6 +53,36 @@ describe('UpdateSystemParametersUseCase', () => {
     );
   });
 
+  it('grava o armazém e os tempos por paragem quando vêm no pedido', async () => {
+    await useCase.call({
+      ...validDto(),
+      warehouseAddress: 'Rua X 1, Maia',
+      warehouseLat: 41.23,
+      warehouseLong: -8.62,
+      stopBaseMinutes: 5,
+      stopMinutesPerBag: 1,
+    });
+
+    expect(repository.update).toHaveBeenCalledWith(
+      { id: 'sp-1' },
+      expect.objectContaining({
+        warehouseAddress: 'Rua X 1, Maia',
+        warehouseLat: 41.23,
+        warehouseLong: -8.62,
+        stopBaseMinutes: 5,
+        stopMinutesPerBag: 1,
+      }),
+    );
+  });
+
+  it('não apaga o armazém quando o pedido não o traz', async () => {
+    await useCase.call(validDto());
+
+    const patch = repository.update.mock.calls[0][1];
+    expect(patch).not.toHaveProperty('warehouseAddress');
+    expect(patch).not.toHaveProperty('stopBaseMinutes');
+  });
+
   it('cria a linha com as medidas quando ainda não existe', async () => {
     repository.getSingleton.mockResolvedValue(null);
     repository.create.mockResolvedValue(EXISTING);

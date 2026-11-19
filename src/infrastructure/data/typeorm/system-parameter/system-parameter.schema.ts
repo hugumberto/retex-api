@@ -46,6 +46,38 @@ export const systemParameterSchema = new EntitySchema<SystemParameter>({
       default: 90,
       name: 'label_rotation_deg',
     },
+    warehouseAddress: {
+      type: 'varchar',
+      length: 255,
+      nullable: true,
+      name: 'warehouse_address',
+    },
+    warehouseLat: {
+      type: 'decimal',
+      precision: 10,
+      scale: 7,
+      nullable: true,
+      name: 'warehouse_lat',
+    },
+    warehouseLong: {
+      type: 'decimal',
+      precision: 10,
+      scale: 7,
+      nullable: true,
+      name: 'warehouse_long',
+    },
+    stopBaseMinutes: {
+      type: 'integer',
+      nullable: false,
+      default: 5,
+      name: 'stop_base_minutes',
+    },
+    stopMinutesPerBag: {
+      type: 'integer',
+      nullable: false,
+      default: 1,
+      name: 'stop_minutes_per_bag',
+    },
     ...BaseTimestampColumns,
   },
 });
