@@ -105,6 +105,8 @@ export interface ICollectionRequestRepository
     scope?: DashboardScope,
   ): Promise<CollectionRequestTrendPoint[]>;
   countOutOfZoneByCity(limit: number): Promise<CityCount[]>;
+  /** Concelhos distintos com pelo menos uma recolha pesada (impacto público). */
+  countCitiesServed(): Promise<number>;
   /** Solicitações criadas no intervalo (quadro de atividade do dashboard). */
   countCreatedInRange(range: DateRange): Promise<number>;
   aggregateByMember(companyId: string): Promise<MemberCollectionCount[]>;
