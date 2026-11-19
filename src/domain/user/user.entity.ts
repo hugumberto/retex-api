@@ -24,6 +24,8 @@ export interface User extends Entity {
   activationBypassZone?: boolean;
   resetToken?: string | null;
   resetTokenExpiresAt?: Date | null;
+  // Último login bem-sucedido ("Última atividade" em Utilizadores).
+  lastLoginAt?: Date | null;
   collectionRequests?: CollectionRequest[];
   routes?: Route[];
   roles: UserRole[];

@@ -1,6 +1,8 @@
+import { CompanyKind } from '../../../../domain/company/company.entity';
 import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsObject,
   IsOptional,
@@ -54,6 +56,11 @@ export class CreateCompanyDto {
   @IsOptional()
   @MaxLength(20)
   phone?: string;
+
+  // Empresa, município, escola ou associação. Por omissão, empresa.
+  @IsEnum(CompanyKind)
+  @IsOptional()
+  kind?: CompanyKind;
 
   // Gestor inicial da empresa. Recebe email de ativação para definir a password.
   @IsObject()

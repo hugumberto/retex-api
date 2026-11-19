@@ -29,6 +29,11 @@ import { CreateUserUseCase } from '../../app/use-cases/user/create-user-use-case
 import { CreateUserDto } from '../../app/use-cases/user/create-user-use-case/create-user.dto';
 import { GetAllUsersUseCase } from '../../app/use-cases/user/get-all-users-use-case';
 import { GetUserByIdUseCase } from '../../app/use-cases/user/get-user-by-id-use-case';
+import {
+  GetUserDirectoryDto,
+  GetUserDirectoryUseCase,
+} from '../../app/use-cases/user/get-user-directory-use-case';
+import { InviteUserDto, InviteUserUseCase } from '../../app/use-cases/user/invite-user-use-case';
 import { ActivateUserUseCase } from '../../app/use-cases/user/activate-user-use-case';
 import { ActivateUserDto } from '../../app/use-cases/user/activate-user-use-case/activate-user.dto';
 import { ConfirmResetPasswordUseCase } from '../../app/use-cases/user/confirm-reset-password-use-case';
@@ -60,6 +65,8 @@ export class UserController {
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly getUserByIdUseCase: GetUserByIdUseCase,
     private readonly getAllUsersUseCase: GetAllUsersUseCase,
+    private readonly getUserDirectoryUseCase: GetUserDirectoryUseCase,
+    private readonly inviteUserUseCase: InviteUserUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly resetUserPasswordUseCase: ResetUserPasswordUseCase,
     private readonly sendActivationEmailUseCase: SendActivationEmailUseCase,
@@ -189,6 +196,27 @@ export class UserController {
     @Query('role') role?: Role,
   ): Promise<Omit<User, 'password'>[]> {
     return this.getAllUsersUseCase.call({ role });
+  }
+
+  // Utilizadores (Backoffice): pessoas e entidades, por separador e pesquisa.
+  // Antes de `:id`, para "directory" não ser lido como id.
+  @Get('directory')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Utilizadores e entidades, com recolhas, kg e última atividade' })
+  getDirectory(@Query() query: GetUserDirectoryDto) {
+    return this.getUserDirectoryUseCase.call(query);
+  }
+
+  // Convite: cria a conta com os perfis e envia o email de ativação.
+  @Post('invite')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Convidar utilizador por email' })
+  invite(@Body() dto: InviteUserDto, @CurrentUser() actor: JwtPayload) {
+    return this.inviteUserUseCase.call({ data: dto, actor: { id: actor.sub, roles: actor.roles } });
   }
 
   @Get(':id')

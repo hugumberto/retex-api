@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CompanyProfileKey } from '../../../../domain/company/company-profile.entity';
-import { Company, CompanyStatus } from '../../../../domain/company/company.entity';
+import { Company, CompanyStatus, CompanyKind } from '../../../../domain/company/company.entity';
 import {
   ICompanyMemberRepository,
   ICompanyProfileRepository,
@@ -96,6 +96,7 @@ export class CreateCompanyUseCase
           email: param.email ?? null,
           phone: param.phone ?? null,
           status: CompanyStatus.ACTIVE,
+          kind: param.kind ?? CompanyKind.COMPANY,
           friendlyCode,
         } as Partial<Company>)) as Company;
 
