@@ -2,7 +2,7 @@ import { Address } from '../address/address.entity';
 import { Company } from '../company/company.entity';
 import { Entity } from '../interfaces/entity.interface';
 import { Item } from '../item/item.entity';
-import { Route } from '../route/route.entity';
+import { CollectionInterval, Route } from '../route/route.entity';
 import { User } from '../user/user.entity';
 
 export interface CollectionRequest extends Entity {
@@ -20,6 +20,10 @@ export interface CollectionRequest extends Entity {
   route?: Route;
   weight?: number;
   estimatedBags?: number;
+  // Janela pedida pelo cliente (dia `YYYY-MM-DD` e período). Indicativa: a
+  // janela que conta é a da rota. NULL nos pedidos anteriores a este campo.
+  preferredDate?: string | null;
+  preferredInterval?: CollectionInterval | null;
   address?: Address;
   addressId?: string;
   items?: Item[];

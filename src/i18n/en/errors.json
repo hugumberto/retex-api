@@ -57,7 +57,8 @@
     "notFoundWithId": "Collection request {id} not found",
     "notInCreatedStatus": "Collection request {id} is not in the CREATED status",
     "alreadyLinkedToRoute": "Collection request {id} is already linked to a route",
-    "alreadyLinkedToAnotherRoute": "Collection request {id} is already linked to another route"
+    "alreadyLinkedToAnotherRoute": "Collection request {id} is already linked to another route",
+    "preferredDateInPast": "The requested pickup date is in the past"
   },
   "bag": {
     "notFound": "Bag not found",

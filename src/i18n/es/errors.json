@@ -57,7 +57,8 @@
     "notFoundWithId": "Solicitud de recogida {id} no encontrada",
     "notInCreatedStatus": "La solicitud de recogida {id} no está en el estado CREATED",
     "alreadyLinkedToRoute": "La solicitud de recogida {id} ya está asociada a una ruta",
-    "alreadyLinkedToAnotherRoute": "La solicitud de recogida {id} ya está asociada a otra ruta"
+    "alreadyLinkedToAnotherRoute": "La solicitud de recogida {id} ya está asociada a otra ruta",
+    "preferredDateInPast": "La fecha solicitada para la recogida ya ha pasado"
   },
   "bag": {
     "notFound": "Bolsa no encontrada",

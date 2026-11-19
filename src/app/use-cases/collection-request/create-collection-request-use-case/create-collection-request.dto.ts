@@ -1,6 +1,8 @@
 import { Type } from 'class-transformer';
 import {
+  IsDateString,
   IsEmail,
+  IsEnum,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -10,6 +12,7 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import { CollectionInterval } from '../../../../domain/route/route.entity';
 import { RegisterAddressDto } from '../../user/register-user-use-case/register-user.dto';
 
 /**
@@ -64,4 +67,14 @@ export class CreateCollectionRequestDto {
   @IsInt({ message: 'Estimativa de sacos deve ser um número inteiro' })
   @Min(1, { message: 'Estimativa de sacos deve ser pelo menos 1' })
   estimatedBags: number;
+
+  // Janela pedida pelo cliente. Opcional para não partir clientes antigos; o
+  // portal pede-a sempre ao cliente.
+  @IsOptional()
+  @IsDateString({ strict: true })
+  preferredDate?: string;
+
+  @IsOptional()
+  @IsEnum(CollectionInterval)
+  preferredInterval?: CollectionInterval;
 }

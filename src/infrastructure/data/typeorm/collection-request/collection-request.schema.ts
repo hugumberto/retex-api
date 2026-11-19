@@ -36,6 +36,18 @@ export const collectionRequestSchema = new EntitySchema<CollectionRequest>({
       nullable: true,
       name: 'estimated_bags',
     },
+    preferredDate: {
+      type: 'date',
+      nullable: true,
+      name: 'preferred_date',
+    },
+    // varchar como `route.collection_interval`: os valores são os do mesmo enum.
+    preferredInterval: {
+      type: 'varchar',
+      length: 32,
+      nullable: true,
+      name: 'preferred_interval',
+    },
     companyId: {
       type: 'uuid',
       nullable: true,

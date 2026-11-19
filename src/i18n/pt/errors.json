@@ -57,7 +57,8 @@
     "notFoundWithId": "Solicitação de recolha {id} não encontrada",
     "notInCreatedStatus": "A solicitação de recolha {id} não está no estado CREATED",
     "alreadyLinkedToRoute": "A solicitação de recolha {id} já está associada a uma rota",
-    "alreadyLinkedToAnotherRoute": "A solicitação de recolha {id} já está associada a outra rota"
+    "alreadyLinkedToAnotherRoute": "A solicitação de recolha {id} já está associada a outra rota",
+    "preferredDateInPast": "A data pedida para a recolha já passou"
   },
   "bag": {
     "notFound": "Saco não encontrado",
