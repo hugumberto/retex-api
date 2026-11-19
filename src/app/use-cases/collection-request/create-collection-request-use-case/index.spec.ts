@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
 import { Address } from '../../../../domain/address/address.entity';
@@ -89,6 +89,26 @@ describe('CreateCollectionRequestUseCase', () => {
     expect(collectionRequestRepositoryMock.create).toHaveBeenCalledWith(
       expect.objectContaining({ status: CollectionRequestStatus.CREATED, estimatedBags: 2 }),
     );
+  });
+
+  it('guarda a janela pedida pelo cliente', async () => {
+    userRepositoryMock.findOne.mockResolvedValue(user);
+    addressRepositoryMock.findOne.mockResolvedValue(address);
+    testZoneRepositoryMock.findByCity.mockResolvedValue({ id: 'z', city: 'Lisboa' } as any);
+    collectionRequestRepositoryMock.create.mockImplementation(async (dto) => ({ id: 'pkg', ...dto } as any));
+
+    await useCase.call({ ...param, preferredDate: '2999-01-15', preferredInterval: '09:00 - 13:00' });
+
+    expect(collectionRequestRepositoryMock.create).toHaveBeenCalledWith(
+      expect.objectContaining({ preferredDate: '2999-01-15', preferredInterval: '09:00 - 13:00' }),
+    );
+  });
+
+  it('recusa uma janela no passado, sem criar nada', async () => {
+    await expect(
+      useCase.call({ ...param, preferredDate: '2000-01-01' }),
+    ).rejects.toThrow(BadRequestException);
+    expect(collectionRequestRepositoryMock.create).not.toHaveBeenCalled();
   });
 
   it('creates with status OUT_OF_ZONE when the city has no service zone', async () => {

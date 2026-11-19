@@ -57,7 +57,8 @@
     "notFoundWithId": "Demande de collecte {id} introuvable",
     "notInCreatedStatus": "La demande de collecte {id} n'est pas au statut CREATED",
     "alreadyLinkedToRoute": "La demande de collecte {id} est déjà associée à une tournée",
-    "alreadyLinkedToAnotherRoute": "La demande de collecte {id} est déjà associée à une autre tournée"
+    "alreadyLinkedToAnotherRoute": "La demande de collecte {id} est déjà associée à une autre tournée",
+    "preferredDateInPast": "La date de collecte demandée est déjà passée"
   },
   "bag": {
     "notFound": "Sac introuvable",

@@ -1,4 +1,10 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { randomBytes } from 'crypto';
 import { IAddressRepository } from '../../../../domain/address/address.repository';
 import { IUnitOfWork } from '../../../../domain/interfaces/unit-of-work.interface';
@@ -23,6 +29,11 @@ import { SERVICE_TOKENS } from '../../../services/tokens';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { generateUniqueFriendlyCode } from '../../shared/friendly-code.util';
 import { CreateCollectionRequestDto } from './create-collection-request.dto';
+
+// Dia de hoje em Portugal (YYYY-MM-DD): o servidor corre em UTC e, perto da
+// meia-noite, o dia UTC não é o do cliente.
+const todayInLisbon = () =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Lisbon' }).format(new Date());
 
 @Injectable()
 export class CreateCollectionRequestUseCase
@@ -53,6 +64,11 @@ export class CreateCollectionRequestUseCase
   ) {}
 
   async call(param: CreateCollectionRequestDto): Promise<CollectionRequest> {
+    const preferredDate = param.preferredDate?.slice(0, 10);
+    if (preferredDate && preferredDate < todayInLisbon()) {
+      throw new BadRequestException('errors.collectionRequest.preferredDateInPast');
+    }
+
     const friendlyCode = await this.generateUniqueFriendlyCode();
 
     // Resolver o cliente dentro da transação: na forma de balcão isto cria
@@ -82,6 +98,8 @@ export class CreateCollectionRequestUseCase
           companyId: companyContext?.companyId ?? null,
           address: address,
           estimatedBags: param.estimatedBags,
+          preferredDate: preferredDate ?? null,
+          preferredInterval: param.preferredInterval ?? null,
         };
 
         const pkg =
