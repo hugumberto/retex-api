@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GetDashboardActivityUseCase } from '../../app/use-cases/dashboard/get-dashboard-activity-use-case';
+import { GetPublicImpactStatsUseCase } from '../../app/use-cases/dashboard/get-public-impact-stats-use-case';
 import { GetDashboardStatsUseCase } from '../../app/use-cases/dashboard/get-dashboard-stats-use-case';
 import { GetScopedDashboardStatsUseCase } from '../../app/use-cases/dashboard/get-scoped-dashboard-stats-use-case';
 import { JwtPayload } from '../../app/services/interfaces/auth.interface';
@@ -16,6 +17,7 @@ describe('DashboardController', () => {
       controllers: [DashboardController],
       providers: [
         { provide: GetDashboardStatsUseCase, useValue: { call: jest.fn() } },
+        { provide: GetPublicImpactStatsUseCase, useValue: { call: jest.fn() } },
         {
           provide: GetScopedDashboardStatsUseCase,
           useValue: { call: jest.fn() },

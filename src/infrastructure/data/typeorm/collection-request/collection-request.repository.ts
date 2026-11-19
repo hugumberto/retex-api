@@ -398,6 +398,20 @@ export class CollectionRequestRepository
     }));
   }
 
+  // Conta só as solicitações com peso: é o que garante que houve recolha de
+  // facto, sem depender da lista de estados por onde a solicitação já passou.
+  async countCitiesServed(): Promise<number> {
+    const repository = await this.getRepository();
+    const row = await repository
+      .createQueryBuilder('collectionRequest')
+      .innerJoin('collectionRequest.address', 'address')
+      .select('COUNT(DISTINCT LOWER(TRIM(address.city)))', 'count')
+      .where('collectionRequest.weight > 0')
+      .andWhere("COALESCE(TRIM(address.city), '') <> ''")
+      .getRawOne<{ count: string }>();
+    return Number(row?.count ?? 0);
+  }
+
   async findOneWithAllRelations(id: string): Promise<CollectionRequest> {
     const repository = await this.getRepository();
     return repository
