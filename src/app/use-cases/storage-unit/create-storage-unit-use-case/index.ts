@@ -33,6 +33,7 @@ export class CreateStorageUnitUseCase implements IUseCase<CreateStorageUnitDto, 
       friendlyCode,
       ...slot,
       location: param.location?.trim() || null,
+      zone: param.zone ?? null,
       status: StorageUnitStatus.ATIVO,
       weight: 0,
     });

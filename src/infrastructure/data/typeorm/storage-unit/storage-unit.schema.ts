@@ -4,6 +4,7 @@ import {
   StorageGroup,
   StorageUnit,
   StorageUnitStatus,
+  StorageZone,
 } from '../../../../domain/storage-unit/storage-unit.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
 
@@ -51,6 +52,17 @@ export const storageUnitSchema = new EntitySchema<StorageUnit>({
       enum: StorageUnitStatus,
       nullable: false,
       default: StorageUnitStatus.ATIVO,
+    },
+    zone: {
+      type: 'enum',
+      enum: StorageZone,
+      enumName: 'storage_unit_zone_enum',
+      nullable: true,
+    },
+    outboundId: {
+      type: 'uuid',
+      nullable: true,
+      name: 'outbound_id',
     },
     weight: {
       type: 'decimal',

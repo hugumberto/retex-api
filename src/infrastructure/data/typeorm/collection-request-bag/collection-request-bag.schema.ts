@@ -41,6 +41,18 @@ export const collectionRequestBagSchema = new EntitySchema<CollectionRequestBag>
       nullable: true,
       name: 'route_id',
     },
+    receivedAt: {
+      type: 'timestamp with time zone',
+      nullable: true,
+      name: 'received_at',
+    },
+    receivedWeight: {
+      type: 'decimal',
+      precision: 10,
+      scale: 2,
+      nullable: true,
+      name: 'received_weight',
+    },
     weight: {
       type: 'decimal',
       precision: 10,

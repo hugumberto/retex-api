@@ -18,6 +18,7 @@ import { FaqController } from './faq/faq.controller';
 import { TestZoneController } from './test-zone/test-zone.controller';
 import { BrandController } from './brand/brand.controller';
 import { VehicleController } from './vehicle/vehicle.controller';
+import { WarehouseController } from './warehouse/warehouse.controller';
 import { MeController } from './me/me.controller';
 import { HealthController } from './health/health.controller';
 import { ItemController } from './item/item.controller';
@@ -52,6 +53,7 @@ import { WelcomeController } from './welcome/welcome.controller';
     TriageController,
     BrandController,
     VehicleController,
+    WarehouseController,
     ItemController,
     BlogPostController,
     BlogCategoryController,

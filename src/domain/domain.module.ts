@@ -4,6 +4,7 @@ import { IBlogCategoryRepository } from './blog-post/blog-category.repository';
 import { IBlogPostRepository } from './blog-post/blog-post.repository';
 import { IBrandRepository } from './brand/brand.repository';
 import { IVehicleRepository } from './vehicle/vehicle.repository';
+import { IWarehouseOutboundRepository } from './warehouse/warehouse.repository';
 import {
   ICompanyMemberRepository,
   ICompanyProfileRepository,
@@ -31,6 +32,7 @@ export interface DomainModuleOptions {
   testZoneRepository: Type<ITestZoneRepository>;
   brandRepository: Type<IBrandRepository>;
   vehicleRepository: Type<IVehicleRepository>;
+  warehouseOutboundRepository: Type<IWarehouseOutboundRepository>;
   itemRepository: Type<IItemRepository>;
   collectionRequestRepository: Type<ICollectionRequestRepository>;
   routeRepository: Type<IRouteRepository>;
@@ -79,6 +81,10 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.VEHICLE_REPOSITORY,
           useClass: options.vehicleRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.WAREHOUSE_OUTBOUND_REPOSITORY,
+          useClass: options.warehouseOutboundRepository,
         },
         {
           provide: DOMAIN_TOKENS.ITEM_REPOSITORY,
@@ -169,6 +175,10 @@ export class DomainModule {
         {
           provide: DOMAIN_TOKENS.VEHICLE_REPOSITORY,
           useClass: options.vehicleRepository,
+        },
+        {
+          provide: DOMAIN_TOKENS.WAREHOUSE_OUTBOUND_REPOSITORY,
+          useClass: options.warehouseOutboundRepository,
         },
         {
           provide: DOMAIN_TOKENS.ITEM_REPOSITORY,

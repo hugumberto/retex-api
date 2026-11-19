@@ -124,5 +124,17 @@
     "notFound": "Veículo não encontrado",
     "duplicatePlate": "Já existe um veículo com esta matrícula",
     "inactive": "Este veículo está desativado e não pode ser usado numa rota"
+  },
+  "reception": {
+    "bagNotLinked": "Este saco não está associado a nenhum pedido.",
+    "alreadyReceived": "Já deu entrada.",
+    "notFound": "Não há saco nem pedido com este código.",
+    "noBags": "Este pedido não tem sacos associados.",
+    "notCollected": "O pedido ainda não foi recolhido."
+  },
+  "outbound": {
+    "notFound": "Saída não encontrada.",
+    "notScheduled": "Esta saída já foi fechada.",
+    "invalidUnits": "Há lotes inativos ou já noutra saída."
   }
 }

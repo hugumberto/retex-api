@@ -77,4 +77,32 @@ export class UpdateSystemParametersDto {
   @Min(0)
   @Max(30)
   stopMinutesPerBag?: number;
+
+  // Capacidade da zona do armazém, em kg.
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(1000000)
+  zoneSortingCapacityKg?: number;
+
+  // Capacidade da zona do armazém, em kg.
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(1000000)
+  zoneReuseCapacityKg?: number;
+
+  // Capacidade da zona do armazém, em kg.
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(1000000)
+  zoneUpcyclingCapacityKg?: number;
+
+  // Capacidade da zona do armazém, em kg.
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(1000000)
+  zoneRecyclingCapacityKg?: number;
 }

@@ -1,6 +1,6 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, ValidateIf } from "class-validator";
 import { Season, Type } from "../../../../domain/item/item.entity";
-import { StorageGroup } from "../../../../domain/storage-unit/storage-unit.entity";
+import { StorageGroup, StorageZone } from "../../../../domain/storage-unit/storage-unit.entity";
 
 export class CreateStorageUnitDto {
   @IsNotEmpty()
@@ -21,4 +21,9 @@ export class CreateStorageUnitDto {
   @IsString()
   @MaxLength(100)
   location?: string;
+
+  // Zona do armazém; nula = a do grupo (ver `zoneOf`).
+  @IsOptional()
+  @IsEnum(StorageZone)
+  zone?: StorageZone | null;
 }

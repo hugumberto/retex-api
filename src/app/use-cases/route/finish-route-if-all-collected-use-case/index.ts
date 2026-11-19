@@ -36,6 +36,7 @@ export class FinishRouteIfAllCollectedUseCase implements IUseCase<string, void> 
     const allDone = collectionRequests.every(
       (pkg) =>
         pkg.status === CollectionRequestStatus.COLLECTED ||
+        pkg.status === CollectionRequestStatus.IN_HOUSE ||
         pkg.status === CollectionRequestStatus.CANCELLED,
     );
     if (!allDone) return;

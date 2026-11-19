@@ -63,8 +63,10 @@ export class ProcessTriageQrUseCase
     if (!collectionRequestEntity) {
       throw new NotFoundException('errors.collection.requestNotFound');
     }
+    // Recolhido, já recebido no armazém (IN_HOUSE) ou já em triagem.
     if (
       collectionRequestEntity.status !== CollectionRequestStatus.COLLECTED &&
+      collectionRequestEntity.status !== CollectionRequestStatus.IN_HOUSE &&
       collectionRequestEntity.status !== CollectionRequestStatus.SCREENING
     ) {
       throw new BadRequestException('errors.triage.requestNotInTriage',
