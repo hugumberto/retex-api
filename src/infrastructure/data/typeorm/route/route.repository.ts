@@ -40,6 +40,7 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
     queryBuilder
       .leftJoinAndSelect('route.driver', 'driver')
       .leftJoinAndSelect('driver.roles', 'driverRoles')
+      .leftJoinAndSelect('route.vehicle', 'vehicle')
       .loadRelationCountAndMap('route.collectionRequestsCount', 'route.collectionRequests')
       // Nº de recolhas já confirmadas pelo cliente (collectionConfirmedAt != null).
       .loadRelationCountAndMap(
@@ -83,6 +84,7 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
       .createQueryBuilder('route')
       .leftJoinAndSelect('route.driver', 'driver')
       .leftJoinAndSelect('driver.roles', 'driverRoles')
+      .leftJoinAndSelect('route.vehicle', 'vehicle')
       .leftJoinAndSelect('route.collectionRequests', 'collectionRequests')
       .leftJoinAndSelect('collectionRequests.user', 'collectionRequestUser')
       // Idem à listagem: o construtor de rotas mostra o crachá de empresa nas

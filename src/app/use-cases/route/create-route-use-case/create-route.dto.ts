@@ -17,4 +17,9 @@ export class CreateRouteDto {
   @IsOptional()
   @IsEnum(CollectionInterval)
   collectionInterval?: CollectionInterval;
+
+  // Opcional: o veículo também se pode escolher depois, enquanto a rota está em rascunho.
+  @IsOptional()
+  @IsUUID()
+  vehicleId?: string;
 }

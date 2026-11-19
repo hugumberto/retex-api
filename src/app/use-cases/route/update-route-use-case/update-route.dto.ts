@@ -28,4 +28,9 @@ export class UpdateRouteDto {
   @IsOptional()
   @IsDateString()
   endDate?: string;
+
+  // `null` tira o veículo da rota.
+  @IsOptional()
+  @IsUUID()
+  vehicleId?: string | null;
 }

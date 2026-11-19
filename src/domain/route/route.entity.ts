@@ -1,6 +1,7 @@
 import { Entity } from "../interfaces/entity.interface";
 import { CollectionRequest } from "../collection-request/collection-request.entity";
 import { User } from "../user/user.entity";
+import { Vehicle } from "../vehicle/vehicle.entity";
 
 export enum CollectionInterval {
   MORNING = '09:00 - 13:00',
@@ -15,6 +16,8 @@ export interface Route extends Entity {
   // Intervalo de horário da recolha (informado no email de confirmação).
   collectionInterval?: CollectionInterval | null
   driver: User
+  // Veículo da rota (opcional: as rotas anteriores aos veículos não o têm).
+  vehicle?: Vehicle | null
   collectionRequests: CollectionRequest[]
   startDate: Date
   endDate?: Date

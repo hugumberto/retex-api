@@ -118,5 +118,10 @@
   },
   "systemParameter": {
     "qrLargerThanLabel": "The QR does not fit the label at the given size"
+  },
+  "vehicle": {
+    "notFound": "Vehicle not found",
+    "duplicatePlate": "A vehicle with this licence plate already exists",
+    "inactive": "This vehicle is deactivated and cannot be used on a route"
   }
 }
