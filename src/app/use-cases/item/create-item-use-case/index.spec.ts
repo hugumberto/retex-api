@@ -93,6 +93,19 @@ describe('CreateItemUseCase', () => {
     expect(result.storageSlot).toEqual({ group: 'MEN', season: 'SUMMER', type: 'UNDER_PART' });
   });
 
+  it('regista o estado da etiqueta, ou null quando não vem', async () => {
+    arrange();
+    await useCase.call({ ...param, careLabel: 'ILLEGIBLE' });
+    expect(itemRepositoryMock.create).toHaveBeenLastCalledWith(
+      expect.objectContaining({ careLabel: 'ILLEGIBLE' }),
+    );
+
+    await useCase.call(param);
+    expect(itemRepositoryMock.create).toHaveBeenLastCalledWith(
+      expect.objectContaining({ careLabel: null }),
+    );
+  });
+
   it('rejeita type que não bate com a categoria', async () => {
     arrange();
     await expect(

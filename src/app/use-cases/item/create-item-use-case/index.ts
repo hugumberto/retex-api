@@ -80,6 +80,7 @@ export class CreateItemUseCase implements IUseCase<CreateItemParams, CreateItemR
       type,
       category: param.category ?? null,
       condition: param.condition ?? null,
+      careLabel: param.careLabel ?? null,
       brand,
       quantity: param.quantity,
       denim: param.denim ?? null,
