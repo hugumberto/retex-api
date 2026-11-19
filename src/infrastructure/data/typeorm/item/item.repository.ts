@@ -11,6 +11,7 @@ import {
   ItemBrandCount,
   ItemDimension,
   ItemDimensionCount,
+  TriageQueueEntry,
 } from '../../../../domain/item/item.repository';
 import { BaseRepository } from '../abstraction/base.repository';
 import { itemSchema } from './item.schema';
@@ -62,6 +63,63 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
       where: { collectionRequest: { id: collectionRequestId } },
       relations: ['collectionRequest', 'brand', 'storageUnit'],
     });
+  }
+
+  async triageQueue(limit: number): Promise<TriageQueueEntry[]> {
+    const repository = await this.getRepository();
+    const rows: {
+      id: string; code: string | null; status: string; client_name: string | null;
+      bags: string; bags_processed: string; collected_at: Date | null;
+    }[] = await repository.manager.query(
+      `SELECT cr.id, cr.friendly_code AS code, cr.status,
+              COALESCE(c.name, NULLIF(TRIM(CONCAT(u.first_name, ' ', u.last_name)), '')) AS client_name,
+              COUNT(b.id) AS bags,
+              COUNT(b.processed_at) AS bags_processed,
+              MIN(b.used_at) AS collected_at
+         FROM collection_request cr
+         LEFT JOIN company c ON c.id = cr.company_id
+         LEFT JOIN "user" u ON u.id = cr.user_id
+         LEFT JOIN collection_request_bag b ON b.collection_request_id = cr.id AND b.deleted_at IS NULL
+        WHERE cr.deleted_at IS NULL
+          AND cr.status IN ('COLLECTED', 'IN_HOUSE', 'SCREENING')
+        GROUP BY cr.id, c.name, u.first_name, u.last_name
+        ORDER BY (cr.status = 'SCREENING') DESC, MIN(b.used_at) ASC NULLS LAST, cr.created_at ASC
+        LIMIT $1`,
+      [limit],
+    );
+    return rows.map((r) => ({
+      id: r.id,
+      code: r.code,
+      status: r.status,
+      clientName: r.client_name,
+      bags: Number(r.bags),
+      bagsProcessed: Number(r.bags_processed),
+      collectedAt: r.collected_at,
+    }));
+  }
+
+  async operatorStats(operatorId: string, since: Date): Promise<{ pieces: number; requests: number }> {
+    const repository = await this.getRepository();
+    const [row]: { pieces: string; requests: string }[] = await repository.manager.query(
+      `SELECT COALESCE(SUM(quantity), 0) AS pieces, COUNT(DISTINCT collection_request_id) AS requests
+         FROM item
+        WHERE deleted_at IS NULL AND operator_id = $1 AND created_at >= $2`,
+      [operatorId, since],
+    );
+    return { pieces: Number(row.pieces), requests: Number(row.requests) };
+  }
+
+  async topCategories(limit: number): Promise<string[]> {
+    const repository = await this.getRepository();
+    const rows: { category: string }[] = await repository.manager.query(
+      `SELECT category FROM item
+        WHERE deleted_at IS NULL AND category IS NOT NULL
+        GROUP BY category
+        ORDER BY SUM(quantity) DESC
+        LIMIT $1`,
+      [limit],
+    );
+    return rows.map((r) => r.category);
   }
 
   async countByBagId(bagId: string): Promise<number> {
