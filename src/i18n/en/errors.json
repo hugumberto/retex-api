@@ -124,5 +124,17 @@
     "notFound": "Vehicle not found",
     "duplicatePlate": "A vehicle with this licence plate already exists",
     "inactive": "This vehicle is deactivated and cannot be used on a route"
+  },
+  "reception": {
+    "bagNotLinked": "This bag isn't linked to any request.",
+    "alreadyReceived": "Already received.",
+    "notFound": "No bag or request with this code.",
+    "noBags": "This request has no linked bags.",
+    "notCollected": "The request hasn't been collected yet."
+  },
+  "outbound": {
+    "notFound": "Outbound not found.",
+    "notScheduled": "This outbound is already closed.",
+    "invalidUnits": "Some lots are inactive or already in another outbound."
   }
 }

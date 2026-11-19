@@ -1,6 +1,6 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator";
 import { Season, Type } from "../../../../domain/item/item.entity";
-import { StorageGroup, StorageUnitStatus } from "../../../../domain/storage-unit/storage-unit.entity";
+import { StorageGroup, StorageZone, StorageUnitStatus } from "../../../../domain/storage-unit/storage-unit.entity";
 
 export class UpdateStorageUnitDto {
   @IsOptional()
@@ -30,4 +30,9 @@ export class UpdateStorageUnitDto {
   @IsOptional()
   @IsNumber()
   weight?: number;
+
+  // Zona do armazém; nula = a do grupo (ver `zoneOf`).
+  @IsOptional()
+  @IsEnum(StorageZone)
+  zone?: StorageZone | null;
 }

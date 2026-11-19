@@ -124,5 +124,17 @@
     "notFound": "Vehículo no encontrado",
     "duplicatePlate": "Ya existe un vehículo con esta matrícula",
     "inactive": "Este vehículo está desactivado y no se puede usar en una ruta"
+  },
+  "reception": {
+    "bagNotLinked": "Esta bolsa no está asociada a ninguna solicitud.",
+    "alreadyReceived": "Ya se registró la entrada.",
+    "notFound": "No hay bolsa ni solicitud con este código.",
+    "noBags": "Esta solicitud no tiene bolsas asociadas.",
+    "notCollected": "La solicitud aún no se ha recogido."
+  },
+  "outbound": {
+    "notFound": "Salida no encontrada.",
+    "notScheduled": "Esta salida ya está cerrada.",
+    "invalidUnits": "Hay lotes inactivos o ya en otra salida."
   }
 }

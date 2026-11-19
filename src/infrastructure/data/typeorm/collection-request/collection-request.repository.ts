@@ -533,6 +533,7 @@ export class CollectionRequestRepository
         excludedStatuses: [
           CollectionRequestStatus.CANCELLED,
           CollectionRequestStatus.COLLECTED,
+          CollectionRequestStatus.IN_HOUSE,
         ],
       })
       .andWhere("route.start_date::date = CURRENT_DATE + INTERVAL '1 day'")

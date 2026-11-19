@@ -48,6 +48,10 @@ export class UpdateStorageUnitUseCase implements IUseCase<UpdateStorageUnitParam
       updateData.location = data.location?.trim() || null;
     }
 
+    if (data.zone !== undefined) {
+      updateData.zone = data.zone;
+    }
+
     // A combinação resultante tem de continuar a ser um lote válido.
     const slot = {
       group: updateData.group ?? existingStorageUnit.group,

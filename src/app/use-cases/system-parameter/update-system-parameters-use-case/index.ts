@@ -34,6 +34,10 @@ export class UpdateSystemParametersUseCase
       'warehouseLong',
       'stopBaseMinutes',
       'stopMinutesPerBag',
+      'zoneSortingCapacityKg',
+      'zoneReuseCapacityKg',
+      'zoneUpcyclingCapacityKg',
+      'zoneRecyclingCapacityKg',
     ] as const) {
       if (param[key] !== undefined) {
         (optional as Record<string, unknown>)[key] = param[key];

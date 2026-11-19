@@ -21,6 +21,7 @@ import { FaqCategoryRepository } from './infrastructure/data/typeorm/faq/faq-cat
 import { FaqItemRepository } from './infrastructure/data/typeorm/faq/faq-item.repository';
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
 import { VehicleRepository } from './infrastructure/data/typeorm/vehicle/vehicle.repository';
+import { WarehouseOutboundRepository } from './infrastructure/data/typeorm/warehouse/warehouse-outbound.repository';
 import {
   CompanyMemberRepository,
   CompanyProfileRepository,
@@ -60,6 +61,7 @@ export class AppModule {
         testZoneRepository: TestZoneRepository,
         brandRepository: BrandRepository,
         vehicleRepository: VehicleRepository,
+        warehouseOutboundRepository: WarehouseOutboundRepository,
         itemRepository: ItemRepository,
         collectionRequestRepository: CollectionRequestRepository,
         routeRepository: RouteRepository,

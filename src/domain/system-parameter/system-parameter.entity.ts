@@ -34,4 +34,9 @@ export interface SystemParameter extends Entity {
    */
   stopBaseMinutes: number
   stopMinutesPerBag: number
+  /** Capacidade de cada zona do armazém, em kg (A por triar, B reutilização, C upcycling, D reciclagem). */
+  zoneSortingCapacityKg: number
+  zoneReuseCapacityKg: number
+  zoneUpcyclingCapacityKg: number
+  zoneRecyclingCapacityKg: number
 }
