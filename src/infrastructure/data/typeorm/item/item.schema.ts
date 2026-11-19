@@ -2,6 +2,7 @@ import { EntitySchema } from 'typeorm';
 import { Category } from '../../../../domain/item/item-category';
 import {
   AgeGroup,
+  CareLabel,
   Condition,
   Destination,
   Item,
@@ -54,6 +55,12 @@ export const itemSchema = new EntitySchema<Item>({
     condition: {
       type: 'enum',
       enum: Condition,
+      nullable: true,
+    },
+    careLabel: {
+      name: 'care_label',
+      type: 'enum',
+      enum: CareLabel,
       nullable: true,
     },
     denim: {

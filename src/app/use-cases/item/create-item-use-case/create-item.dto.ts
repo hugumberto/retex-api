@@ -13,6 +13,7 @@ import {
 import { Category } from '../../../../domain/item/item-category';
 import {
   AgeGroup,
+  CareLabel,
   Condition,
   Destination,
   Season,
@@ -75,6 +76,10 @@ export class CreateItemDto {
   quantity: number;
 
   // Indicadores informativos opcionais.
+  @IsOptional()
+  @IsEnum(CareLabel)
+  careLabel?: CareLabel;
+
   @IsOptional()
   @IsBoolean()
   denim?: boolean;

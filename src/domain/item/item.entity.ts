@@ -25,6 +25,9 @@ export interface Item extends Entity {
   // Indicadores informativos (relatórios e análises; não decidem o lote).
   category?: Category | null
   condition?: Condition | null
+  // Etiqueta de composição/cuidados. Nula nos itens triados antes de o
+  // indicador existir.
+  careLabel?: CareLabel | null
   brand?: Brand | null
   denim?: boolean | null
   material?: string | null
@@ -39,6 +42,13 @@ export enum Condition {
   EXCELLENT = "EXCELLENT",
   GOOD = "GOOD",
   REGULAR = "REGULAR",
+}
+
+// Estado da etiqueta de composição/cuidados da peça.
+export enum CareLabel {
+  LEGIBLE = "LEGIBLE",
+  ILLEGIBLE = "ILLEGIBLE",
+  MISSING = "MISSING",
 }
 
 // Destino / valorização da peça.
