@@ -25,6 +25,21 @@ export class UpdateSystemParametersUseCase
   async call(param: UpdateSystemParametersDto): Promise<SystemParameter> {
     this.assertQrFitsLabel(param);
 
+    // Os campos opcionais só entram quando vêm no pedido: quem não os envia
+    // não os apaga.
+    const optional: Partial<SystemParameter> = {};
+    for (const key of [
+      'warehouseAddress',
+      'warehouseLat',
+      'warehouseLong',
+      'stopBaseMinutes',
+      'stopMinutesPerBag',
+    ] as const) {
+      if (param[key] !== undefined) {
+        (optional as Record<string, unknown>)[key] = param[key];
+      }
+    }
+
     const existing = await this.systemParameterRepository.getSingleton();
     if (!existing) {
       return this.systemParameterRepository.create({
@@ -35,6 +50,7 @@ export class UpdateSystemParametersUseCase
         labelHeightMm: param.labelHeightMm,
         labelQrSizeMm: param.labelQrSizeMm,
         labelRotationDeg: param.labelRotationDeg,
+        ...optional,
       });
     }
 
@@ -48,6 +64,7 @@ export class UpdateSystemParametersUseCase
         labelHeightMm: param.labelHeightMm,
         labelQrSizeMm: param.labelQrSizeMm,
         labelRotationDeg: param.labelRotationDeg,
+        ...optional,
       },
     );
     return updated;
