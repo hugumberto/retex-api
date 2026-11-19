@@ -36,6 +36,16 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
       queryBuilder.andWhere('route.driverId = :driverId', { driverId: filters.driverId });
     }
 
+    // O portal grava o dia escolhido à meia-noite UTC; compara-se o intervalo
+    // do dia para aproveitar o índice, em vez de DATE(startDate).
+    if (filters.date) {
+      queryBuilder
+        .andWhere('route.startDate >= CAST(:routeDate AS date)', { routeDate: filters.date })
+        .andWhere("route.startDate < CAST(:routeDate AS date) + interval '1 day'", {
+          routeDate: filters.date,
+        });
+    }
+
     // Incluir relacionamentos (SEM collectionRequests para performance)
     queryBuilder
       .leftJoinAndSelect('route.driver', 'driver')

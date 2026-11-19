@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString, IsUUID, Matches, Max, Min } from 'class-validator';
+import { DATE_ONLY_PATTERN } from '../../../../domain/dashboard/date-range';
 import { RouteStatus } from '../../../../domain/route/route.entity';
 
 export class GetAllRoutesDto {
@@ -11,6 +12,11 @@ export class GetAllRoutesDto {
   @IsString()
   @IsUUID()
   driverId?: string;
+
+  // Rotas de um dia (vista "Rotas de hoje" do portal).
+  @IsOptional()
+  @Matches(DATE_ONLY_PATTERN, { message: 'date deve ser uma data YYYY-MM-DD' })
+  date?: string;
 
   @IsOptional()
   @Type(() => Number)
