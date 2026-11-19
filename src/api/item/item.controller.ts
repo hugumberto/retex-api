@@ -5,6 +5,7 @@ import { CreateItemUseCase } from '../../app/use-cases/item/create-item-use-case
 import { CreateItemDto } from '../../app/use-cases/item/create-item-use-case/create-item.dto';
 import { DeleteItemUseCase } from '../../app/use-cases/item/delete-item-use-case';
 import { Role } from '../../domain/user/user-roles.entity';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('items')
@@ -17,8 +18,8 @@ export class ItemController {
   ) {}
 
   @Post()
-  createItem(@Body() body: CreateItemDto) {
-    return this.createItemUseCase.call(body);
+  createItem(@Body() body: CreateItemDto, @CurrentUser('sub') operatorId: string) {
+    return this.createItemUseCase.call({ ...body, operatorId });
   }
 
   @Post('bind-storage-units')

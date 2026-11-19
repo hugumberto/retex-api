@@ -27,6 +27,7 @@ export class CreateBrandUseCase implements IUseCase<CreateBrandDto, Brand> {
     const brand = await this.brandRepository.create({
       name,
       manual: true,
+      premium: param.premium ?? false,
     });
 
     return brand;

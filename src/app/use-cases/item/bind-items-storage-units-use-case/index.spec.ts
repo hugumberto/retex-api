@@ -43,13 +43,25 @@ describe('BindItemsStorageUnitsUseCase', () => {
       id: 'i1',
       collectionRequest: { id: 'p1' },
       brand: { id: 'b1', name: 'Nike' },
-      quality: 'GOOD',
+      destination: 'REUSE',
+      sex: 'MALE',
+      ageGroup: 'ADULT',
+      season: 'SUMMER',
+      type: 'UPPER_PART',
       storageUnit: null,
       ...over,
     } as unknown as Item);
 
   const su = (over: Partial<StorageUnit> = {}) =>
-    ({ id: 's1', brand: { id: 'b1' }, quality: 'GOOD', weight: 1, ...over } as unknown as StorageUnit);
+    ({
+      id: 's1',
+      group: 'MEN',
+      season: 'SUMMER',
+      type: 'UPPER_PART',
+      status: 'ATIVO',
+      weight: 1,
+      ...over,
+    } as unknown as StorageUnit);
 
   it('rejects when some items are missing', async () => {
     itemRepositoryMock.findByIds.mockResolvedValue([item()]);
@@ -128,5 +140,75 @@ describe('BindItemsStorageUnitsUseCase', () => {
     // O survey deixou de ser enviado na triagem — passou para a finalização da rota.
     await new Promise((resolve) => setImmediate(resolve));
     expect(emailServiceMock.send).not.toHaveBeenCalled();
+  });
+
+  describe('lote pelos indicadores básicos', () => {
+    const bindTo = async (it: Item, units: StorageUnit[], finalize = false) => {
+      itemRepositoryMock.findByIds.mockResolvedValue([it]);
+      storageUnitRepositoryMock.findByIds.mockResolvedValue(units);
+      return useCase.call({
+        items: [it.id],
+        storageUnits: units.map((u) => u.id),
+        finalize,
+      });
+    };
+
+    it('ignora estado, marca e categoria ao escolher o lote', async () => {
+      await bindTo(
+        item({ condition: 'REGULAR', category: 'TOP', brand: { id: 'other' } } as any),
+        [su()],
+      );
+      expect(itemRepositoryMock.update).toHaveBeenCalledWith(
+        { id: 'i1' },
+        { storageUnit: expect.objectContaining({ id: 's1' }) },
+      );
+    });
+
+    it('junta rapaz e rapariga no lote Criança', async () => {
+      const children = su({ id: 's-child', group: 'CHILDREN' } as any);
+      await bindTo(item({ sex: 'FEMALE', ageGroup: 'CHILD' } as any), [su(), children]);
+      expect(itemRepositoryMock.update).toHaveBeenCalledWith(
+        { id: 'i1' },
+        { storageUnit: expect.objectContaining({ id: 's-child' }) },
+      );
+    });
+
+    it('manda peças não reutilizáveis para o lote único, sem estação nem parte', async () => {
+      const nonReusable = su({
+        id: 's-nr',
+        group: 'NON_REUSABLE',
+        season: null,
+        type: null,
+      } as any);
+      await bindTo(
+        item({ destination: 'NON_REUSABLE', sex: null, ageGroup: null } as any),
+        [su(), nonReusable],
+      );
+      expect(itemRepositoryMock.update).toHaveBeenCalledWith(
+        { id: 'i1' },
+        { storageUnit: expect.objectContaining({ id: 's-nr' }) },
+      );
+    });
+
+    it('não associa acessórios a nenhum lote', async () => {
+      const result = await bindTo(item({ destination: 'ACCESSORY' } as any), [su()]);
+      expect(itemRepositoryMock.update).not.toHaveBeenCalled();
+      expect(result.success).toEqual([]);
+    });
+
+    it('não usa lotes inativos', async () => {
+      await expect(
+        bindTo(item(), [su({ status: 'INATIVO' } as any)], true),
+      ).rejects.toThrow(BadRequestException);
+      expect(itemRepositoryMock.update).not.toHaveBeenCalled();
+    });
+
+    it('prefere o lote compatível com menor peso', async () => {
+      await bindTo(item(), [su({ id: 'heavy', weight: 10 }), su({ id: 'light', weight: 2 })]);
+      expect(itemRepositoryMock.update).toHaveBeenCalledWith(
+        { id: 'i1' },
+        { storageUnit: expect.objectContaining({ id: 'light' }) },
+      );
+    });
   });
 });

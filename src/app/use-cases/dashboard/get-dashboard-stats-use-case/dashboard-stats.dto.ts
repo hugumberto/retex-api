@@ -18,7 +18,9 @@ export interface DimensionStat {
 
 export interface TriageStats {
   totalItems: number;
-  byQuality: DimensionStat[];
+  byCondition: DimensionStat[];
+  byDestination: DimensionStat[];
+  byCategory: DimensionStat[];
   bySeason: DimensionStat[];
   byType: DimensionStat[];
   byBrand: { brand: string; count: number; quantity: number }[];

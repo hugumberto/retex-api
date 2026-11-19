@@ -8,6 +8,7 @@ tempo de execução pela API — são todos para correr à mão.
 | `seed-triage-requests.ts` | `yarn seed:triage` | Cria pacotes prontos a triar | Só com `--clean` |
 | `backfill-geocoding.ts` | `yarn geocode:backfill` | Preenche coordenadas em falta nas moradas | Não |
 | `db-refresh-from-prod.sh` | `yarn db:refresh` | Repõe a base local a partir de um dump da produção | **Sim** |
+| `backups-prune.sh` | `yarn db:prune` | Apaga os dumps rodados antigos de `backups/` | **Sim** (só backups) |
 | `blog-post-clean.sh` | — | Testa os endpoints do blog de ponta a ponta | **Sim** |
 | `seed-test-users.sql` | — | Cria um utilizador de teste por perfil (sem MASTER) | Não |
 | `send-test-emails.ts` | — | Envia um exemplar de cada template de email a um destinatário | Não |
@@ -113,6 +114,8 @@ scripts/db-refresh-from-prod.sh --help
 |---|---|
 | `--skip-dump` | Reutiliza `backups/prd.dump` em vez de ir buscar à produção |
 | `--skip-admin-reset` | Não repõe a password do admin a partir do `.env` |
+| `--skip-prune` | Não apaga os dumps rodados antigos no fim do dump |
+| `--keep N` | Quantos dumps rodados manter (omissão: 2) |
 | `-y`, `--yes` | Não pede confirmação antes de destruir a base local |
 | `-h`, `--help` | Mostra a ajuda |
 
@@ -169,6 +172,32 @@ docker exec -e PW='nova-senha' application \
 
 Pode ser corrido as vezes que forem precisas: repõe senha, estado e perfis, e
 não duplica contas nem moradas.
+
+---
+
+## `backups-prune.sh` — limpar dumps antigos
+
+Cada `yarn db:refresh` guarda o dump anterior como `prd.dump.bak-<epoch>`. Sem
+limpeza a pasta cresce o tamanho de um dump (hoje ~8 MB) por execução. Este
+script fica com os N mais recentes e apaga o resto; o dump atual (`prd.dump`)
+nunca é tocado.
+
+```bash
+yarn db:prune                       # mantém os 2 mais recentes
+scripts/backups-prune.sh --keep 5
+scripts/backups-prune.sh --dry-run  # lista sem apagar
+```
+
+| Opção | Efeito |
+|---|---|
+| `--keep N` | Quantos `.bak` manter (omissão: 2; `0` apaga todos) |
+| `--dry-run` | Mostra o que apagaria, sem apagar |
+| `-q`, `--quiet` | Só escreve se apagar alguma coisa |
+
+**Corre sozinho** no fim de cada `yarn db:refresh`, logo a seguir a validar o
+dump novo — é por isso que o refresh ganhou `--skip-prune` e `--keep N`. A
+ordem é a alfabética inversa do nome, que é a cronológica: o sufixo é o
+`date +%s` do refresh.
 
 ---
 

@@ -18,6 +18,8 @@
 # Opções:
 #   --skip-dump          Reutiliza backups/prd.dump em vez de ir buscar à prod
 #   --skip-admin-reset   Não repõe a password do admin a partir do .env
+#   --skip-prune         Não apaga os dumps rodados antigos no fim do dump
+#   --keep N             Quantos dumps rodados manter (omissão: 2)
 #   -y, --yes            Não pede confirmação antes de destruir a base local
 #   -h, --help           Mostra esta ajuda
 #
@@ -39,6 +41,8 @@ readonly HEALTH_TIMEOUT=120
 SKIP_DUMP=false
 SKIP_ADMIN_RESET=false
 ASSUME_YES=false
+SKIP_PRUNE=false
+KEEP_BACKUPS="${KEEP_BACKUPS:-2}"
 
 # ── output ────────────────────────────────────────────────────────────────────
 
@@ -56,6 +60,9 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --skip-dump)        SKIP_DUMP=true ;;
     --skip-admin-reset) SKIP_ADMIN_RESET=true ;;
+    --skip-prune)       SKIP_PRUNE=true ;;
+    --keep)             KEEP_BACKUPS="${2:-}"; shift ;;
+    --keep=*)           KEEP_BACKUPS="${1#*=}" ;;
     -y|--yes)           ASSUME_YES=true ;;
     -h|--help)          usage; exit 0 ;;
     *)                  die "Opção desconhecida: $1 (usa --help)" ;;
@@ -125,6 +132,12 @@ if [[ "$SKIP_DUMP" == false ]]; then
     || die "O ficheiro gerado não é um dump válido."
 
   ok "Dump criado ($(du -h "$DUMP_FILE" | cut -f1)) em backups/$(basename "$DUMP_FILE")"
+
+  # Sem isto a pasta cresce o tamanho de um dump a cada refresh.
+  if [[ "$SKIP_PRUNE" == false ]]; then
+    "$PROJECT_ROOT/scripts/backups-prune.sh" --keep "$KEEP_BACKUPS" --quiet || \
+      warn "A limpeza dos dumps antigos falhou (o refresh continua)."
+  fi
 else
   info "A reutilizar o dump existente ($(du -h "$DUMP_FILE" | cut -f1))"
 fi

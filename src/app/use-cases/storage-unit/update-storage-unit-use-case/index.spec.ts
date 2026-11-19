@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
 import { StorageUnit } from '../../../../domain/storage-unit/storage-unit.entity';
@@ -28,9 +29,21 @@ describe('UpdateStorageUnitUseCase', () => {
   });
 
   it('updates an existing storage unit', async () => {
-    repo.findOne.mockResolvedValue({ id: 's1' } as StorageUnit);
+    repo.findOne.mockResolvedValue({
+      id: 's1', group: 'MEN', season: 'SUMMER', type: 'UPPER_PART',
+    } as StorageUnit);
     repo.update.mockResolvedValue([{ id: 's1' } as StorageUnit]);
     await useCase.call({ id: 's1', data: { weight: 3 } } as any);
     expect(repo.update).toHaveBeenCalled();
+  });
+
+  it('rejeita lote de reutilização sem estação', async () => {
+    repo.findOne.mockResolvedValue({
+      id: 's1', group: 'MEN', season: 'SUMMER', type: 'UPPER_PART',
+    } as StorageUnit);
+    await expect(
+      useCase.call({ id: 's1', data: { season: null } } as any),
+    ).rejects.toThrow(BadRequestException);
+    expect(repo.update).not.toHaveBeenCalled();
   });
 });

@@ -80,11 +80,14 @@
     "someNotFound": "Articles introuvables : {items}",
     "sameCollectionRequestRequired": "Tous les articles doivent appartenir à la même demande de collecte",
     "bindFailed": "Erreur lors de l'association de l'article {id} : {error}",
-    "bulkOperationCancelled": "Opération annulée en raison d'erreurs : {errors}"
+    "bulkOperationCancelled": "Opération annulée en raison d'erreurs : {errors}",
+    "missingBasicIndicators": "Indicateurs de base de l'article manquants (sexe, tranche d'âge, saison et catégorie)",
+    "categoryTypeMismatch": "La catégorie ne correspond pas à la partie indiquée (haut / bas)"
   },
   "storageUnit": {
     "notFound": "Unité de stockage introuvable",
-    "someNotFound": "Unités de stockage introuvables : {units}"
+    "someNotFound": "Unités de stockage introuvables : {units}",
+    "invalidSlot": "Combinaison de lot invalide : les lots de réemploi exigent une saison et une partie ; le lot non réutilisable n'en a aucune"
   },
   "brand": {
     "notFound": "Marque introuvable",

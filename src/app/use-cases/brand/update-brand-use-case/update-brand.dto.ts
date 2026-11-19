@@ -8,4 +8,8 @@ export class UpdateBrandDto {
   @IsBoolean()
   @IsOptional()
   manual?: boolean;
-} 
+
+  @IsBoolean()
+  @IsOptional()
+  premium?: boolean;
+}

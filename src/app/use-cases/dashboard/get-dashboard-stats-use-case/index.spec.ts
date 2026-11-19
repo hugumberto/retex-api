@@ -51,10 +51,10 @@ describe('GetDashboardStatsUseCase', () => {
       { city: 'Porto', count: 2 },
     ]);
     itemRepo.aggregateBy.mockImplementation(async (dimension) =>
-      dimension === 'quality'
+      dimension === 'destination'
         ? [
-            { key: 'GOOD', count: 4, quantity: 8 },
-            { key: 'BAD', count: 1, quantity: 1 },
+            { key: 'REUSE', count: 4, quantity: 8 },
+            { key: 'NON_REUSABLE', count: 1, quantity: 1 },
           ]
         : [],
     );
