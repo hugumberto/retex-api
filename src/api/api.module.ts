@@ -17,6 +17,7 @@ import { EmailLogController } from './email-log/email-log.controller';
 import { FaqController } from './faq/faq.controller';
 import { TestZoneController } from './test-zone/test-zone.controller';
 import { BrandController } from './brand/brand.controller';
+import { VehicleController } from './vehicle/vehicle.controller';
 import { MeController } from './me/me.controller';
 import { HealthController } from './health/health.controller';
 import { ItemController } from './item/item.controller';
@@ -50,6 +51,7 @@ import { WelcomeController } from './welcome/welcome.controller';
     SystemParameterController,
     TriageController,
     BrandController,
+    VehicleController,
     ItemController,
     BlogPostController,
     BlogCategoryController,

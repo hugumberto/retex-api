@@ -7,12 +7,14 @@ import { Role } from '../../../../domain/user/user-roles.entity';
 import { User } from '../../../../domain/user/user.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
+import { IVehicleRepository } from '../../../../domain/vehicle/vehicle.repository';
 import { CreateRouteUseCase } from '.';
 
 describe('CreateRouteUseCase', () => {
   const routeRepo = mock<IRouteRepository>();
   const userRepo = mock<IUserRepository>();
   const collectionRequestRepo = mock<ICollectionRequestRepository>();
+  const vehicleRepo = mock<IVehicleRepository>();
   let useCase: CreateRouteUseCase;
 
   beforeEach(async () => {
@@ -23,6 +25,7 @@ describe('CreateRouteUseCase', () => {
         { provide: DOMAIN_TOKENS.ROUTE_REPOSITORY, useValue: routeRepo },
         { provide: DOMAIN_TOKENS.USER_REPOSITORY, useValue: userRepo },
         { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepo },
+        { provide: DOMAIN_TOKENS.VEHICLE_REPOSITORY, useValue: vehicleRepo },
       ],
     }).compile();
     useCase = module.get(CreateRouteUseCase);
@@ -66,5 +69,40 @@ describe('CreateRouteUseCase', () => {
 
     // Email só na transição para CREATED; pacotes seguem CREATED sem update.
     expect(collectionRequestRepo.update).not.toHaveBeenCalled();
+  });
+
+  describe('veículo', () => {
+    const arrange = () => {
+      userRepo.findOneWithRelations.mockResolvedValue({
+        id: 'd1', roles: [{ role: Role.DRIVER }],
+      } as User);
+      collectionRequestRepo.findOneWithAllRelations.mockResolvedValue({
+        id: 'p1', status: 'CREATED',
+      } as any);
+      routeRepo.create.mockImplementation(async (data) => ({ id: 'r1', ...data }) as any);
+    };
+
+    it('liga o veículo ativo à rota', async () => {
+      arrange();
+      vehicleRepo.findOne.mockResolvedValue({ id: 'v1', active: true } as any);
+
+      await useCase.call({ ...param, vehicleId: 'v1' });
+
+      expect(routeRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ vehicle: expect.objectContaining({ id: 'v1' }) }),
+      );
+    });
+
+    it('recusa um veículo inativo', async () => {
+      arrange();
+      vehicleRepo.findOne.mockResolvedValue({ id: 'v1', active: false } as any);
+      await expect(useCase.call({ ...param, vehicleId: 'v1' })).rejects.toThrow(BadRequestException);
+    });
+
+    it('recusa um veículo que não existe', async () => {
+      arrange();
+      vehicleRepo.findOne.mockResolvedValue(undefined);
+      await expect(useCase.call({ ...param, vehicleId: 'v1' })).rejects.toThrow(NotFoundException);
+    });
   });
 });

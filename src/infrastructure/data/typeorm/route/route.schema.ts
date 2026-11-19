@@ -49,6 +49,15 @@ export const routeSchema = new EntitySchema<Route>({
       },
       inverseSide: 'routes',
     },
+    vehicle: {
+      type: 'many-to-one',
+      target: 'vehicle',
+      joinColumn: {
+        name: 'vehicle_id',
+      },
+      nullable: true,
+      onDelete: 'SET NULL',
+    },
     collectionRequests: {
       type: 'one-to-many',
       target: 'collection_request',

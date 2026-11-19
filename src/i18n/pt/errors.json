@@ -118,5 +118,10 @@
   },
   "systemParameter": {
     "qrLargerThanLabel": "O QR não cabe na etiqueta com as medidas indicadas"
+  },
+  "vehicle": {
+    "notFound": "Veículo não encontrado",
+    "duplicatePlate": "Já existe um veículo com esta matrícula",
+    "inactive": "Este veículo está desativado e não pode ser usado numa rota"
   }
 }

@@ -8,6 +8,7 @@ import { ISystemParameterRepository } from '../../../../domain/system-parameter/
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
+import { IVehicleRepository } from '../../../../domain/vehicle/vehicle.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { SendCollectionConfirmationUseCase } from '../../collection-request/send-collection-confirmation-use-case';
 import { GenerateCollectionBagsUseCase } from '../../collection-request-bag/generate-collection-bags-use-case';
@@ -32,6 +33,8 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
     private readonly userRepository: IUserRepository,
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
+    @Inject(DOMAIN_TOKENS.VEHICLE_REPOSITORY)
+    private readonly vehicleRepository: IVehicleRepository,
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY)
     private readonly collectionRequestBagRepository: ICollectionRequestBagRepository,
     @Inject(DOMAIN_TOKENS.SYSTEM_PARAMETER_REPOSITORY)
@@ -79,6 +82,19 @@ export class UpdateRouteUseCase implements IUseCase<UpdateRouteParamDto, Route> 
       }
 
       updateData.driver = driver;
+    }
+
+    // Veículo: pode mudar em qualquer estado (troca de carrinha não mexe no que
+    // foi combinado com o cliente). `null` tira-o.
+    if (data.vehicleId !== undefined) {
+      if (data.vehicleId === null) {
+        updateData.vehicle = null;
+      } else {
+        const vehicle = await this.vehicleRepository.findOne({ id: data.vehicleId });
+        if (!vehicle) throw new NotFoundException('errors.vehicle.notFound');
+        if (!vehicle.active) throw new BadRequestException('errors.vehicle.inactive');
+        updateData.vehicle = vehicle;
+      }
     }
 
     // 4. Validar e atualizar collectionRequests se fornecidos

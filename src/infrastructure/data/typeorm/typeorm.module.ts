@@ -4,6 +4,7 @@ import { addressSchema } from './address/address.schema';
 import { blogCategorySchema } from './blog-post/blog-category.schema';
 import { blogPostSchema } from './blog-post/blog-post.schema';
 import { brandSchema } from './brand/brand.schema';
+import { vehicleSchema } from './vehicle/vehicle.schema';
 import { emailLogSchema } from './email-log/email-log.schema';
 import { TEST_DATABASE_CONFIG } from './config/typeorm-test.config';
 import { DATABASE_CONFIG } from './config/typeorm.config';
@@ -33,6 +34,7 @@ import { userSchema } from './user/user.schema';
       addressSchema,
       testZoneSchema,
       brandSchema,
+      vehicleSchema,
       itemSchema,
       collectionRequestSchema,
       routeSchema,

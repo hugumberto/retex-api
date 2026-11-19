@@ -118,5 +118,10 @@
   },
   "systemParameter": {
     "qrLargerThanLabel": "Le QR ne tient pas sur l'étiquette avec ces dimensions"
+  },
+  "vehicle": {
+    "notFound": "Véhicule introuvable",
+    "duplicatePlate": "Un véhicule avec cette immatriculation existe déjà",
+    "inactive": "Ce véhicule est désactivé et ne peut pas être utilisé pour une tournée"
   }
 }

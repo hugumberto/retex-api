@@ -6,6 +6,7 @@ import { IRouteRepository } from '../../../../domain/route/route.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
 import { Role } from '../../../../domain/user/user-roles.entity';
 import { IUserRepository } from '../../../../domain/user/user.repository';
+import { IVehicleRepository } from '../../../../domain/vehicle/vehicle.repository';
 import { IUseCase } from '../../interfaces/use-case.interface';
 import { generateUniqueFriendlyCode } from '../../shared/friendly-code.util';
 import { CreateRouteDto } from './create-route.dto';
@@ -19,6 +20,8 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
     private readonly userRepository: IUserRepository,
     @Inject(DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY)
     private readonly collectionRequestRepository: ICollectionRequestRepository,
+    @Inject(DOMAIN_TOKENS.VEHICLE_REPOSITORY)
+    private readonly vehicleRepository: IVehicleRepository,
   ) { }
 
   async call(param: CreateRouteDto): Promise<Route> {
@@ -54,8 +57,17 @@ export class CreateRouteUseCase implements IUseCase<CreateRouteDto, Route> {
       collectionRequests.push(collectionRequestEntity);
     }
 
+    // Veículo opcional; só os ativos se podem escolher.
+    let vehicle = null;
+    if (param.vehicleId) {
+      vehicle = await this.vehicleRepository.findOne({ id: param.vehicleId });
+      if (!vehicle) throw new NotFoundException('errors.vehicle.notFound');
+      if (!vehicle.active) throw new BadRequestException('errors.vehicle.inactive');
+    }
+
     // 5. Criar a route no status DRAFTING (collectionRequests permanecem CREATED)
     const routeData: Partial<Route> = {
+      vehicle,
       status: RouteStatus.DRAFTING,
       friendlyCode: await this.generateUniqueFriendlyCode(),
       collectionInterval: param.collectionInterval,

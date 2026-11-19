@@ -9,6 +9,7 @@ import { SystemParameter } from '../../../../domain/system-parameter/system-para
 import { ISystemParameterRepository } from '../../../../domain/system-parameter/system-parameter.repository';
 import { IUserRepository } from '../../../../domain/user/user.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
+import { IVehicleRepository } from '../../../../domain/vehicle/vehicle.repository';
 import { SendCollectionConfirmationUseCase } from '../../collection-request/send-collection-confirmation-use-case';
 import { GenerateCollectionBagsUseCase } from '../../collection-request-bag/generate-collection-bags-use-case';
 import { SendRouteSurveyUseCase } from '../send-route-survey-use-case';
@@ -18,6 +19,7 @@ describe('UpdateRouteUseCase', () => {
   const routeRepo = mock<IRouteRepository>();
   const userRepo = mock<IUserRepository>();
   const collectionRequestRepo = mock<ICollectionRequestRepository>();
+  const vehicleRepo = mock<IVehicleRepository>();
   const collectionRequestBagRepo = mock<ICollectionRequestBagRepository>();
   const systemParamRepo = mock<ISystemParameterRepository>();
   const sendConfirmation = mock<SendCollectionConfirmationUseCase>();
@@ -33,6 +35,7 @@ describe('UpdateRouteUseCase', () => {
         { provide: DOMAIN_TOKENS.ROUTE_REPOSITORY, useValue: routeRepo },
         { provide: DOMAIN_TOKENS.USER_REPOSITORY, useValue: userRepo },
         { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_REPOSITORY, useValue: collectionRequestRepo },
+        { provide: DOMAIN_TOKENS.VEHICLE_REPOSITORY, useValue: vehicleRepo },
         { provide: DOMAIN_TOKENS.COLLECTION_REQUEST_BAG_REPOSITORY, useValue: collectionRequestBagRepo },
         {
           provide: DOMAIN_TOKENS.SYSTEM_PARAMETER_REPOSITORY,

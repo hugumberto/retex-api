@@ -20,6 +20,7 @@ import { BlogPostRepository } from './infrastructure/data/typeorm/blog-post/blog
 import { FaqCategoryRepository } from './infrastructure/data/typeorm/faq/faq-category.repository';
 import { FaqItemRepository } from './infrastructure/data/typeorm/faq/faq-item.repository';
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
+import { VehicleRepository } from './infrastructure/data/typeorm/vehicle/vehicle.repository';
 import {
   CompanyMemberRepository,
   CompanyProfileRepository,
@@ -58,6 +59,7 @@ export class AppModule {
         addressRepository: AddressRepository,
         testZoneRepository: TestZoneRepository,
         brandRepository: BrandRepository,
+        vehicleRepository: VehicleRepository,
         itemRepository: ItemRepository,
         collectionRequestRepository: CollectionRequestRepository,
         routeRepository: RouteRepository,

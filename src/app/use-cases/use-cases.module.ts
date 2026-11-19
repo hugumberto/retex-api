@@ -7,6 +7,7 @@ import { AUTH_USE_CASES } from './auth';
 import { BLOG_CATEGORY_USE_CASES } from './blog-category';
 import { BLOG_POST_USE_CASES } from './blog-post';
 import { BRAND_USE_CASES } from './brand';
+import { VEHICLE_USE_CASES } from './vehicle';
 import { COLLECTION_USE_CASES } from './collection';
 import { COMPANY_USE_CASES } from './company';
 import { CONTACT_USE_CASES } from './contact';
@@ -40,6 +41,7 @@ export class UseCasesModule {
       ...SYSTEM_PARAMETER_USE_CASES,
       ...TRIAGE_USE_CASES,
       ...BRAND_USE_CASES,
+      ...VEHICLE_USE_CASES,
       ...ITEM_USE_CASES,
       ...BLOG_POST_USE_CASES,
       ...BLOG_CATEGORY_USE_CASES,
