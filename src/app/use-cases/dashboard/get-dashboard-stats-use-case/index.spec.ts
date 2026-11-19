@@ -50,6 +50,7 @@ describe('GetDashboardStatsUseCase', () => {
     collectionRequestRepo.countOutOfZoneByCity.mockResolvedValue([
       { city: 'Porto', count: 2 },
     ]);
+    collectionRequestRepo.weightByCity.mockResolvedValue([]);
     itemRepo.aggregateBy.mockImplementation(async (dimension) =>
       dimension === 'destination'
         ? [
@@ -78,5 +79,31 @@ describe('GetDashboardStatsUseCase', () => {
     expect(result.outOfZone.totalCollectionRequests).toBe(2);
     expect(result.outOfZone.topCities).toEqual([{ city: 'Porto', count: 2 }]);
     expect(userRepo.countByStatus).toHaveBeenCalledWith(UserStatus.ACTIVE);
+  });
+
+  it('aplica o período e o concelho a todas as agregações', async () => {
+    collectionRequestRepo.getTotals.mockResolvedValue({
+      totalCollectionRequests: 0, totalWeight: 0, totalEstimatedBags: 0, totalCollectedBags: 0,
+    });
+    collectionRequestRepo.countByStatus.mockResolvedValue([]);
+    collectionRequestRepo.getWeightTrend.mockResolvedValue([]);
+    collectionRequestRepo.weightByCity.mockResolvedValue([
+      { city: 'Maia', weightKg: 12.345, count: 3 },
+    ]);
+    collectionRequestRepo.countOutOfZoneByCity.mockResolvedValue([]);
+    itemRepo.aggregateBy.mockResolvedValue([]);
+    itemRepo.aggregateByBrand.mockResolvedValue([]);
+    userRepo.countAll.mockResolvedValue(0);
+    userRepo.countByStatus.mockResolvedValue(0);
+    refreshTokenRepo.countActiveUsers.mockResolvedValue(0);
+
+    const result = await useCase.call({ from: '2026-01-01', to: '2026-10-31', city: ' Maia ' });
+
+    const scope = { from: '2026-01-01', to: '2026-10-31', city: 'Maia' };
+    expect(collectionRequestRepo.getTotals).toHaveBeenCalledWith(scope);
+    expect(collectionRequestRepo.weightByCity).toHaveBeenCalledWith(scope);
+    expect(itemRepo.aggregateBy).toHaveBeenCalledWith('destination', scope);
+    expect(itemRepo.aggregateByBrand).toHaveBeenCalledWith(scope);
+    expect(result.collectionRequests.byCity).toEqual([{ city: 'Maia', weightKg: 12.35, count: 3 }]);
   });
 });

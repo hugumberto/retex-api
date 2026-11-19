@@ -1,4 +1,22 @@
+import { IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 import { CollectionRequestStatus } from '../../../../domain/collection-request/collection-request.entity';
+import { DATE_ONLY_PATTERN } from '../../../../domain/dashboard/date-range';
+
+/** Filtros do dashboard de impacto: período (inclusivo) e concelho. Tudo opcional. */
+export class GetDashboardStatsDto {
+  @IsOptional()
+  @Matches(DATE_ONLY_PATTERN, { message: 'from deve ser uma data YYYY-MM-DD' })
+  from?: string;
+
+  @IsOptional()
+  @Matches(DATE_ONLY_PATTERN, { message: 'to deve ser uma data YYYY-MM-DD' })
+  to?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  city?: string;
+}
 
 export interface CollectionRequestsStats {
   total: number;
@@ -8,6 +26,8 @@ export interface CollectionRequestsStats {
   totalCollectedBags: number;
   byStatus: { status: CollectionRequestStatus; count: number }[];
   trend: { period: string; weightKg: number; count: number }[];
+  // Peso recolhido por concelho, do maior para o menor.
+  byCity?: { city: string; weightKg: number; count: number }[];
 }
 
 export interface DimensionStat {

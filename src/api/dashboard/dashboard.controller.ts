@@ -2,6 +2,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { GetDashboardActivityUseCase } from '../../app/use-cases/dashboard/get-dashboard-activity-use-case';
 import { GetDashboardActivityDto } from '../../app/use-cases/dashboard/get-dashboard-activity-use-case/dashboard-activity.dto';
 import { GetDashboardStatsUseCase } from '../../app/use-cases/dashboard/get-dashboard-stats-use-case';
+import { GetDashboardStatsDto } from '../../app/use-cases/dashboard/get-dashboard-stats-use-case/dashboard-stats.dto';
 import { GetPublicImpactStatsUseCase } from '../../app/use-cases/dashboard/get-public-impact-stats-use-case';
 import { GetScopedDashboardStatsUseCase } from '../../app/use-cases/dashboard/get-scoped-dashboard-stats-use-case';
 import { JwtPayload } from '../../app/services/interfaces/auth.interface';
@@ -30,8 +31,8 @@ export class DashboardController {
   // uma vista filtrada sem ele pedir seria enganador.
   @Get('stats')
   @Roles(Role.ADMIN)
-  getStats() {
-    return this.getDashboardStatsUseCase.call();
+  getStats(@Query() query: GetDashboardStatsDto) {
+    return this.getDashboardStatsUseCase.call(query);
   }
 
   // Quadro de atividade do período. Sem filtro conta tudo; com `from`/`to`

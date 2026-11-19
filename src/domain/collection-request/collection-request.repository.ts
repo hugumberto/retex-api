@@ -29,7 +29,16 @@ export interface CollectionRequestFilters {
 export type DashboardScope = Pick<
   CollectionRequestFilters,
   'companyId' | 'userId'
->;
+> & {
+  /**
+   * Período do dashboard (`YYYY-MM-DD`, ambos inclusivos). Nas solicitações
+   * conta a data de criação; nas peças, a data da triagem.
+   */
+  from?: string;
+  to?: string;
+  /** Concelho da morada da recolha (sem distinguir maiúsculas/espaços). */
+  city?: string;
+}
 
 /** Repartição das recolhas de uma empresa por membro. */
 export interface MemberCollectionCount {
@@ -63,6 +72,13 @@ export interface CollectionRequestTotals {
 
 export interface CollectionRequestTrendPoint {
   period: string;
+  weightKg: number;
+  count: number;
+}
+
+/** Peso recolhido por concelho (dashboard de impacto). */
+export interface CityWeight {
+  city: string;
   weightKg: number;
   count: number;
 }
@@ -105,6 +121,8 @@ export interface ICollectionRequestRepository
     scope?: DashboardScope,
   ): Promise<CollectionRequestTrendPoint[]>;
   countOutOfZoneByCity(limit: number): Promise<CityCount[]>;
+  /** Peso recolhido por concelho, do maior para o menor. */
+  weightByCity(scope?: DashboardScope): Promise<CityWeight[]>;
   /** Concelhos distintos com pelo menos uma recolha pesada (impacto público). */
   countCitiesServed(): Promise<number>;
   /** Solicitações criadas no intervalo (quadro de atividade do dashboard). */
