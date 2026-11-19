@@ -5,6 +5,8 @@ import { Route, RouteStatus } from './route.entity';
 export interface RouteFilters {
   status?: RouteStatus;
   driverId?: string;
+  /** Dia da rota (`YYYY-MM-DD`), comparado com o dia de `startDate`. */
+  date?: string;
 }
 
 export interface IRouteRepository extends IRepository<Route> {

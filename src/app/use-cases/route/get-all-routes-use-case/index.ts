@@ -17,6 +17,7 @@ export class GetAllRoutesUseCase implements IUseCase<GetAllRoutesDto, PaginatedR
     const filters = {
       status: param.status,
       driverId: param.driverId,
+      date: param.date,
     };
 
     const pagination = {

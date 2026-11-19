@@ -30,4 +30,17 @@ describe('GetAllRoutesUseCase', () => {
       expect.objectContaining({ page: 1, limit: 10 }),
     );
   });
+
+  it('passa o dia ao repositório', async () => {
+    routeRepo.findByFiltersWithPagination.mockResolvedValue({
+      data: [], meta: { total: 0, page: 1, limit: 100, totalPages: 0 },
+    });
+
+    await useCase.call({ date: '2026-11-19', limit: 100 } as any);
+
+    expect(routeRepo.findByFiltersWithPagination).toHaveBeenCalledWith(
+      expect.objectContaining({ date: '2026-11-19' }),
+      expect.anything(),
+    );
+  });
 });
