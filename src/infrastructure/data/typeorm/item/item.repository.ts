@@ -83,11 +83,29 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
     queryBuilder: SelectQueryBuilder<T>,
     scope?: DashboardScope,
   ): SelectQueryBuilder<T> {
-    if (!scope?.companyId && !scope?.userId) {
+    // Período: nas peças conta a data da triagem (criação do item).
+    if (scope?.from) {
+      queryBuilder.andWhere('item.created_at >= CAST(:itemFrom AS date)', {
+        itemFrom: scope.from,
+      });
+    }
+    if (scope?.to) {
+      queryBuilder.andWhere(
+        "item.created_at < CAST(:itemTo AS date) + interval '1 day'",
+        { itemTo: scope.to },
+      );
+    }
+    if (!scope?.companyId && !scope?.userId && !scope?.city) {
       return queryBuilder;
     }
 
     queryBuilder.innerJoin('item.collectionRequest', 'collectionRequest');
+    if (scope.city) {
+      queryBuilder.andWhere(
+        'collectionRequest.address_id IN (SELECT a.id FROM user_address a WHERE LOWER(TRIM(a.city)) = LOWER(TRIM(:scopeCity)))',
+        { scopeCity: scope.city },
+      );
+    }
     if (scope.companyId) {
       queryBuilder.andWhere('collectionRequest.company_id = :scopeCompanyId', {
         scopeCompanyId: scope.companyId,

@@ -15,6 +15,7 @@ import {
 import {
   AddressCollectionCount,
   CityCount,
+  CityWeight,
   DashboardScope,
   ICollectionRequestRepository,
   CollectionRequestFilters,
@@ -174,7 +175,45 @@ export class CollectionRequestRepository
         scopeUserId: scope.userId,
       });
     }
+    // Subconsulta em vez de join: várias agregações já juntam a morada e um
+    // segundo join com o mesmo alias rebentava.
+    if (scope?.city) {
+      queryBuilder.andWhere(
+        'collectionRequest.address_id IN (SELECT a.id FROM user_address a WHERE LOWER(TRIM(a.city)) = LOWER(TRIM(:scopeCity)))',
+        { scopeCity: scope.city },
+      );
+    }
+    if (scope?.from || scope?.to) {
+      this.applyDateRange(queryBuilder, 'collectionRequest.created_at', {
+        from: scope.from,
+        to: scope.to,
+      });
+    }
     return queryBuilder;
+  }
+
+  async weightByCity(scope?: DashboardScope): Promise<CityWeight[]> {
+    const repository = await this.getRepository();
+    const rows = await this.applyScope(
+      repository
+        .createQueryBuilder('collectionRequest')
+        .innerJoin('collectionRequest.address', 'cityAddress')
+        .select('MIN(TRIM(cityAddress.city))', 'city')
+        .addSelect('COALESCE(SUM(collectionRequest.weight), 0)', 'weight')
+        .addSelect('COUNT(*)', 'count')
+        .where('collectionRequest.weight > 0')
+        .andWhere("COALESCE(TRIM(cityAddress.city), '') <> ''"),
+      scope,
+    )
+      .groupBy('LOWER(TRIM(cityAddress.city))')
+      .orderBy('weight', 'DESC')
+      .getRawMany<{ city: string; weight: string; count: string }>();
+
+    return rows.map((row) => ({
+      city: row.city,
+      weightKg: Number(row.weight),
+      count: Number(row.count),
+    }));
   }
 
   async countCreatedInRange(range: DateRange): Promise<number> {

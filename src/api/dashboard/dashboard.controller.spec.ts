@@ -42,8 +42,9 @@ describe('DashboardController', () => {
   it('delegates to the use-case', async () => {
     const stats = { collectionRequests: { total: 1 } } as any;
     (getDashboardStatsUseCase.call as jest.Mock).mockResolvedValue(stats);
-    expect(await controller.getStats()).toBe(stats);
-    expect(getDashboardStatsUseCase.call).toHaveBeenCalledTimes(1);
+    const query = { from: '2026-01-01', to: '2026-10-31', city: 'Maia' };
+    expect(await controller.getStats(query)).toBe(stats);
+    expect(getDashboardStatsUseCase.call).toHaveBeenCalledWith(query);
   });
 
   it('passa o filtro de datas ao quadro de atividade tal como veio', async () => {
