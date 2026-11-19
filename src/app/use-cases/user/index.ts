@@ -5,6 +5,8 @@ import { CreateUserUseCase } from './create-user-use-case';
 import { ForgotPasswordUseCase } from './forgot-password-use-case';
 import { GetAllUsersUseCase } from './get-all-users-use-case';
 import { GetUserByIdUseCase } from './get-user-by-id-use-case';
+import { GetUserDirectoryUseCase } from './get-user-directory-use-case';
+import { InviteUserUseCase } from './invite-user-use-case';
 import { RegisterUserUseCase } from './register-user-use-case';
 import { ResetUserPasswordUseCase } from './reset-user-password-use-case';
 import { SendActivationEmailUseCase } from './send-activation-email-use-case';
@@ -24,6 +26,8 @@ export const USER_USE_CASES = [
   ForgotPasswordUseCase,
   ConfirmResetPasswordUseCase,
   SendActivationEmailUseCase,
+  GetUserDirectoryUseCase,
+  InviteUserUseCase,
 ];
 
 export * from './activate-user-use-case';
@@ -33,6 +37,8 @@ export * from './forgot-password-use-case';
 export * from './create-user-use-case';
 export * from './get-all-users-use-case';
 export * from './get-user-by-id-use-case';
+export * from './get-user-directory-use-case';
+export * from './invite-user-use-case';
 export * from './register-user-use-case';
 export * from './reset-user-password-use-case';
 export * from './send-activation-email-use-case';

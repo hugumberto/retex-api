@@ -6,6 +6,14 @@ export enum CompanyStatus {
   INACTIVE = 'INACTIVE',
 }
 
+/** Tipo de entidade: decide em que separador aparece em Utilizadores. */
+export enum CompanyKind {
+  COMPANY = 'COMPANY',
+  MUNICIPALITY = 'MUNICIPALITY',
+  SCHOOL = 'SCHOOL',
+  ASSOCIATION = 'ASSOCIATION',
+}
+
 export interface Company extends Entity {
   // Nome comercial, usado na listagem e no crachá das solicitações.
   name: string;
@@ -17,6 +25,7 @@ export interface Company extends Entity {
   email?: string | null;
   phone?: string | null;
   status: CompanyStatus;
+  kind: CompanyKind;
   // Código amigável (`ano-XXXXXX`), mesma convenção de rota/solicitação.
   friendlyCode?: string | null;
   members?: CompanyMember[];

@@ -108,6 +108,11 @@ export const userSchema = new EntitySchema<User>({
       name: 'reset_token_expires_at',
       select: false,
     },
+    lastLoginAt: {
+      type: 'timestamp with time zone',
+      nullable: true,
+      name: 'last_login_at',
+    },
     ...BaseTimestampColumns,
   },
   relations: {

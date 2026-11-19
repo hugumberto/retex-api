@@ -1,6 +1,7 @@
 import { EntitySchema } from 'typeorm';
 import {
   Company,
+  CompanyKind,
   CompanyStatus,
 } from '../../../../domain/company/company.entity';
 import { BaseTimestampColumns } from '../abstraction/timestamp';
@@ -46,6 +47,13 @@ export const companySchema = new EntitySchema<Company>({
       enum: CompanyStatus,
       nullable: false,
       default: CompanyStatus.ACTIVE,
+    },
+    kind: {
+      type: 'enum',
+      enum: CompanyKind,
+      enumName: 'company_kind_enum',
+      nullable: false,
+      default: CompanyKind.COMPANY,
     },
     friendlyCode: {
       type: 'varchar',
