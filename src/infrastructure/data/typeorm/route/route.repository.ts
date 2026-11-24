@@ -33,7 +33,8 @@ export class RouteRepository extends BaseRepository<Route> implements IRouteRepo
     }
 
     if (filters.driverId) {
-      queryBuilder.andWhere('route.driverId = :driverId', { driverId: filters.driverId });
+      // `driverId` não é coluna da entidade (é a relação `driver`): filtrar pela relação.
+      queryBuilder.andWhere('route.driver = :driverId', { driverId: filters.driverId });
     }
 
     // O portal grava o dia escolhido à meia-noite UTC; compara-se o intervalo
