@@ -10,6 +10,7 @@ interface CreateFaqItemParam {
   categoryId: string;
   title: string;
   description: string;
+  visible?: boolean;
 }
 
 @Injectable()
@@ -28,6 +29,8 @@ export class CreateFaqItemUseCase implements IUseCase<CreateFaqItemParam, FaqIte
       categoryId: param.categoryId,
       title: param.title,
       description: param.description,
+      visible: param.visible ?? true,
+      position: await this.faqItemRepository.nextPosition(param.categoryId),
     });
   }
 }

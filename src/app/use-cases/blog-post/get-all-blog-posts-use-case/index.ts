@@ -18,6 +18,8 @@ export class GetAllBlogPostsUseCase implements IUseCase<GetAllBlogPostsDto, Pagi
       status: param.status,
       highlight: param.highlight,
       search: param.search,
+      categoryId: param.categoryId,
+      sort: param.sort,
     };
 
     const pagination = {

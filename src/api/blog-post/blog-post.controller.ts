@@ -1,4 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  SetBlogPostHighlightDto,
+  SetBlogPostHighlightUseCase,
+} from '../../app/use-cases/blog-post/set-blog-post-highlight-use-case';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DeleteBlogPostUseCase } from '../../app/use-cases/blog-post/delete-blog-post-use-case';
 import { GetAllBlogPostsUseCase } from '../../app/use-cases/blog-post/get-all-blog-posts-use-case';
@@ -31,6 +35,7 @@ export class BlogPostController {
     private readonly getPublicBlogPostBySlugUseCase: GetPublicBlogPostBySlugUseCase,
     private readonly getAllBlogPostsUseCase: GetAllBlogPostsUseCase,
     private readonly getBlogPostByIdUseCase: GetBlogPostByIdUseCase,
+    private readonly setBlogPostHighlightUseCase: SetBlogPostHighlightUseCase,
   ) { }
 
   @Post()
@@ -64,6 +69,15 @@ export class BlogPostController {
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   async publishBlogPost(@Param('id') id: string): Promise<BlogPost> {
     return this.publishBlogPostUseCase.call({ id });
+  }
+
+  @Patch(':id/highlight')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Mudar só o destaque do post' })
+  async setHighlight(@Param('id') id: string, @Body() dto: SetBlogPostHighlightDto): Promise<BlogPost> {
+    return this.setBlogPostHighlightUseCase.call({ id, highlight: dto.highlight });
   }
 
   @Delete(':id')

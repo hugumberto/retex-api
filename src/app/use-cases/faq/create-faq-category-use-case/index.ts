@@ -6,7 +6,7 @@ import { IUseCase } from '../../interfaces/use-case.interface';
 
 interface CreateFaqCategoryParam {
   title: string;
-  description: string;
+  description?: string;
   status?: FaqStatus;
 }
 
@@ -20,8 +20,9 @@ export class CreateFaqCategoryUseCase implements IUseCase<CreateFaqCategoryParam
   async call(param: CreateFaqCategoryParam): Promise<FaqCategory> {
     return this.faqCategoryRepository.create({
       title: param.title,
-      description: param.description,
+      description: param.description ?? '',
       status: param.status ?? FaqStatus.ACTIVE,
+      position: await this.faqCategoryRepository.nextPosition(),
     });
   }
 }

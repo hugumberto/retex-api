@@ -2,6 +2,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import { CreateBlogCategoryUseCase } from '../../app/use-cases/blog-category/create-blog-category-use-case';
 import { DeleteBlogCategoryUseCase } from '../../app/use-cases/blog-category/delete-blog-category-use-case';
+import { ReorderBlogCategoriesUseCase } from '../../app/use-cases/blog-category/reorder-blog-categories-use-case';
 import { GetAllBlogCategoriesUseCase } from '../../app/use-cases/blog-category/get-all-blog-categories-use-case';
 import { UpdateBlogCategoryUseCase } from '../../app/use-cases/blog-category/update-blog-category-use-case';
 import { BlogCategoryController } from './blog-category.controller';
@@ -22,6 +23,7 @@ describe('BlogCategoryController', () => {
         { provide: CreateBlogCategoryUseCase, useValue: create },
         { provide: UpdateBlogCategoryUseCase, useValue: update },
         { provide: DeleteBlogCategoryUseCase, useValue: del },
+        { provide: ReorderBlogCategoriesUseCase, useValue: { call: jest.fn() } },
         { provide: JwtService, useValue: {} },
       ],
     }).compile();

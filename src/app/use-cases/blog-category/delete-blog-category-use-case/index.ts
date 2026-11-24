@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { BlogCategory } from '../../../../domain/blog-post/blog-category.entity';
 import { IBlogCategoryRepository } from '../../../../domain/blog-post/blog-category.repository';
 import { DOMAIN_TOKENS } from '../../../../domain/tokens';
@@ -16,6 +16,10 @@ export class DeleteBlogCategoryUseCase implements IUseCase<{ id: string }, void>
       id,
     } as Partial<BlogCategory>);
     if (!existing) throw new NotFoundException('errors.category.notFound');
+    // Com artigos não se apaga: esconde-se ou mudam-se os artigos primeiro.
+    if ((await this.blogCategoryRepository.countPosts(id)) > 0) {
+      throw new ConflictException('errors.category.hasPosts');
+    }
     // O vínculo na tabela blog_post_categories é removido em cascata (ON DELETE CASCADE).
     await this.blogCategoryRepository.delete({ id } as Partial<BlogCategory>);
   }

@@ -7,6 +7,7 @@ import { GetPublicBlogPostBySlugUseCase } from '../../app/use-cases/blog-post/ge
 import { GetPublicBlogPostsUseCase } from '../../app/use-cases/blog-post/get-public-blog-posts-use-case';
 import { PublishBlogPostUseCase } from '../../app/use-cases/blog-post/publish-blog-post-use-case';
 import { UpsertBlogPostUseCase } from '../../app/use-cases/blog-post/upsert-blog-post-use-case';
+import { SetBlogPostHighlightUseCase } from '../../app/use-cases/blog-post/set-blog-post-highlight-use-case';
 import { BlogPostController } from './blog-post.controller';
 
 describe('BlogPostController', () => {
@@ -31,6 +32,7 @@ describe('BlogPostController', () => {
         { provide: GetPublicBlogPostBySlugUseCase, useValue: getBySlug },
         { provide: GetAllBlogPostsUseCase, useValue: getAll },
         { provide: GetBlogPostByIdUseCase, useValue: getById },
+        { provide: SetBlogPostHighlightUseCase, useValue: { call: jest.fn() } },
         { provide: JwtService, useValue: {} },
       ],
     }).compile();

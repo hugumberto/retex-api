@@ -101,4 +101,43 @@ describe('UpsertBlogPostUseCase', () => {
     expect(blogCategoryRepositoryMock.findByIds).toHaveBeenCalledWith(['c1']);
     expect(blogPostRepositoryMock.create).toHaveBeenCalled();
   });
+
+  describe('publicação e destaque', () => {
+    const NOW = new Date('2026-11-24T10:00:00Z');
+    const base = { body: '<p>x</p>', slug: 's', title: 'T', hero: 'h', highlight: 0, tags: [] } as any;
+
+    beforeEach(() => {
+      blogPostRepositoryMock.findBySlug.mockResolvedValue(undefined);
+      blogPostRepositoryMock.create.mockImplementation(async (dto) => ({ id: 'p1', ...dto }) as BlogPost);
+    });
+
+    it('agendado precisa de data no futuro', async () => {
+      await expect(
+        useCase.call({ ...base, status: BlogPostStatus.SCHEDULED, publishDate: '2026-11-24T09:00:00Z' }, NOW),
+      ).rejects.toThrow('errors.blogPost.scheduleInPast');
+
+      await useCase.call({ ...base, status: BlogPostStatus.SCHEDULED, publishDate: '2026-12-01T09:00:00Z' }, NOW);
+      expect(blogPostRepositoryMock.create).toHaveBeenCalledWith(
+        expect.objectContaining({ status: BlogPostStatus.SCHEDULED, publishDate: new Date('2026-12-01T09:00:00Z') }),
+      );
+    });
+
+    it('publicar mantém a data da primeira publicação', async () => {
+      const first = new Date('2026-10-01T00:00:00Z');
+      blogPostRepositoryMock.findOne.mockResolvedValue({ id: 'p1', status: BlogPostStatus.PUBLISHED, publishDate: first } as BlogPost);
+      blogPostRepositoryMock.update.mockResolvedValue([{ id: 'p1' } as BlogPost]);
+
+      await useCase.call({ ...base, id: 'p1', status: BlogPostStatus.PUBLISHED, summary: '  Resumo  ' }, NOW);
+
+      expect(blogPostRepositoryMock.update).toHaveBeenCalledWith(
+        { id: 'p1' },
+        expect.objectContaining({ status: BlogPostStatus.PUBLISHED, publishDate: first, summary: 'Resumo' }),
+      );
+    });
+
+    it('destaque principal é único: o anterior passa a secundário', async () => {
+      await useCase.call({ ...base, highlight: 2 }, NOW);
+      expect(blogPostRepositoryMock.replaceHighlight).toHaveBeenCalledWith(2, 1, 'p1');
+    });
+  });
 });

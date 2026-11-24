@@ -1,3 +1,4 @@
+import { ReorderFaqUseCase } from '../../app/use-cases/faq/reorder-faq-use-case';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import { CreateFaqCategoryUseCase } from '../../app/use-cases/faq/create-faq-category-use-case';
@@ -36,6 +37,7 @@ describe('FaqController', () => {
         { provide: CreateFaqItemUseCase, useValue: m.createItem },
         { provide: UpdateFaqItemUseCase, useValue: m.updateItem },
         { provide: DeleteFaqItemUseCase, useValue: m.deleteItem },
+        { provide: ReorderFaqUseCase, useValue: { call: jest.fn() } },
         { provide: JwtService, useValue: {} },
       ],
     }).compile();

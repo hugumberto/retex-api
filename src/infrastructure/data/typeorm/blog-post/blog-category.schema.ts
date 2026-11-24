@@ -32,6 +32,16 @@ export const blogCategorySchema = new EntitySchema<BlogCategory>({
       name: 'status',
       default: BlogCategoryStatus.ACTIVE,
     },
+    description: {
+      type: 'varchar',
+      length: 500,
+      nullable: true,
+    },
+    position: {
+      type: 'integer',
+      nullable: false,
+      default: 0,
+    },
     ...BaseTimestampColumns,
   },
   relations: {

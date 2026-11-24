@@ -53,6 +53,17 @@ export const blogPostSchema = new EntitySchema<BlogPost>({
       name: 'tags',
       default: [],
     },
+    summary: {
+      type: 'varchar',
+      length: 160,
+      nullable: true,
+    },
+    heroAlt: {
+      type: 'varchar',
+      length: 255,
+      nullable: true,
+      name: 'hero_alt',
+    },
     publishDate: {
       type: 'timestamp with time zone',
       nullable: true,
