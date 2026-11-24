@@ -54,4 +54,15 @@ describe('DeleteItemUseCase', () => {
     expect(repo.delete).toHaveBeenCalledWith({ id: 'i1' });
     expect(storageUnitRepo.incrementItemsCount).toHaveBeenCalledWith('su1', -1);
   });
+
+  it('desconta as peças da linha (quantidade), não 1', async () => {
+    repo.findByIds.mockResolvedValue([
+      { id: 'i2', quantity: 3, storageUnit: { id: 'su1' } as StorageUnit } as Item,
+    ]);
+    repo.delete.mockResolvedValue({ id: 'i2' } as Item);
+
+    await useCase.call('i2');
+
+    expect(storageUnitRepo.incrementItemsCount).toHaveBeenCalledWith('su1', -3);
+  });
 });

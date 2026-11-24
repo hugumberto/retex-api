@@ -129,8 +129,9 @@ export class BindItemsStorageUnitsUseCase implements IUseCase<BindItemsStorageUn
 
     // Mantém coerente o contador denormalizado de itens por unidade.
     const countByUnit = new Map<string, number>();
-    for (const { storageUnit } of bindingPlan) {
-      countByUnit.set(storageUnit.id, (countByUnit.get(storageUnit.id) ?? 0) + 1);
+    // Conta peças (quantidade), não linhas: uma linha "2 calças" são 2 peças no lote.
+    for (const { item, storageUnit } of bindingPlan) {
+      countByUnit.set(storageUnit.id, (countByUnit.get(storageUnit.id) ?? 0) + (item.quantity ?? 1));
     }
     for (const [storageUnitId, delta] of countByUnit) {
       await this.storageUnitRepository.incrementItemsCount(storageUnitId, delta);

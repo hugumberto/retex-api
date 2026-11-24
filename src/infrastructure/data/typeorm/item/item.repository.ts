@@ -112,7 +112,8 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
     const [row]: { pieces: string; requests: string }[] = await repository.manager.query(
       `SELECT COALESCE(SUM(quantity), 0) AS pieces, COUNT(DISTINCT collection_request_id) AS requests
          FROM item
-        WHERE deleted_at IS NULL AND operator_id = $1 AND created_at >= $2`,
+        WHERE deleted_at IS NULL AND operator_id = $1 AND created_at >= $2
+          AND destination <> 'ACCESSORY'`,
       [operatorId, since],
     );
     return { pieces: Number(row.pieces), requests: Number(row.requests) };

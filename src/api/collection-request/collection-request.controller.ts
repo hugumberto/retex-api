@@ -1,3 +1,4 @@
+import { GetCollectionConfirmationUseCase } from '../../app/use-cases/collection-request/get-collection-confirmation-use-case';
 import {
   Body,
   Controller,
@@ -45,9 +46,17 @@ export class CollectionRequestController {
     private readonly updateCollectionRequestUseCase: UpdateCollectionRequestUseCase,
     private readonly getAllCollectionRequestsUseCase: GetAllCollectionRequestsUseCase,
     private readonly confirmCollectionUseCase: ConfirmCollectionUseCase,
+    private readonly getCollectionConfirmationUseCase: GetCollectionConfirmationUseCase,
     private readonly rejectCollectionUseCase: RejectCollectionUseCase,
     private readonly setCollectionRequestRouteUseCase: SetCollectionRequestRouteUseCase,
   ) {}
+
+  // Página do link de confirmação: mostra o dia antes de confirmar (não confirma).
+  @Get('confirmation')
+  @Public()
+  getConfirmation(@Query('token') token: string) {
+    return this.getCollectionConfirmationUseCase.call({ token: token ?? '' });
+  }
 
   @Post('confirm-collection')
   @Public()

@@ -478,6 +478,7 @@ export class CollectionRequestRepository
       .addSelect('collectionRequest.collectionConfirmationToken')
       .leftJoinAndSelect('collectionRequest.user', 'user')
       .leftJoinAndSelect('collectionRequest.route', 'route')
+      .leftJoinAndSelect('collectionRequest.address', 'address')
       .where('collectionRequest.collectionConfirmationToken = :token', { token })
       .getOne();
   }

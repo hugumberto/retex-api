@@ -1,4 +1,5 @@
 import { ConfirmCollectionUseCase } from './confirm-collection-use-case';
+import { GetCollectionConfirmationUseCase } from './get-collection-confirmation-use-case';
 import { CreateCollectionRequestUseCase } from './create-collection-request-use-case';
 import { GetAllCollectionRequestsUseCase } from './get-all-collection-requests-use-case';
 import { GetCollectionRequestByIdUseCase } from './get-collection-request-by-id-use-case';
@@ -18,6 +19,7 @@ export const COLLECTION_REQUEST_USE_CASES = [
   GetAllCollectionRequestsUseCase,
   SendCollectionConfirmationUseCase,
   ConfirmCollectionUseCase,
+  GetCollectionConfirmationUseCase,
   RejectCollectionUseCase,
   SetCollectionRequestRouteUseCase,
 ];
