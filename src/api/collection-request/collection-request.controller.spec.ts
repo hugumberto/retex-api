@@ -5,6 +5,7 @@ import { CreateCollectionRequestUseCase } from '../../app/use-cases/collection-r
 import { GetAllCollectionRequestsUseCase } from '../../app/use-cases/collection-request/get-all-collection-requests-use-case';
 import { GetCollectionRequestByIdUseCase } from '../../app/use-cases/collection-request/get-collection-request-by-id-use-case';
 import { RejectCollectionUseCase } from '../../app/use-cases/collection-request/reject-collection-use-case';
+import { GetCollectionConfirmationUseCase } from '../../app/use-cases/collection-request/get-collection-confirmation-use-case';
 import { UpdateCollectionRequestUseCase } from '../../app/use-cases/collection-request/update-collection-request-use-case';
 import { CollectionRequestStatus } from '../../domain/collection-request/collection-request.entity';
 import { Role } from '../../domain/user/user-roles.entity';
@@ -30,6 +31,7 @@ describe('CollectionRequestController', () => {
         { provide: GetAllCollectionRequestsUseCase, useValue: { call: jest.fn() } },
         { provide: ConfirmCollectionUseCase, useValue: { call: jest.fn() } },
         { provide: RejectCollectionUseCase, useValue: { call: jest.fn() } },
+        { provide: GetCollectionConfirmationUseCase, useValue: { call: jest.fn() } },
         { provide: SetCollectionRequestRouteUseCase, useValue: { call: jest.fn() } },
       ],
     }).compile();

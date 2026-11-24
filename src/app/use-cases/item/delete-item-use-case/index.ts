@@ -28,7 +28,7 @@ export class DeleteItemUseCase implements IUseCase<string, Item> {
     if (existingItem.storageUnit?.id) {
       await this.storageUnitRepository.incrementItemsCount(
         existingItem.storageUnit.id,
-        -1,
+        -(existingItem.quantity ?? 1),
       );
     }
 
