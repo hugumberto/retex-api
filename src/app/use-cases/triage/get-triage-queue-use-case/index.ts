@@ -38,13 +38,13 @@ export const startOfTodayInLisbon = (now = new Date()): Date => {
 
 /** Fila do posto de triagem, as contagens de hoje e os atalhos de categoria. */
 @Injectable()
-export class GetTriageQueueUseCase implements IUseCase<{ operatorId: string }, TriageQueue> {
+export class GetTriageQueueUseCase implements IUseCase<{ operatorId: string; station?: number }, TriageQueue> {
   constructor(
     @Inject(DOMAIN_TOKENS.ITEM_REPOSITORY)
     private readonly itemRepository: IItemRepository,
   ) {}
 
-  async call({ operatorId }: { operatorId: string }): Promise<TriageQueue> {
+  async call({ operatorId, station }: { operatorId: string; station?: number }): Promise<TriageQueue> {
     const [queue, today, top] = await Promise.all([
       this.itemRepository.triageQueue(QUEUE_LIMIT),
       this.itemRepository.operatorStats(operatorId, startOfTodayInLisbon()),
@@ -55,6 +55,10 @@ export class GetTriageQueueUseCase implements IUseCase<{ operatorId: string }, T
       0,
       QUICK_CATEGORIES,
     );
-    return { today, quickCategories, queue };
+    // O que a supervisão atribuiu a este posto vem primeiro.
+    const ordered = station
+      ? [...queue.filter((q) => q.assignedStation === station), ...queue.filter((q) => q.assignedStation !== station)]
+      : queue;
+    return { today, quickCategories, queue: ordered };
   }
 }

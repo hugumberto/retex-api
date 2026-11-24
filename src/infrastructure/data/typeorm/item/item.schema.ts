@@ -20,6 +20,10 @@ export const itemSchema = new EntitySchema<Item>({
       type: 'uuid',
       generated: 'uuid',
     },
+    station: {
+      type: 'integer',
+      nullable: true,
+    },
     destination: {
       type: 'enum',
       enum: Destination,

@@ -115,7 +115,10 @@
     "requestNotFoundForCode": "Nenhuma solicitação encontrada para o código indicado",
     "qrCodeNotLinked": "O QR code não está associado a uma solicitação",
     "requestNotInTriage": "A solicitação não está em recolha/triagem",
-    "bagWithoutItems": "Não é possível fechar um saco sem itens registados"
+    "bagWithoutItems": "Não é possível fechar um saco sem itens registados",
+    "requestNotFound": "Pedido não encontrado.",
+    "notTriageable": "Este pedido não está à espera de triagem.",
+    "invalidStation": "Posto inválido."
   },
   "systemParameter": {
     "qrLargerThanLabel": "O QR não cabe na etiqueta com as medidas indicadas"

@@ -35,6 +35,8 @@ export interface Item extends Entity {
   size?: string | null
   // Operador que registou o item na triagem.
   operator?: User | null
+  // Posto de triagem onde foi registado.
+  station?: number | null
 }
 
 // Estado da peça.

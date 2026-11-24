@@ -27,6 +27,10 @@ export interface TriageQueueEntry {
   bagsProcessed: number;
   /** Primeiro saco lido pelo motorista. */
   collectedAt: Date | null;
+  /** Posto a que a supervisão atribuiu o pedido. */
+  assignedStation?: number | null;
+  /** Posto com o pedido aberto agora (com sinal recente). */
+  openStation?: number | null;
 }
 
 export interface IItemRepository extends IRepository<Item> {

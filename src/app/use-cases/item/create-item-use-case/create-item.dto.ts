@@ -1,11 +1,13 @@
 import {
   IsBoolean,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   IsUUID,
+  Max,
   MaxLength,
   Min,
   ValidateIf,
@@ -98,4 +100,11 @@ export class CreateItemDto {
   @IsString()
   @MaxLength(20)
   size?: string;
+
+  // Posto de triagem onde a peça foi registada.
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(99)
+  station?: number;
 }

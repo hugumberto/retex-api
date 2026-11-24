@@ -115,7 +115,10 @@
     "requestNotFoundForCode": "Aucune demande trouvée pour le code indiqué",
     "qrCodeNotLinked": "Le QR code n'est pas associé à une demande",
     "requestNotInTriage": "La demande n'est pas en collecte/tri",
-    "bagWithoutItems": "Impossible de fermer un sac sans articles enregistrés"
+    "bagWithoutItems": "Impossible de fermer un sac sans articles enregistrés",
+    "requestNotFound": "Demande introuvable.",
+    "notTriageable": "Cette demande n'attend pas de tri.",
+    "invalidStation": "Poste invalide."
   },
   "systemParameter": {
     "qrLargerThanLabel": "Le QR ne tient pas sur l'étiquette avec ces dimensions"

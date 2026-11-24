@@ -88,6 +88,7 @@ export class CreateItemUseCase implements IUseCase<CreateItemParams, CreateItemR
       color: param.color?.trim() || null,
       size: param.size?.trim() || null,
       operator: param.operatorId ? ({ id: param.operatorId } as User) : null,
+      station: param.station ?? null,
       storageUnit: null, // Inicialmente vazio
       bag: bag,
     };

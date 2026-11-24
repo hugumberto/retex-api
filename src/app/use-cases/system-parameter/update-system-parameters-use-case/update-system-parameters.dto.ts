@@ -105,4 +105,11 @@ export class UpdateSystemParametersDto {
   @Min(1)
   @Max(1000000)
   zoneRecyclingCapacityKg?: number;
+
+  // Meta de peças por hora em cada posto de triagem.
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(1000)
+  triageTargetPerHour?: number;
 }

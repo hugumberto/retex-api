@@ -22,6 +22,7 @@ import { FaqItemRepository } from './infrastructure/data/typeorm/faq/faq-item.re
 import { BrandRepository } from './infrastructure/data/typeorm/brand/brand.repository';
 import { VehicleRepository } from './infrastructure/data/typeorm/vehicle/vehicle.repository';
 import { WarehouseOutboundRepository } from './infrastructure/data/typeorm/warehouse/warehouse-outbound.repository';
+import { TriageStationRepository } from './infrastructure/data/typeorm/triage-station/triage-station.repository';
 import {
   CompanyMemberRepository,
   CompanyProfileRepository,
@@ -62,6 +63,7 @@ export class AppModule {
         brandRepository: BrandRepository,
         vehicleRepository: VehicleRepository,
         warehouseOutboundRepository: WarehouseOutboundRepository,
+        triageStationRepository: TriageStationRepository,
         itemRepository: ItemRepository,
         collectionRequestRepository: CollectionRequestRepository,
         routeRepository: RouteRepository,

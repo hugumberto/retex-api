@@ -15,6 +15,7 @@ import {
 } from '../../../../domain/item/item.repository';
 import { BaseRepository } from '../abstraction/base.repository';
 import { itemSchema } from './item.schema';
+import { STATION_STALE_MINUTES } from '../../../../domain/triage-station/triage-station.entity';
 
 @Injectable()
 export class ItemRepository extends BaseRepository<Item> implements IItemRepository {
@@ -70,12 +71,18 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
     const rows: {
       id: string; code: string | null; status: string; client_name: string | null;
       bags: string; bags_processed: string; collected_at: Date | null;
+      assigned_station: number | null; open_station: number | null;
     }[] = await repository.manager.query(
       `SELECT cr.id, cr.friendly_code AS code, cr.status,
               COALESCE(c.name, NULLIF(TRIM(CONCAT(u.first_name, ' ', u.last_name)), '')) AS client_name,
               COUNT(b.id) AS bags,
               COUNT(b.processed_at) AS bags_processed,
-              MIN(b.used_at) AS collected_at
+              MIN(b.used_at) AS collected_at,
+              (SELECT ts.number FROM triage_station ts
+                WHERE ts.assigned_request_id = cr.id AND ts.deleted_at IS NULL LIMIT 1) AS assigned_station,
+              (SELECT ts.number FROM triage_station ts
+                WHERE ts.collection_request_id = cr.id AND ts.deleted_at IS NULL
+                  AND ts.last_seen_at > now() - make_interval(mins => $2) LIMIT 1) AS open_station
          FROM collection_request cr
          LEFT JOIN company c ON c.id = cr.company_id
          LEFT JOIN "user" u ON u.id = cr.user_id
@@ -85,7 +92,7 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
         GROUP BY cr.id, c.name, u.first_name, u.last_name
         ORDER BY (cr.status = 'SCREENING') DESC, MIN(b.used_at) ASC NULLS LAST, cr.created_at ASC
         LIMIT $1`,
-      [limit],
+      [limit, STATION_STALE_MINUTES],
     );
     return rows.map((r) => ({
       id: r.id,
@@ -95,6 +102,8 @@ export class ItemRepository extends BaseRepository<Item> implements IItemReposit
       bags: Number(r.bags),
       bagsProcessed: Number(r.bags_processed),
       collectedAt: r.collected_at,
+      assignedStation: r.assigned_station,
+      openStation: r.open_station,
     }));
   }
 

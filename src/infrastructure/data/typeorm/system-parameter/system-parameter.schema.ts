@@ -82,6 +82,7 @@ export const systemParameterSchema = new EntitySchema<SystemParameter>({
     zoneReuseCapacityKg: { type: 'integer', nullable: false, default: 1500, name: 'zone_reuse_capacity_kg' },
     zoneUpcyclingCapacityKg: { type: 'integer', nullable: false, default: 500, name: 'zone_upcycling_capacity_kg' },
     zoneRecyclingCapacityKg: { type: 'integer', nullable: false, default: 2000, name: 'zone_recycling_capacity_kg' },
+    triageTargetPerHour: { type: 'integer', nullable: false, default: 40, name: 'triage_target_per_hour' },
     ...BaseTimestampColumns,
   },
 });
