@@ -6,6 +6,7 @@ import { GetAllFaqCategoriesUseCase } from './get-all-faq-categories-use-case';
 import { GetPublicFaqUseCase } from './get-public-faq-use-case';
 import { UpdateFaqCategoryUseCase } from './update-faq-category-use-case';
 import { UpdateFaqItemUseCase } from './update-faq-item-use-case';
+import { ReorderFaqUseCase } from './reorder-faq-use-case';
 
 export const FAQ_USE_CASES = [
   GetPublicFaqUseCase,
@@ -16,6 +17,7 @@ export const FAQ_USE_CASES = [
   CreateFaqItemUseCase,
   UpdateFaqItemUseCase,
   DeleteFaqItemUseCase,
+  ReorderFaqUseCase,
 ];
 
 export * from './create-faq-category-use-case';
@@ -26,3 +28,4 @@ export * from './get-all-faq-categories-use-case';
 export * from './get-public-faq-use-case';
 export * from './update-faq-category-use-case';
 export * from './update-faq-item-use-case';
+export * from './reorder-faq-use-case';

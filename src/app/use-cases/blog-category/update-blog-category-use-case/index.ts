@@ -17,6 +17,7 @@ interface UpdateBlogCategoryParam {
   id: string;
   title?: string;
   status?: BlogCategoryStatus;
+  description?: string | null;
 }
 
 @Injectable()
@@ -27,7 +28,7 @@ export class UpdateBlogCategoryUseCase
     private readonly blogCategoryRepository: IBlogCategoryRepository,
   ) {}
 
-  async call({ id, title, status }: UpdateBlogCategoryParam): Promise<BlogCategory> {
+  async call({ id, title, status, description }: UpdateBlogCategoryParam): Promise<BlogCategory> {
     const existing = await this.blogCategoryRepository.findOne({
       id,
     } as Partial<BlogCategory>);
@@ -47,6 +48,10 @@ export class UpdateBlogCategoryUseCase
 
     if (status !== undefined) {
       data.status = status;
+    }
+
+    if (description !== undefined) {
+      data.description = description?.trim() || null;
     }
 
     const [updated] = await this.blogCategoryRepository.update(

@@ -1,5 +1,16 @@
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from 'class-validator';
+import { BlogPostStatus } from '../../../../domain/blog-post/blog-post-status.enum';
 import { BlogPostHighlight } from '../../../../domain/blog-post/blog-post-highlight.enum';
 
 export class UpsertBlogPostDto {
@@ -39,4 +50,24 @@ export class UpsertBlogPostDto {
   @ArrayMaxSize(20, { message: 'Máximo de 20 categorias' })
   @IsUUID('4', { each: true, message: 'Cada categoria deve ser um UUID válido' })
   categoryIds?: string[];
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(160)
+  summary?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  heroAlt?: string | null;
+
+  // Sem estado, um artigo novo fica rascunho e um existente mantém o que tinha.
+  @IsOptional()
+  @IsEnum(BlogPostStatus)
+  status?: BlogPostStatus;
+
+  // Obrigatória (e no futuro) para "agendado".
+  @IsOptional()
+  @IsDateString()
+  publishDate?: string;
 }

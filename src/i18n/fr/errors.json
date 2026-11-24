@@ -97,15 +97,19 @@
   "category": {
     "notFound": "Catégorie introuvable",
     "someNotFound": "Une ou plusieurs catégories sont introuvables",
-    "duplicateName": "Une catégorie portant ce nom existe déjà"
+    "duplicateName": "Une catégorie portant ce nom existe déjà",
+    "hasPosts": "Cette catégorie contient des articles. Masquez-la ou déplacez d'abord les articles.",
+    "invalidOrder": "L'ordre envoyé ne correspond pas aux catégories."
   },
   "blogPost": {
     "notFound": "Article introuvable",
-    "duplicateSlug": "Un article avec ce slug existe déjà"
+    "duplicateSlug": "Un article avec ce slug existe déjà",
+    "scheduleInPast": "La date de publication doit être dans le futur."
   },
   "faq": {
     "categoryNotFound": "Catégorie de FAQ introuvable",
-    "itemNotFound": "Élément de FAQ introuvable"
+    "itemNotFound": "Élément de FAQ introuvable",
+    "invalidOrder": "L'ordre envoyé ne correspond pas à ce qui existe."
   },
   "testZone": {
     "notFound": "Zone introuvable",

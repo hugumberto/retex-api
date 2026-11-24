@@ -25,6 +25,24 @@ export class BlogPostRepository
     super(blogPostRepository, localStorageService);
   }
 
+  async publishDue(now = new Date()): Promise<void> {
+    const repository = await this.getRepository();
+    await repository.manager.query(
+      `UPDATE blog_post SET status = 'PUBLISHED', updated_at = now()
+        WHERE status = 'SCHEDULED' AND publish_date <= $1 AND deleted_at IS NULL`,
+      [now],
+    );
+  }
+
+  async replaceHighlight(from: BlogPostHighlight, to: BlogPostHighlight, exceptId: string): Promise<void> {
+    const repository = await this.getRepository();
+    await repository.manager.query(
+      `UPDATE blog_post SET highlight = $2, updated_at = now()
+        WHERE highlight = $1 AND id <> $3 AND deleted_at IS NULL`,
+      [from, to, exceptId],
+    );
+  }
+
   async findBySlug(slug: string): Promise<BlogPost> {
     const repository = await this.getRepository();
     return repository.findOne({
@@ -34,6 +52,7 @@ export class BlogPostRepository
   }
 
   async findPublishedBySlug(slug: string): Promise<BlogPost> {
+    await this.publishDue();
     const repository = await this.getRepository();
     return repository.findOne({
       where: { slug, status: BlogPostStatus.PUBLISHED } as FindOptionsWhere<BlogPost>,
@@ -99,6 +118,7 @@ export class BlogPostRepository
     search: string | undefined,
     pagination: PaginationParams
   ): Promise<PaginatedResult<BlogPost>> {
+    await this.publishDue();
     const repository = await this.getRepository();
     const queryBuilder = repository.createQueryBuilder('blog_post');
     queryBuilder.leftJoinAndSelect('blog_post.categories', 'categories');
@@ -142,6 +162,7 @@ export class BlogPostRepository
     filters: BlogPostFilters,
     pagination: PaginationParams
   ): Promise<PaginatedResult<BlogPost>> {
+    await this.publishDue();
     const repository = await this.getRepository();
     const queryBuilder = repository.createQueryBuilder('blog_post');
     queryBuilder.leftJoinAndSelect('blog_post.categories', 'categories');
@@ -162,12 +183,20 @@ export class BlogPostRepository
       );
     }
 
+    if (filters.categoryId) {
+      queryBuilder.andWhere(
+        'EXISTS (SELECT 1 FROM blog_post_categories pc WHERE pc.post_id = blog_post.id AND pc.category_id = :categoryId)',
+        { categoryId: filters.categoryId },
+      );
+    }
+
     // Aplicar paginação
     const offset = (pagination.page - 1) * pagination.limit;
     queryBuilder.skip(offset).take(pagination.limit);
 
-    // Ordenar por data de criação (mais recentes primeiro)
-    queryBuilder.orderBy('blog_post.createdAt', 'DESC');
+    if (filters.sort === 'oldest') queryBuilder.orderBy('blog_post.updatedAt', 'ASC');
+    else if (filters.sort === 'title') queryBuilder.orderBy('blog_post.title', 'ASC');
+    else queryBuilder.orderBy('blog_post.updatedAt', 'DESC');
 
     // Executar consulta
     const [data, total] = await queryBuilder.getManyAndCount();

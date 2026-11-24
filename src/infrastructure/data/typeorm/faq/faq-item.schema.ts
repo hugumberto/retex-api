@@ -24,6 +24,16 @@ export const faqItemSchema = new EntitySchema<FaqItem>({
       type: 'text',
       nullable: false,
     },
+    visible: {
+      type: 'boolean',
+      nullable: false,
+      default: true,
+    },
+    position: {
+      type: 'integer',
+      nullable: false,
+      default: 0,
+    },
     ...BaseTimestampColumns,
   },
   relations: {

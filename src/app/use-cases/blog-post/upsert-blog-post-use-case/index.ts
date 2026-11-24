@@ -1,4 +1,5 @@
-import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BlogPostHighlight } from '../../../../domain/blog-post/blog-post-highlight.enum';
 import { BlogCategory } from '../../../../domain/blog-post/blog-category.entity';
 import { IBlogCategoryRepository } from '../../../../domain/blog-post/blog-category.repository';
 import { BlogPostStatus } from '../../../../domain/blog-post/blog-post-status.enum';
@@ -17,9 +18,48 @@ export class UpsertBlogPostUseCase implements IUseCase<UpsertBlogPostDto, BlogPo
     private readonly blogCategoryRepository: IBlogCategoryRepository,
   ) { }
 
-  async call(param: UpsertBlogPostDto): Promise<BlogPost> {
+  async call(param: UpsertBlogPostDto, now = new Date()): Promise<BlogPost> {
     // Resolve as categorias (quando enviadas) para entidades existentes.
     const categories = await this.resolveCategories(param.categoryIds);
+    const post = await this.save(param, categories, now);
+    // Destaque principal: só um artigo de cada vez; o anterior passa a secundário.
+    if (param.highlight === BlogPostHighlight.HIGHLIGHTED) {
+      await this.blogPostRepository.replaceHighlight(
+        BlogPostHighlight.HIGHLIGHTED,
+        BlogPostHighlight.FEATURED,
+        post.id,
+      );
+    }
+    return post;
+  }
+
+  /** Estado e data de publicação a gravar, a partir do pedido e do que o artigo já tinha. */
+  private publication(
+    param: UpsertBlogPostDto,
+    existing: BlogPost | null,
+    now: Date,
+  ): Pick<BlogPost, 'status' | 'publishDate'> {
+    const status = param.status ?? existing?.status ?? BlogPostStatus.DRAFT;
+    if (status === BlogPostStatus.SCHEDULED) {
+      const date = param.publishDate ? new Date(param.publishDate) : existing?.publishDate;
+      if (!date || new Date(date).getTime() <= now.getTime()) {
+        throw new BadRequestException('errors.blogPost.scheduleInPast');
+      }
+      return { status, publishDate: new Date(date) };
+    }
+    if (status === BlogPostStatus.PUBLISHED) {
+      // Mantém a data de quando foi publicado pela primeira vez.
+      const keep = existing?.status === BlogPostStatus.PUBLISHED && existing.publishDate;
+      return { status, publishDate: keep ? existing.publishDate : now };
+    }
+    return { status, publishDate: existing?.status === BlogPostStatus.DRAFT ? existing.publishDate ?? null : null };
+  }
+
+  private async save(
+    param: UpsertBlogPostDto,
+    categories: BlogCategory[] | undefined,
+    now: Date,
+  ): Promise<BlogPost> {
 
     // Se tem ID, é update
     if (param.id) {
@@ -34,8 +74,8 @@ export class UpsertBlogPostUseCase implements IUseCase<UpsertBlogPostDto, BlogPo
         throw new ConflictException('errors.blogPost.duplicateSlug');
       }
 
-      // Atualizar post existente — preservar o estado atual: editar (ex.: corrigir
-      // um typo) não deve despublicar silenciosamente um post PUBLISHED.
+      // Sem `status`, preserva o estado atual: editar (ex.: corrigir um typo)
+      // não deve despublicar silenciosamente um post PUBLISHED.
       const updatedPosts = await this.blogPostRepository.update(
         { id: param.id },
         {
@@ -43,9 +83,11 @@ export class UpsertBlogPostUseCase implements IUseCase<UpsertBlogPostDto, BlogPo
           slug: param.slug,
           title: param.title,
           hero: param.hero,
-          status: existingPost.status,
           highlight: param.highlight,
           tags: param.tags,
+          ...(param.summary !== undefined ? { summary: param.summary?.trim() || null } : {}),
+          ...(param.heroAlt !== undefined ? { heroAlt: param.heroAlt?.trim() || null } : {}),
+          ...this.publication(param, existingPost, now),
         }
       );
 
@@ -70,10 +112,12 @@ export class UpsertBlogPostUseCase implements IUseCase<UpsertBlogPostDto, BlogPo
       slug: param.slug,
       title: param.title,
       hero: param.hero,
-      status: BlogPostStatus.DRAFT,
       highlight: param.highlight,
       tags: param.tags,
+      summary: param.summary?.trim() || null,
+      heroAlt: param.heroAlt?.trim() || null,
       categories: categories ?? [],
+      ...this.publication(param, null, now),
     };
 
     return this.blogPostRepository.create(newPost);

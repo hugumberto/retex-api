@@ -11,6 +11,7 @@ import { slugify } from '../slugify';
 interface CreateBlogCategoryParam {
   title: string;
   status?: BlogCategoryStatus;
+  description?: string | null;
 }
 
 @Injectable()
@@ -33,6 +34,8 @@ export class CreateBlogCategoryUseCase
       title: param.title,
       slug,
       status: param.status ?? BlogCategoryStatus.ACTIVE,
+      description: param.description?.trim() || null,
+      position: await this.blogCategoryRepository.nextPosition(),
     });
   }
 }

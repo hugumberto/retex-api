@@ -8,10 +8,12 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { ReorderBlogCategoriesUseCase } from '../../app/use-cases/blog-category/reorder-blog-categories-use-case';
 import { CreateBlogCategoryUseCase } from '../../app/use-cases/blog-category/create-blog-category-use-case';
 import { DeleteBlogCategoryUseCase } from '../../app/use-cases/blog-category/delete-blog-category-use-case';
 import { GetAllBlogCategoriesUseCase } from '../../app/use-cases/blog-category/get-all-blog-categories-use-case';
@@ -26,11 +28,17 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 class CreateBlogCategoryDto {
   @IsString() @IsNotEmpty() title: string;
   @IsEnum(BlogCategoryStatus) @IsOptional() status?: BlogCategoryStatus;
+  @IsString() @IsOptional() @MaxLength(500) description?: string | null;
 }
 
 class UpdateBlogCategoryDto {
   @IsString() @IsOptional() title?: string;
   @IsEnum(BlogCategoryStatus) @IsOptional() status?: BlogCategoryStatus;
+  @IsString() @IsOptional() @MaxLength(500) description?: string | null;
+}
+
+class ReorderBlogCategoriesDto {
+  @IsArray() @ArrayMaxSize(200) @IsUUID('4', { each: true }) ids: string[];
 }
 
 @ApiTags('blog-categories')
@@ -41,6 +49,7 @@ export class BlogCategoryController {
     private readonly createBlogCategoryUseCase: CreateBlogCategoryUseCase,
     private readonly updateBlogCategoryUseCase: UpdateBlogCategoryUseCase,
     private readonly deleteBlogCategoryUseCase: DeleteBlogCategoryUseCase,
+    private readonly reorderBlogCategoriesUseCase: ReorderBlogCategoriesUseCase,
   ) {}
 
   @Get('public')
@@ -66,6 +75,17 @@ export class BlogCategoryController {
   @ApiOperation({ summary: 'Criar categoria' })
   create(@Body() dto: CreateBlogCategoryDto) {
     return this.createBlogCategoryUseCase.call(dto);
+  }
+
+  // Antes de `:id`.
+  @Put('order')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Ordem das categorias no site' })
+  reorder(@Body() dto: ReorderBlogCategoriesDto) {
+    return this.reorderBlogCategoriesUseCase.call({ ids: dto.ids });
   }
 
   @Patch(':id')

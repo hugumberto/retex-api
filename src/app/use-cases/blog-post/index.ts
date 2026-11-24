@@ -5,6 +5,7 @@ import { GetPublicBlogPostBySlugUseCase } from './get-public-blog-post-by-slug-u
 import { GetPublicBlogPostsUseCase } from './get-public-blog-posts-use-case';
 import { PublishBlogPostUseCase } from './publish-blog-post-use-case';
 import { UpsertBlogPostUseCase } from './upsert-blog-post-use-case';
+import { SetBlogPostHighlightUseCase } from './set-blog-post-highlight-use-case';
 
 export const BLOG_POST_USE_CASES = [
   UpsertBlogPostUseCase,
@@ -14,4 +15,5 @@ export const BLOG_POST_USE_CASES = [
   GetPublicBlogPostBySlugUseCase,
   GetAllBlogPostsUseCase,
   GetBlogPostByIdUseCase,
+  SetBlogPostHighlightUseCase,
 ];

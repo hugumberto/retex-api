@@ -10,6 +10,8 @@ export interface FaqCategory {
   title: string;
   description: string;
   status: FaqStatus;
+  // Ordem dos grupos no site (0, 1, 2…).
+  position: number;
   items?: FaqItem[];
   createdAt: Date;
   updatedAt: Date;

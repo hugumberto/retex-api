@@ -9,9 +9,16 @@ export interface BlogPostFilters {
   status?: BlogPostStatus;
   highlight?: BlogPostHighlight;
   search?: string;
+  categoryId?: string;
+  // Por omissão, os atualizados mais recentemente primeiro.
+  sort?: 'recent' | 'oldest' | 'title';
 }
 
 export interface IBlogPostRepository extends IRepository<BlogPost> {
+  /** Passa a publicados os agendados cuja data já chegou. */
+  publishDue(now?: Date): Promise<void>;
+  /** Muda o destaque `from` para `to` em todos os artigos menos `exceptId`. */
+  replaceHighlight(from: BlogPostHighlight, to: BlogPostHighlight, exceptId: string): Promise<void>;
   findBySlug(slug: string): Promise<BlogPost>;
   findPublishedBySlug(slug: string): Promise<BlogPost>;
   findByIdWithCategories(id: string): Promise<BlogPost>;

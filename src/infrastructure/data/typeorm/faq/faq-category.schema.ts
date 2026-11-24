@@ -25,6 +25,11 @@ export const faqCategorySchema = new EntitySchema<FaqCategory>({
       nullable: false,
       default: FaqStatus.ACTIVE,
     },
+    position: {
+      type: 'integer',
+      nullable: false,
+      default: 0,
+    },
     ...BaseTimestampColumns,
   },
   relations: {

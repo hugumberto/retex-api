@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsEnum, IsIn, IsNumber, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
 import { BlogPostHighlight } from '../../../../domain/blog-post/blog-post-highlight.enum';
 import { BlogPostStatus } from '../../../../domain/blog-post/blog-post-status.enum';
 
@@ -15,6 +15,14 @@ export class GetAllBlogPostsDto {
   @IsOptional()
   @IsString({ message: 'Busca deve ser uma string' })
   search?: string;
+
+  @IsOptional()
+  @IsUUID('4')
+  categoryId?: string;
+
+  @IsOptional()
+  @IsIn(['recent', 'oldest', 'title'])
+  sort?: 'recent' | 'oldest' | 'title';
 
   @IsOptional()
   @Type(() => Number)

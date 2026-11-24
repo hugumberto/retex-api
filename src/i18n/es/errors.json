@@ -97,15 +97,19 @@
   "category": {
     "notFound": "Categoría no encontrada",
     "someNotFound": "No se han encontrado una o más categorías",
-    "duplicateName": "Ya existe una categoría con este nombre"
+    "duplicateName": "Ya existe una categoría con este nombre",
+    "hasPosts": "Esta categoría tiene artículos. Ocúltala o cambia primero los artículos de categoría.",
+    "invalidOrder": "El orden enviado no corresponde a las categorías."
   },
   "blogPost": {
     "notFound": "Artículo no encontrado",
-    "duplicateSlug": "Ya existe un artículo con este slug"
+    "duplicateSlug": "Ya existe un artículo con este slug",
+    "scheduleInPast": "La fecha de publicación tiene que ser futura."
   },
   "faq": {
     "categoryNotFound": "Categoría de FAQ no encontrada",
-    "itemNotFound": "Elemento de FAQ no encontrado"
+    "itemNotFound": "Elemento de FAQ no encontrado",
+    "invalidOrder": "El orden enviado no corresponde a lo que existe."
   },
   "testZone": {
     "notFound": "Zona no encontrada",

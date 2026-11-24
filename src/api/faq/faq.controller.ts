@@ -8,9 +8,11 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { ReorderFaqUseCase } from '../../app/use-cases/faq/reorder-faq-use-case';
 import { CreateFaqCategoryUseCase } from '../../app/use-cases/faq/create-faq-category-use-case';
 import { CreateFaqItemUseCase } from '../../app/use-cases/faq/create-faq-item-use-case';
 import { DeleteFaqCategoryUseCase } from '../../app/use-cases/faq/delete-faq-category-use-case';
@@ -28,7 +30,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 
 class CreateFaqCategoryDto {
   @IsString() @IsNotEmpty() title: string;
-  @IsString() @IsNotEmpty() description: string;
+  @IsString() @IsOptional() description?: string;
   @IsEnum(FaqStatus) @IsOptional() status?: FaqStatus;
 }
 
@@ -41,11 +43,18 @@ class UpdateFaqCategoryDto {
 class CreateFaqItemDto {
   @IsString() @IsNotEmpty() title: string;
   @IsString() @IsNotEmpty() description: string;
+  @IsBoolean() @IsOptional() visible?: boolean;
 }
 
 class UpdateFaqItemDto {
   @IsString() @IsOptional() title?: string;
   @IsString() @IsOptional() description?: string;
+  @IsBoolean() @IsOptional() visible?: boolean;
+  @IsUUID('4') @IsOptional() categoryId?: string;
+}
+
+class ReorderFaqDto {
+  @IsArray() @ArrayMaxSize(500) @IsUUID('4', { each: true }) ids: string[];
 }
 
 @Controller('faq')
@@ -59,6 +68,7 @@ export class FaqController {
     private readonly createFaqItemUseCase: CreateFaqItemUseCase,
     private readonly updateFaqItemUseCase: UpdateFaqItemUseCase,
     private readonly deleteFaqItemUseCase: DeleteFaqItemUseCase,
+    private readonly reorderFaqUseCase: ReorderFaqUseCase,
   ) {}
 
   @Get()
@@ -72,6 +82,24 @@ export class FaqController {
   @Roles(Role.ADMIN, Role.OPS)
   getAll() {
     return this.getAllFaqCategoriesUseCase.call();
+  }
+
+  // Ordem dos grupos.
+  @Put('order')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.OPS)
+  reorderCategories(@Body() dto: ReorderFaqDto) {
+    return this.reorderFaqUseCase.call({ ids: dto.ids });
+  }
+
+  // Ordem das perguntas de um grupo.
+  @Put('category/:id/order')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.OPS)
+  reorderItems(@Param('id') id: string, @Body() dto: ReorderFaqDto) {
+    return this.reorderFaqUseCase.call({ categoryId: id, ids: dto.ids });
   }
 
   @Post('category')

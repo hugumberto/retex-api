@@ -25,7 +25,26 @@ export class FaqItemRepository
     const repository = await this.getRepository();
     return repository.find({
       where: { categoryId },
-      order: { createdAt: 'ASC' },
+      order: { position: 'ASC', createdAt: 'ASC' },
     });
+  }
+
+  async nextPosition(categoryId: string): Promise<number> {
+    const repository = await this.getRepository();
+    const [row] = await repository.manager.query(
+      `SELECT COALESCE(MAX(position) + 1, 0) AS next FROM faq_item WHERE category_id = $1 AND deleted_at IS NULL`,
+      [categoryId],
+    );
+    return Number(row?.next ?? 0);
+  }
+
+  async reorder(categoryId: string, ids: string[]): Promise<void> {
+    const repository = await this.getRepository();
+    await repository.manager.query(
+      `UPDATE faq_item i SET position = o.ord - 1, updated_at = now()
+         FROM unnest($2::uuid[]) WITH ORDINALITY AS o(id, ord)
+        WHERE i.id = o.id AND i.category_id = $1`,
+      [categoryId, ids],
+    );
   }
 }
