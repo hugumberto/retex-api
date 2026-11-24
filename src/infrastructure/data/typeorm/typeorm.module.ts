@@ -6,6 +6,7 @@ import { blogPostSchema } from './blog-post/blog-post.schema';
 import { brandSchema } from './brand/brand.schema';
 import { vehicleSchema } from './vehicle/vehicle.schema';
 import { warehouseOutboundSchema } from './warehouse/warehouse-outbound.schema';
+import { triageEventSchema, triageStationSchema } from './triage-station/triage-station.schema';
 import { emailLogSchema } from './email-log/email-log.schema';
 import { TEST_DATABASE_CONFIG } from './config/typeorm-test.config';
 import { DATABASE_CONFIG } from './config/typeorm.config';
@@ -37,6 +38,8 @@ import { userSchema } from './user/user.schema';
       brandSchema,
       vehicleSchema,
       warehouseOutboundSchema,
+      triageStationSchema,
+      triageEventSchema,
       itemSchema,
       collectionRequestSchema,
       routeSchema,

@@ -115,7 +115,10 @@
     "requestNotFoundForCode": "No request found for the given code",
     "qrCodeNotLinked": "The QR code is not linked to a request",
     "requestNotInTriage": "The request is not in collection/triage",
-    "bagWithoutItems": "A bag cannot be closed without any registered items"
+    "bagWithoutItems": "A bag cannot be closed without any registered items",
+    "requestNotFound": "Request not found.",
+    "notTriageable": "This request is not waiting for sorting.",
+    "invalidStation": "Invalid station."
   },
   "systemParameter": {
     "qrLargerThanLabel": "The QR does not fit the label at the given size"

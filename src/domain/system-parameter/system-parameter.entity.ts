@@ -39,4 +39,6 @@ export interface SystemParameter extends Entity {
   zoneReuseCapacityKg: number
   zoneUpcyclingCapacityKg: number
   zoneRecyclingCapacityKg: number
+  /** Meta de peças por hora em cada posto de triagem. */
+  triageTargetPerHour: number
 }
